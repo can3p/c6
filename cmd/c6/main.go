@@ -1,8 +1,15 @@
 package main
 
-import "github.com/c9s/c6/runtime"
-import "github.com/spf13/cobra"
-import "fmt"
+import (
+	"fmt"
+	"io"
+	"os"
+
+	"github.com/c9s/c6/compiler"
+	"github.com/c9s/c6/parser"
+	"github.com/c9s/c6/runtime"
+	"github.com/spf13/cobra"
+)
 
 func main() {
 	var rootCmd = &cobra.Command{
@@ -29,9 +36,12 @@ func main() {
 		Short: "Compile some scss files",
 		// Long:  "",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Run compile!")
-
-			_ = runtime.NewContext()
+			var context = runtime.NewContext()
+			var parser = parser.NewParser(context)
+			content, _ := io.ReadAll(os.Stdin)
+			var stmts = parser.ParseScss(string(content))
+			var compiler = compiler.NewCompactCompiler(context)
+			fmt.Println(compiler.CompileString(stmts))
 		},
 	}
 	rootCmd.AddCommand(compileCmd)
