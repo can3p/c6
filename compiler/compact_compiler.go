@@ -63,7 +63,7 @@ func (compiler *CompactCompiler) CompileComplexSelectorList(selectorList *ast.Co
 
 func (compiler *CompactCompiler) CompileDeclBlock(block *ast.DeclBlock) (out string) {
 	out += "{"
-	for _, stm := range *block.Stmts {
+	for _, stm := range block.Stmts.Stmts {
 		out += stm.String()
 	}
 	out += "}"
@@ -89,18 +89,18 @@ func (compiler *CompactCompiler) CompileStmt(anyStm ast.Stmt) string {
 	panic("Unsupported compilation")
 }
 
-func (compiler *CompactCompiler) CompileString(any interface{}) string {
-	return compiler.Compile(any).String()
+func (compiler *CompactCompiler) CompileString(in interface{}) string {
+	return compiler.Compile(in).String()
 }
 
 func (compiler *CompactCompiler) Compile(any interface{}) *bytes.Buffer {
 	switch v := any.(type) {
 	case ast.StmtList:
-		for _, stm := range v {
+		for _, stm := range v.Stmts {
 			compiler.Buffer.WriteString(compiler.CompileStmt(stm))
 		}
 	case *ast.StmtList:
-		for _, stm := range *v {
+		for _, stm := range v.Stmts {
 			compiler.Buffer.WriteString(compiler.CompileStmt(stm))
 		}
 	}

@@ -91,7 +91,7 @@ func (parser *Parser) ParseStmts() *ast.StmtList {
 	// stop at t_brace end
 	for !parser.eof() {
 		if stm := parser.ParseStmt(); stm != nil {
-			*stmts = append(*stmts, stm)
+			stmts.Append(stm)
 		} else {
 			break
 		}
