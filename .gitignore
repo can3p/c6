@@ -1,3 +1,4 @@
 *.cov
 benchmarks/new.txt
 vendor
+main
