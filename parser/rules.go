@@ -1186,7 +1186,9 @@ func (parser *Parser) ParseDeclBlock() *ast.DeclBlock {
 			var property = ast.NewProperty(tok)
 
 			if valueList := parser.ParsePropertyValue(parentRuleSet, property); valueList != nil {
-				// property.Values = valueList
+				for _, v := range valueList.Exprs {
+					property.AppendValue(v)
+				}
 			}
 			declBlock.Append(property)
 
