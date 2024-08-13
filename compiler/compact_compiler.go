@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"bytes"
+
 	"github.com/c9s/c6/ast"
 	"github.com/c9s/c6/runtime"
 )
@@ -62,10 +63,8 @@ func (compiler *CompactCompiler) CompileComplexSelectorList(selectorList *ast.Co
 
 func (compiler *CompactCompiler) CompileDeclBlock(block *ast.DeclBlock) (out string) {
 	out += "{"
-	if block.Stmts != nil {
-		for _, stm := range *block.Stmts {
-			_ = stm
-		}
+	for _, stm := range *block.Stmts {
+		out += stm.String()
 	}
 	out += "}"
 	return out
