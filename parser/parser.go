@@ -6,6 +6,7 @@ package parser
 
 import (
 	"fmt"
+	"io/fs"
 	"path/filepath"
 
 	"github.com/c9s/c6/ast"
@@ -41,6 +42,8 @@ type Parser struct {
 	GlobalContext *runtime.Context
 	ContextStack  []runtime.Context
 
+	fsys fs.FS
+
 	File *ast.File
 
 	// file content
@@ -70,30 +73,31 @@ func NewParser(context *runtime.Context) *Parser {
 	}
 }
 
-func (parser *Parser) ParseFile(path string) error {
+func (parser *Parser) ParseFile(fsys fs.FS, path string) (*ast.StmtList, error) {
 	ext := filepath.Ext(path)
 	filetype := getFileTypeByExtension(ext)
 
-	f, err := ast.NewFile(path)
+	f, err := ast.NewFile(fsys, path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	data, err := f.ReadFile()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	parser.Content = string(data)
 	parser.File = f
 
+	var stmts *ast.StmtList
+
 	switch filetype {
 	case ScssFileType:
-		parser.ParseScss(parser.Content)
-		break
+		stmts = parser.ParseScss(parser.Content)
 	default:
-		return fmt.Errorf("Unsupported file format: %s", path)
+		return nil, fmt.Errorf("Unsupported file format: %s", path)
 	}
-	return nil
+	return stmts, nil
 }
 
 func (parser *Parser) backup() {

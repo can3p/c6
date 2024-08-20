@@ -21,7 +21,7 @@ var HttpUrlPattern = regexp.MustCompile("^https?://")
 var AbsoluteUrlPattern = regexp.MustCompile("^[a-zA-Z]+?://")
 
 func (parser *Parser) ReadFile(file string) error {
-	f, err := ast.NewFile(file)
+	f, err := ast.NewFile(parser.fsys, file)
 	if err != nil {
 		return err
 	}
