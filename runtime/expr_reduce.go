@@ -21,46 +21,59 @@ The difference between Evaluate*Expr method is:
 
 - `ReduceExpr` returns either value or expression (when there is an unsolved expression)
 - `EvaluateBinaryExpr` returns nil if there is an unsolved expression.
-
 */
-func ReduceExpr(expr ast.Expr, context *Context) (ast.Value, bool) {
+func ReduceExpr(expr ast.Expr, context *Context) (ast.Value, bool, error) {
 	switch e := expr.(type) {
 	case *ast.BinaryExpr:
-		if exprLeft, ok := ReduceExpr(e.Left, context); ok {
+		if exprLeft, ok, err := ReduceExpr(e.Left, context); err != nil {
+			return nil, false, err
+		} else if ok {
 			e.Left = exprLeft
 		}
-		if exprRight, ok := ReduceExpr(e.Right, context); ok {
+		if exprRight, ok, err := ReduceExpr(e.Right, context); err != nil {
+			return nil, false, err
+		} else if ok {
 			e.Right = exprRight
 		}
 
 	case *ast.UnaryExpr:
 
-		if retExpr, ok := ReduceExpr(e.Expr, context); ok {
+		if retExpr, ok, err := ReduceExpr(e.Expr, context); err != nil {
+			return nil, false, err
+		} else if ok {
 			e.Expr = retExpr
 		}
 
 	case *ast.Variable:
 		if context == nil {
-			return nil, false
+			return nil, false, nil
 		}
 
 		if varVal, ok := context.GetVariable(e.Name); ok {
-			return varVal.(ast.Expr), true
+			return varVal.(ast.Expr), true, nil
 		}
 
 	default:
 		// it's already an constant value
-		return e, true
+		return e, true, nil
 	}
 
 	if IsSimpleExpr(expr) {
 		switch e := expr.(type) {
 		case *ast.BinaryExpr:
-			return EvaluateBinaryExpr(e, context), true
+			rs, err := EvaluateBinaryExpr(e, context)
+			if err != nil {
+				return nil, false, err
+			}
+			return rs, true, nil
 		case *ast.UnaryExpr:
-			return EvaluateUnaryExpr(e, context), true
+			rs, err := EvaluateUnaryExpr(e, context)
+			if err != nil {
+				return nil, false, err
+			}
+			return rs, true, nil
 		}
 	}
 	// not a constant expression
-	return nil, false
+	return nil, false, nil
 }

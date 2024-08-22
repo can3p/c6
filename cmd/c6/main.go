@@ -64,11 +64,15 @@ func main() {
 			var parser = parser.NewParser(context)
 			content, _ := io.ReadAll(os.Stdin)
 
-			var stmts = parser.ParseScss(string(content))
+			stmts, err := parser.ParseScss(string(content))
+			if err != nil {
+				return err
+			}
+
 			var b bytes.Buffer
 			var compiler = compiler.NewPrettyCompiler(context, &b)
 
-			err := compiler.Compile(stmts)
+			err = compiler.Compile(stmts)
 
 			if err != nil {
 				return err

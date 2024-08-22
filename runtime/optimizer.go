@@ -2,14 +2,17 @@ package runtime
 
 import "github.com/c9s/c6/ast"
 
-func OptimizeIfStmt(parentBlock *ast.Block, stm *ast.IfStmt) {
+func OptimizeIfStmt(parentBlock *ast.Block, stm *ast.IfStmt) error {
 
 	// TODO: select passed condition and merge block
 	// try to simplify the condition without context and symbol table
 
 	var mergeBlock = false
 	var ignoreBlock = false
-	var val = EvaluateExprInBooleanContext(stm.Condition, nil)
+	val, err := EvaluateExprInBooleanContext(stm.Condition, nil)
+	if err != nil {
+		return err
+	}
 	// check if the expression is evaluated
 	if IsValue(val) {
 		if b, ok := val.(ast.BooleanValue); ok {
@@ -27,4 +30,5 @@ func OptimizeIfStmt(parentBlock *ast.Block, stm *ast.IfStmt) {
 
 	}
 
+	return nil
 }

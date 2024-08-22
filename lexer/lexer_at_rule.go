@@ -2,8 +2,9 @@ package lexer
 
 import (
 	"fmt"
-	"github.com/c9s/c6/ast"
 	"unicode"
+
+	"github.com/c9s/c6/ast"
 )
 
 /*
@@ -11,15 +12,23 @@ Currently the @import rule only supports '@import url(...) media;
 
 @see https://developer.mozilla.org/en-US/docs/Web/CSS/@import for more @import syntax support
 */
-func lexAtRule(l *Lexer) stateFn {
+func lexAtRule(l *Lexer) (stateFn, error) {
 	var tok = l.matchKeywordList(ast.KeywordList)
 	if tok != nil {
 		switch tok.Type {
 		case ast.T_IMPORT:
 			l.ignoreSpaces()
-			for fn := lexExpr(l); fn != nil; fn = lexExpr(l) {
+			for {
+				fn, err := lexExpr(l)
+				if err != nil {
+					return nil, err
+				}
+
+				if fn == nil {
+					break
+				}
 			}
-			return lexStart
+			return lexStart, nil
 
 		case ast.T_PAGE:
 			l.ignoreSpaces()
@@ -28,56 +37,95 @@ func lexAtRule(l *Lexer) stateFn {
 			if l.peek() == ':' {
 				lexPseudoSelector(l)
 			}
-			return lexStart
+			return lexStart, nil
 
 		case ast.T_MEDIA:
-			for fn := lexExpr(l); fn != nil; fn = lexExpr(l) {
+			for {
+				fn, err := lexExpr(l)
+				if err != nil {
+					return nil, err
+				}
+
+				if fn == nil {
+					break
+				}
 			}
-			return lexStart
+			return lexStart, nil
 
 		case ast.T_CHARSET:
 			l.ignoreSpaces()
-			return lexStart
+			return lexStart, nil
 
 		case ast.T_IF:
 
-			for fn := lexExpr(l); fn != nil; fn = lexExpr(l) {
+			for {
+				fn, err := lexExpr(l)
+				if err != nil {
+					return nil, err
+				}
+
+				if fn == nil {
+					break
+				}
 			}
-			return lexStart
+			return lexStart, nil
 
 		case ast.T_ELSE_IF:
 
-			for fn := lexExpr(l); fn != nil; fn = lexExpr(l) {
+			for {
+				fn, err := lexExpr(l)
+				if err != nil {
+					return nil, err
+				}
+
+				if fn == nil {
+					break
+				}
 			}
-			return lexStart
+			return lexStart, nil
 
 		case ast.T_ELSE:
 
-			return lexStart
+			return lexStart, nil
 
 		case ast.T_FOR:
 
-			return lexForStmt
+			return lexForStmt, nil
 
 		case ast.T_WHILE:
+			for {
+				fn, err := lexExpr(l)
+				if err != nil {
+					return nil, err
+				}
 
-			for fn := lexExpr(l); fn != nil; fn = lexExpr(l) {
+				if fn == nil {
+					break
+				}
 			}
-			return lexStart
+			return lexStart, nil
 
 		case ast.T_CONTENT:
-			return lexStart
+			return lexStart, nil
 
 		case ast.T_EXTEND:
-			return lexSelectors
+			return lexSelectors, nil
 
 		case ast.T_FUNCTION, ast.T_RETURN, ast.T_MIXIN, ast.T_INCLUDE:
-			for fn := lexExpr(l); fn != nil; fn = lexExpr(l) {
+			for {
+				fn, err := lexExpr(l)
+				if err != nil {
+					return nil, err
+				}
+
+				if fn == nil {
+					break
+				}
 			}
-			return lexStart
+			return lexStart, nil
 
 		case ast.T_FONT_FACE:
-			return lexStart
+			return lexStart, nil
 
 		default:
 			var r = l.next()
@@ -85,8 +133,8 @@ func lexAtRule(l *Lexer) stateFn {
 				r = l.next()
 			}
 			l.backup()
-			panic(fmt.Errorf("Unsupported at-rule directive '%s' %s", l.current(), tok))
+			return nil, fmt.Errorf("Unsupported at-rule directive '%s' %s", l.current(), tok)
 		}
 	}
-	return nil
+	return nil, nil
 }

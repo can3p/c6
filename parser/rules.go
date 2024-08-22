@@ -6,7 +6,7 @@ package parser
 
 import (
 	"fmt"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -56,10 +56,10 @@ func (parser *Parser) ParseScssFile(file string) (*ast.StmtList, error) {
 		parser.Tokens = append(parser.Tokens, tok)
 	}
 	l.Close()
-	return parser.ParseStmts(), nil
+	return parser.ParseStmts()
 }
 
-func (parser *Parser) ParseScss(code string) *ast.StmtList {
+func (parser *Parser) ParseScss(code string) (*ast.StmtList, error) {
 	l := lexer.NewLexerWithString(code)
 	parser.Input = l.TokenStream()
 
@@ -77,33 +77,44 @@ func (parser *Parser) ParseScss(code string) *ast.StmtList {
 /*
 ParseBlock method allows root level statements, which does not allow css properties.
 */
-func (parser *Parser) ParseBlock() *ast.Block {
+func (parser *Parser) ParseBlock() (*ast.Block, error) {
 	debug("ParseBlock")
-	parser.expect(ast.T_BRACE_OPEN)
+	if _, err := parser.expect(ast.T_BRACE_OPEN); err != nil {
+		return nil, err
+	}
 	var block = ast.NewBlock()
-	block.Stmts = parser.ParseStmts()
-	parser.expect(ast.T_BRACE_CLOSE)
-	return block
+	st, err := parser.ParseStmts()
+	if err != nil {
+		return nil, err
+	}
+
+	block.Stmts = st
+	if _, err := parser.expect(ast.T_BRACE_CLOSE); err != nil {
+		return nil, err
+	}
+	return block, nil
 }
 
-func (parser *Parser) ParseStmts() *ast.StmtList {
+func (parser *Parser) ParseStmts() (*ast.StmtList, error) {
 	var stmts = new(ast.StmtList)
 	// stop at t_brace end
 	for !parser.eof() {
-		if stm := parser.ParseStmt(); stm != nil {
+		if stm, err := parser.ParseStmt(); err != nil {
+			return nil, err
+		} else if stm != nil {
 			stmts.Append(stm)
 		} else {
 			break
 		}
 	}
-	return stmts
+	return stmts, nil
 }
 
-func (parser *Parser) ParseStmt() ast.Stmt {
+func (parser *Parser) ParseStmt() (ast.Stmt, error) {
 	var token = parser.peek()
 
 	if token == nil {
-		return nil
+		return nil, nil
 	}
 
 	switch token.Type {
@@ -138,29 +149,35 @@ func (parser *Parser) ParseStmt() ast.Stmt {
 	case ast.T_ERROR, ast.T_WARN, ast.T_INFO:
 		return parser.ParseLogStmt()
 	case ast.T_BRACKET_CLOSE:
-		return nil
+		return nil, nil
 	}
 
 	if token.IsSelector() {
 
 		return parser.ParseRuleSet()
-
-	} else {
-
-		// panic(fmt.Errorf("statement parse failed, unknown token", parser.peek()))
-
 	}
-	return nil
+	return nil, fmt.Errorf("statement parse failed, unknown token [%s]", parser.peek())
 }
 
-func (parser *Parser) ParseIfStmt() ast.Stmt {
-	parser.expect(ast.T_IF)
-	condition := parser.ParseCondition()
-	if condition == nil {
-		panic("if statement syntax error")
+func (parser *Parser) ParseIfStmt() (ast.Stmt, error) {
+	if _, err := parser.expect(ast.T_IF); err != nil {
+		return nil, err
 	}
 
-	var block = parser.ParseDeclBlock()
+	condition, err := parser.ParseCondition()
+	if err != nil {
+		return nil, err
+	}
+
+	if condition == nil {
+		return nil, fmt.Errorf("if statement syntax error")
+	}
+
+	block, err := parser.ParseDeclBlock()
+	if err != nil {
+		return nil, err
+	}
+
 	var stm = ast.NewIfStmt(condition, block)
 
 	// TODO: OptimizeIfStmt(...)
@@ -170,9 +187,16 @@ func (parser *Parser) ParseIfStmt() ast.Stmt {
 	for tok != nil && tok.Type == ast.T_ELSE_IF {
 		parser.advance()
 
-		// XXX: handle error here
-		var condition = parser.ParseCondition()
-		var elseifblock = parser.ParseDeclBlock()
+		condition, err := parser.ParseCondition()
+		if err != nil {
+			return nil, err
+		}
+
+		elseifblock, err := parser.ParseDeclBlock()
+		if err != nil {
+			return nil, err
+		}
+
 		var elseIfStm = ast.NewIfStmt(condition, elseifblock)
 		stm.AppendElseIf(elseIfStm)
 		tok = parser.peek()
@@ -183,18 +207,20 @@ func (parser *Parser) ParseIfStmt() ast.Stmt {
 		parser.advance()
 
 		// XXX: handle error here
-		if elseBlock := parser.ParseDeclBlock(); elseBlock != nil {
+		if elseBlock, err := parser.ParseDeclBlock(); err != nil {
+			return nil, err
+		} else if elseBlock != nil {
 			stm.ElseBlock = elseBlock
 		} else {
-			panic(SyntaxError{
+			return nil, SyntaxError{
 				Reason:      "Expecting declaration block { ... }",
 				ActualToken: parser.peek(),
 				File:        parser.File,
-			})
+			}
 		}
 	}
 
-	return stm
+	return stm, nil
 }
 
 /*
@@ -202,96 +228,126 @@ The operator precedence is described here
 
 @see http://introcs.cs.princeton.edu/java/11precedence/
 */
-func (parser *Parser) ParseCondition() ast.Expr {
+func (parser *Parser) ParseCondition() (ast.Expr, error) {
 	debug("ParseCondition")
 
 	// Boolean 'Not'
 	if tok := parser.accept(ast.T_LOGICAL_NOT); tok != nil {
-		var logicexpr = parser.ParseLogicExpr()
-		return ast.NewUnaryExpr(ast.NewOpWithToken(tok), logicexpr)
+		logicexpr, err := parser.ParseLogicExpr()
+		if err != nil {
+			return nil, err
+		}
+
+		return ast.NewUnaryExpr(ast.NewOpWithToken(tok), logicexpr), nil
 	}
 	return parser.ParseLogicExpr()
 }
 
-func (parser *Parser) ParseLogicExpr() ast.Expr {
+func (parser *Parser) ParseLogicExpr() (ast.Expr, error) {
 	debug("ParseLogicExpr")
-	var expr = parser.ParseLogicANDExpr()
+	expr, err := parser.ParseLogicANDExpr()
+	if err != nil {
+		return nil, err
+	}
+
 	for tok := parser.accept(ast.T_LOGICAL_OR); tok != nil; tok = parser.accept(ast.T_LOGICAL_OR) {
-		if subexpr := parser.ParseLogicANDExpr(); subexpr != nil {
+		if subexpr, err := parser.ParseLogicANDExpr(); err != nil {
+			return nil, err
+		} else if subexpr != nil {
 			expr = ast.NewBinaryExpr(ast.NewOpWithToken(tok), expr, subexpr, false)
 		}
 	}
-	return expr
+	return expr, nil
 }
 
-func (parser *Parser) ParseLogicANDExpr() ast.Expr {
+func (parser *Parser) ParseLogicANDExpr() (ast.Expr, error) {
 	debug("ParseLogicANDExpr")
 
-	var expr = parser.ParseComparisonExpr()
+	expr, err := parser.ParseComparisonExpr()
+	if err != nil {
+		return nil, err
+	}
+
 	for tok := parser.accept(ast.T_LOGICAL_AND); tok != nil; tok = parser.accept(ast.T_LOGICAL_AND) {
-		if subexpr := parser.ParseComparisonExpr(); subexpr != nil {
+		if subexpr, err := parser.ParseComparisonExpr(); err != nil {
+			return nil, err
+		} else if subexpr != nil {
 			expr = ast.NewBinaryExpr(ast.NewOpWithToken(tok), expr, subexpr, false)
 		}
 	}
-	return expr
+	return expr, nil
 }
 
-func (parser *Parser) ParseComparisonExpr() ast.Expr {
+func (parser *Parser) ParseComparisonExpr() (ast.Expr, error) {
 	debug("ParseComparisonExpr")
 
 	var expr ast.Expr = nil
+	var err error
 	if parser.accept(ast.T_PAREN_OPEN) != nil {
-		expr = parser.ParseLogicExpr()
-		parser.expect(ast.T_PAREN_CLOSE)
+		expr, err = parser.ParseLogicExpr()
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
+			return nil, err
+		}
 	} else {
-		expr = parser.ParseExpr(false)
+		expr, err = parser.ParseExpr(false)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var tok = parser.peek()
 	for tok != nil && tok.IsComparisonOperator() {
 		parser.advance()
-		if subexpr := parser.ParseExpr(false); subexpr != nil {
+		if subexpr, err := parser.ParseExpr(false); err != nil {
+			return nil, err
+		} else if subexpr != nil {
 			expr = ast.NewBinaryExpr(ast.NewOpWithToken(tok), expr, subexpr, false)
 		}
 		tok = parser.peek()
 	}
-	return expr
+	return expr, nil
 }
 
-func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet) ast.Selector {
+func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet) (ast.Selector, error) {
 	debug("ParseSimpleSelector")
 
 	var tok = parser.next()
 	if tok == nil {
-		return nil
+		return nil, nil
 	}
 
 	switch tok.Type {
 
 	case ast.T_TYPE_SELECTOR:
 
-		return ast.NewTypeSelectorWithToken(tok)
+		return ast.NewTypeSelectorWithToken(tok), nil
 
 	case ast.T_UNIVERSAL_SELECTOR:
 
-		return ast.NewUniversalSelectorWithToken(tok)
+		return ast.NewUniversalSelectorWithToken(tok), nil
 
 	case ast.T_ID_SELECTOR:
 
-		return ast.NewIdSelectorWithToken(tok)
+		return ast.NewIdSelectorWithToken(tok), nil
 
 	case ast.T_CLASS_SELECTOR:
 
-		return ast.NewClassSelectorWithToken(tok)
+		return ast.NewClassSelectorWithToken(tok), nil
 
 	case ast.T_PARENT_SELECTOR:
 
-		return ast.NewParentSelectorWithToken(parentRuleSet, tok)
+		return ast.NewParentSelectorWithToken(parentRuleSet, tok), nil
 
 	case ast.T_FUNCTIONAL_PSEUDO:
 
 		var sel = ast.NewFunctionalPseudoSelectorWithToken(tok)
-		parser.expect(ast.T_PAREN_OPEN)
+		if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
+			return nil, err
+		}
 
 		var tok2 = parser.next()
 		for tok2 != nil && tok2.Type != ast.T_PAREN_CLOSE {
@@ -299,63 +355,82 @@ func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet) ast.Select
 			tok2 = parser.next()
 		}
 		parser.backup()
-		parser.expect(ast.T_PAREN_CLOSE)
+		if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
+			return nil, err
+		}
 
-		return sel
+		return sel, nil
 
 	case ast.T_PSEUDO_SELECTOR:
 
-		return ast.NewPseudoSelectorWithToken(tok)
+		return ast.NewPseudoSelectorWithToken(tok), nil
 
 	// Attribute selector parsing
 	case ast.T_BRACKET_OPEN:
-		var attrName = parser.expect(ast.T_ATTRIBUTE_NAME)
+		attrName, err := parser.expect(ast.T_ATTRIBUTE_NAME)
+		if err != nil {
+			return nil, err
+		}
+
 		var tok2 = parser.next()
 		if tok2.IsAttributeMatchOperator() {
 
 			var tok3 = parser.next()
 			var sel = ast.NewAttributeSelector(attrName, tok2, tok3)
-			parser.expect(ast.T_BRACKET_CLOSE)
-			return sel
+			if _, err := parser.expect(ast.T_BRACKET_CLOSE); err != nil {
+				return nil, err
+			}
+
+			return sel, nil
 
 		} else if tok2.Type == ast.T_BRACKET_CLOSE {
 
-			return ast.NewAttributeSelectorNameOnly(attrName)
+			return ast.NewAttributeSelectorNameOnly(attrName), nil
 
 		} else {
 
-			panic(SyntaxError{
+			return nil, SyntaxError{
 				Reason:      "Unexpected token",
 				ActualToken: tok2,
 				File:        parser.File,
-			})
+			}
 		}
 	}
 	parser.backup()
-	return nil
+	return nil, nil
 }
 
-func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) *ast.CompoundSelector {
+func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) (*ast.CompoundSelector, error) {
 	var sels = ast.NewCompoundSelector()
 	for {
-		if sel := parser.ParseSimpleSelector(parentRuleSet); sel != nil {
+		sel, err := parser.ParseSimpleSelector(parentRuleSet)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if sel != nil {
 			sels.Append(sel)
 		} else {
 			break
 		}
 	}
 	if sels.Length() > 0 {
-		return sels
+		return sels, nil
 	}
-	return nil
+	return nil, nil
 }
 
-func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) *ast.ComplexSelector {
+func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.ComplexSelector, error) {
 	debug("ParseComplexSelector")
 
-	var sel = parser.ParseCompoundSelector(parentRuleSet)
+	sel, err := parser.ParseCompoundSelector(parentRuleSet)
+	if err != nil {
+		return nil, err
+	}
+
 	if sel == nil {
-		return nil
+		return nil, nil
 	}
 
 	var complexSel = ast.NewComplexSelector(sel)
@@ -363,7 +438,7 @@ func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) *ast.Comp
 	for {
 		var tok = parser.next()
 		if tok == nil {
-			return complexSel
+			return complexSel, nil
 		}
 
 		var comb ast.Combinator
@@ -389,66 +464,101 @@ func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) *ast.Comp
 
 		default:
 			parser.backup()
-			return complexSel
+			return complexSel, nil
 		}
 
-		if sel := parser.ParseCompoundSelector(parentRuleSet); sel != nil {
+		sel, err := parser.ParseCompoundSelector(parentRuleSet)
 
+		if err != nil {
+			return nil, err
+		}
+
+		if sel != nil {
 			complexSel.AppendCompoundSelector(comb, sel)
+		}
 
-		} else {
-
-			panic(SyntaxError{
-				Reason:      "Expecting a selector after the combinator.",
-				ActualToken: parser.peek(),
-				File:        parser.File,
-			})
-
+		return nil, SyntaxError{
+			Reason:      "Expecting a selector after the combinator.",
+			ActualToken: parser.peek(),
+			File:        parser.File,
 		}
 	}
 }
 
-func (parser *Parser) ParseSelectorList() *ast.ComplexSelectorList {
+func (parser *Parser) ParseSelectorList() (*ast.ComplexSelectorList, error) {
 	debug("ParseSelectorList")
 
 	var parentRuleSet = parser.GlobalContext.TopRuleSet()
 
 	var complexSelectorList = &ast.ComplexSelectorList{}
 
-	if complexSelector := parser.ParseComplexSelector(parentRuleSet); complexSelector != nil {
+	complexSelector, err := parser.ParseComplexSelector(parentRuleSet)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if complexSelector != nil {
 		complexSelectorList.Append(complexSelector)
 	} else {
-		return nil
+		return nil, nil
 	}
 
 	// if there is more comma
 	for parser.accept(ast.T_COMMA) != nil {
-		if complexSelector := parser.ParseComplexSelector(parentRuleSet); complexSelector != nil {
+		complexSelector, err := parser.ParseComplexSelector(parentRuleSet)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if complexSelector != nil {
 			complexSelectorList.Append(complexSelector)
 		} else {
 			break
 		}
 	}
-	return complexSelectorList
+
+	return complexSelectorList, nil
 }
 
-func (parser *Parser) ParseExtendStmt() ast.Stmt {
-	parser.expect(ast.T_EXTEND)
+func (parser *Parser) ParseExtendStmt() (ast.Stmt, error) {
+	if _, err := parser.expect(ast.T_EXTEND); err != nil {
+		return nil, err
+	}
 	var stm = ast.NewExtendStmt()
-	stm.Selectors = parser.ParseSelectorList()
-	parser.expect(ast.T_SEMICOLON)
-	return stm
+	selectors, err := parser.ParseSelectorList()
+	if err != nil {
+		return nil, err
+	}
+
+	stm.Selectors = selectors
+	if _, err := parser.expect(ast.T_SEMICOLON); err != nil {
+		return nil, err
+	}
+	return stm, nil
 }
 
-func (parser *Parser) ParseRuleSet() ast.Stmt {
+func (parser *Parser) ParseRuleSet() (ast.Stmt, error) {
 	var ruleset = ast.NewRuleSet()
-	ruleset.Selectors = parser.ParseSelectorList()
+	selectors, err := parser.ParseSelectorList()
+
+	if err != nil {
+		return nil, err
+	}
+
+	ruleset.Selectors = selectors
 
 	parser.GlobalContext.PushRuleSet(ruleset)
-	ruleset.Block = parser.ParseDeclBlock()
+	bl, err := parser.ParseDeclBlock()
+	if err != nil {
+		return nil, err
+	}
+
+	ruleset.Block = bl
 	parser.GlobalContext.PopRuleSet()
 
-	return ruleset
+	return ruleset, nil
 }
 
 func (parser *Parser) ParseBoolean() ast.Expr {
@@ -458,7 +568,7 @@ func (parser *Parser) ParseBoolean() ast.Expr {
 	return nil
 }
 
-func (parser *Parser) ParseNumber() ast.Expr {
+func (parser *Parser) ParseNumber() (ast.Expr, error) {
 	var pos = parser.Pos
 	debug("ParseNumber at %d", parser.Pos)
 
@@ -483,7 +593,7 @@ func (parser *Parser) ParseNumber() ast.Expr {
 
 		i, err := strconv.ParseInt(tok.Str, 10, 64)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		if negative {
 			i = -i
@@ -494,7 +604,7 @@ func (parser *Parser) ParseNumber() ast.Expr {
 
 		f, err := strconv.ParseFloat(tok.Str, 64)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		if negative {
 			f = -f
@@ -504,15 +614,15 @@ func (parser *Parser) ParseNumber() ast.Expr {
 	} else {
 		// unknown token
 		parser.restore(pos)
-		return nil
+		return nil, nil
 	}
 
 	if tok2.IsUnit() {
 		// consume the unit token
 		parser.next()
-		return ast.NewNumber(val, ast.NewUnitWithToken(tok2), tok)
+		return ast.NewNumber(val, ast.NewUnitWithToken(tok2), tok), nil
 	}
-	return ast.NewNumber(val, nil, tok)
+	return ast.NewNumber(val, nil, tok), nil
 }
 
 /*
@@ -523,11 +633,11 @@ in a simple way - push/pop the stack.
 @param fcall ast.FunctionCall The current parsing function call ast node
 @return arguments []Expr
 */
-func (parser *Parser) ParseKeywordArguments(fcall *ast.FunctionCall) *ast.FunctionCallArguments {
+func (parser *Parser) ParseKeywordArguments(fcall *ast.FunctionCall) (*ast.FunctionCallArguments, error) {
 	// look up function declaration
 	var item, ok = parser.GlobalContext.Functions.Get(fcall.Ident.Str)
 	if !ok {
-		panic("Undefined function " + fcall.Ident.Str)
+		return nil, fmt.Errorf("Undefined function %s", fcall.Ident.Str)
 	}
 	var fun = item.(*ast.Function)
 
@@ -535,12 +645,21 @@ func (parser *Parser) ParseKeywordArguments(fcall *ast.FunctionCall) *ast.Functi
 	for tok := parser.accept(ast.T_VARIABLE); tok != nil; tok = parser.accept(ast.T_VARIABLE) {
 		var argdef = fun.ArgumentList.Lookup(tok.Str)
 		if argdef == nil {
-			panic("Undefined function argument: " + tok.Str)
+			return nil, fmt.Errorf("Undefined function argument: %s", tok.Str)
 		}
 
-		parser.expect(ast.T_COLON)
-		var argExpr = parser.ParseExpr(false)
-		parser.accept(ast.T_COMMA)
+		if _, err := parser.expect(ast.T_COLON); err != nil {
+			return nil, err
+		}
+
+		argExpr, err := parser.ParseExpr(false)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := parser.expect(ast.T_COMMA); err != nil {
+			return nil, err
+		}
 
 		var arg = ast.NewFunctionCallArgument(argExpr)
 		arg.ArgumentDefineReference = argdef
@@ -550,28 +669,37 @@ func (parser *Parser) ParseKeywordArguments(fcall *ast.FunctionCall) *ast.Functi
 
 	// sort arguments by ArgumentDefineReference
 	arguments.Sort()
-	return &arguments
+	return &arguments, nil
 }
 
-func (parser *Parser) ParseFunctionCall() *ast.FunctionCall {
+func (parser *Parser) ParseFunctionCall() (*ast.FunctionCall, error) {
 	var identTok = parser.next()
 
 	debug("ParseFunctionCall => next: %s", identTok)
 
 	var fcall = ast.NewFunctionCallWithToken(identTok)
 
-	parser.expect(ast.T_PAREN_OPEN)
+	if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
+		return nil, err
+	}
 
 	var tok = parser.peek()
 	var tok2 = parser.peekBy(2)
 	if tok.Type == ast.T_VARIABLE && tok2.Type == ast.T_COLON {
 
-		fcall.Arguments = *parser.ParseKeywordArguments(fcall)
+		args, err := parser.ParseKeywordArguments(fcall)
+		if err != nil {
+			return nil, err
+		}
+
+		fcall.Arguments = *args
 
 	} else {
 		for tok.Type != ast.T_PAREN_CLOSE {
 
-			if arg := parser.ParseFactor(); arg != nil {
+			if arg, err := parser.ParseFactor(); err != nil {
+				return nil, err
+			} else if arg != nil {
 				fcall.AppendArgument(arg)
 				debug("ParseFunctionCall => arg: %+v", arg)
 			} else {
@@ -584,30 +712,42 @@ func (parser *Parser) ParseFunctionCall() *ast.FunctionCall {
 			}
 		}
 	}
-	parser.expect(ast.T_PAREN_CLOSE)
-	return fcall
+	if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
+		return nil, err
+	}
+
+	return fcall, nil
 }
 
-func (parser *Parser) ParseIdent() *ast.Ident {
+func (parser *Parser) ParseIdent() (*ast.Ident, error) {
 	var tok = parser.next()
 	if tok.Type != ast.T_IDENT {
-		panic("Invalid token for ident.")
+		return nil, fmt.Errorf("Invalid token for ident.")
 	}
-	return ast.NewIdentWithToken(tok)
+	return ast.NewIdentWithToken(tok), nil
 }
 
-/**
+/*
+*
 The ParseFactor must return an Expr interface compatible object
 */
-func (parser *Parser) ParseFactor() ast.Expr {
+func (parser *Parser) ParseFactor() (ast.Expr, error) {
 	var tok = parser.peek()
 
 	if tok.Type == ast.T_PAREN_OPEN {
 
-		parser.expect(ast.T_PAREN_OPEN)
-		var expr = parser.ParseExpr(true)
-		parser.expect(ast.T_PAREN_CLOSE)
-		return expr
+		if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
+			return nil, err
+		}
+		expr, err := parser.ParseExpr(true)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
+			return nil, err
+		}
+		return expr, nil
 
 	} else if tok.Type == ast.T_INTERPOLATION_START {
 
@@ -616,37 +756,40 @@ func (parser *Parser) ParseFactor() ast.Expr {
 	} else if tok.Type == ast.T_QQ_STRING {
 
 		parser.advance()
-		return ast.NewStringWithQuote('"', tok)
+		return ast.NewStringWithQuote('"', tok), nil
 
 	} else if tok.Type == ast.T_Q_STRING {
 
 		parser.advance()
-		return ast.NewStringWithQuote('\'', tok)
+		return ast.NewStringWithQuote('\'', tok), nil
 
 	} else if tok.Type == ast.T_UNQUOTE_STRING {
 
 		parser.advance()
-		return ast.NewStringWithQuote(0, tok)
+		return ast.NewStringWithQuote(0, tok), nil
 
 	} else if tok.Type == ast.T_TRUE {
 
 		parser.advance()
-		return ast.NewBooleanTrue(tok)
+		return ast.NewBooleanTrue(tok), nil
 
 	} else if tok.Type == ast.T_FALSE {
 
 		parser.advance()
-		return ast.NewBooleanFalse(tok)
+		return ast.NewBooleanFalse(tok), nil
 
 	} else if tok.Type == ast.T_NULL {
 
 		parser.advance()
-		return ast.NewNullWithToken(tok)
+		return ast.NewNullWithToken(tok), nil
 
 	} else if tok.Type == ast.T_FUNCTION_NAME {
 
-		var fcall = parser.ParseFunctionCall()
-		return ast.Expr(fcall)
+		fcall, err := parser.ParseFunctionCall()
+		if err != nil {
+			return nil, err
+		}
+		return ast.Expr(fcall), nil
 
 	} else if tok.Type == ast.T_VARIABLE {
 
@@ -660,82 +803,98 @@ func (parser *Parser) ParseFactor() ast.Expr {
 		}
 
 		parser.advance()
-		return ast.NewStringWithToken(tok)
+		return ast.NewStringWithToken(tok), nil
 
 	} else if tok.Type == ast.T_HEX_COLOR {
 
 		parser.advance()
-		return ast.NewHexColorFromToken(tok)
+		return ast.NewHexColorFromToken(tok), nil
 
 	} else if tok.Type == ast.T_INTEGER || tok.Type == ast.T_FLOAT {
 
 		return parser.ParseNumber()
 
 	}
-	return nil
+	return nil, nil
 }
 
-func (parser *Parser) ParseTerm() ast.Expr {
+func (parser *Parser) ParseTerm() (ast.Expr, error) {
 	var pos = parser.Pos
-	var factor = parser.ParseFactor()
+	factor, err := parser.ParseFactor()
+	if err != nil {
+		return nil, err
+	}
+
 	if factor == nil {
 		parser.restore(pos)
-		return nil
+		return nil, nil
 	}
 
 	// see if the next token is '*' or '/'
 	if tok := parser.acceptAnyOf2(ast.T_MUL, ast.T_DIV); tok != nil {
-		if term := parser.ParseTerm(); term != nil {
-			return ast.NewBinaryExpr(ast.NewOpWithToken(tok), factor, term, false)
+		term, err := parser.ParseTerm()
+
+		if err != nil {
+			return nil, err
+		} else if term != nil {
+			return ast.NewBinaryExpr(ast.NewOpWithToken(tok), factor, term, false), nil
 		} else {
-			panic(SyntaxError{
+			return nil, SyntaxError{
 				Reason:      "Expecting term after '*' or '/'",
 				ActualToken: parser.peek(),
 				File:        parser.File,
-			})
+			}
 		}
 	}
-	return factor
+	return factor, nil
 }
 
-/**
+/*
+*
 
 We here treat the property values as expressions:
 
 	padding: {expression} {expression} {expression};
 	margin: {expression};
-
 */
-func (parser *Parser) ParseExpr(inParenthesis bool) ast.Expr {
+func (parser *Parser) ParseExpr(inParenthesis bool) (ast.Expr, error) {
 	var pos = parser.Pos
 
 	// plus or minus. This creates an unary expression that holds the later term.
 	// this is for:  +3 or -4
 	var expr ast.Expr = nil
+	var err error
 
 	if tok := parser.acceptAnyOf2(ast.T_PLUS, ast.T_MINUS); tok != nil {
-		if term := parser.ParseTerm(); term != nil {
+		if term, err := parser.ParseTerm(); err != nil {
+			return nil, err
+		} else if term != nil {
 			expr = ast.NewUnaryExpr(ast.NewOpWithToken(tok), term)
 
 			if uexpr, ok := expr.(*ast.UnaryExpr); ok {
 
 				// if it's evaluatable just return the evaluated value.
-				if val, ok := runtime.ReduceExpr(uexpr, parser.GlobalContext); ok {
+				if val, ok, err := runtime.ReduceExpr(uexpr, parser.GlobalContext); err != nil {
+					return nil, err
+				} else if ok {
 					expr = ast.Expr(val)
 				}
 			}
 		} else {
 			parser.restore(pos)
-			return nil
+			return nil, nil
 		}
 	} else {
-		expr = parser.ParseTerm()
+		expr, err = parser.ParseTerm()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if expr == nil {
 		debug("ParseExpr failed, got %+v, restoring to %d", expr, pos)
 		parser.restore(pos)
-		return nil
+		return nil, nil
 	}
 
 	var rightTok = parser.peek()
@@ -743,11 +902,15 @@ func (parser *Parser) ParseExpr(inParenthesis bool) ast.Expr {
 		// accept plus or minus
 		parser.advance()
 
-		if rightTerm := parser.ParseTerm(); rightTerm != nil {
+		if rightTerm, err := parser.ParseTerm(); err != nil {
+			return nil, err
+		} else if rightTerm != nil {
 			// XXX: check parenthesis
 			var bexpr = ast.NewBinaryExpr(ast.NewOpWithToken(rightTok), expr, rightTerm, inParenthesis)
 
-			if val, ok := runtime.ReduceExpr(bexpr, parser.GlobalContext); ok {
+			if val, ok, err := runtime.ReduceExpr(bexpr, parser.GlobalContext); err != nil {
+				return nil, err
+			} else if ok {
 
 				expr = ast.Expr(val)
 
@@ -756,24 +919,24 @@ func (parser *Parser) ParseExpr(inParenthesis bool) ast.Expr {
 				expr = ast.Expr(bexpr)
 			}
 		} else {
-			panic(SyntaxError{
+			return nil, SyntaxError{
 				Reason:      "Expecting term on the right side",
 				ActualToken: parser.peek(),
 				File:        parser.File,
-			})
+			}
 		}
 		rightTok = parser.peek()
 	}
-	return expr
+	return expr, nil
 }
 
-func (parser *Parser) ParseMap() ast.Expr {
+func (parser *Parser) ParseMap() (ast.Expr, error) {
 	var pos = parser.Pos
 	var tok = parser.accept(ast.T_PAREN_OPEN)
 	// since it's not started with '(', it's not map
 	if tok == nil {
 		parser.restore(pos)
-		return nil
+		return nil, nil
 	}
 
 	var mapval = ast.NewMap()
@@ -781,21 +944,27 @@ func (parser *Parser) ParseMap() ast.Expr {
 	// TODO: check and report Map syntax error
 	tok = parser.peek()
 	for tok.Type != ast.T_PAREN_CLOSE {
-		var keyExpr = parser.ParseExpr(false)
+		keyExpr, err := parser.ParseExpr(false)
+		if err != nil {
+			return nil, err
+		}
 		if keyExpr == nil {
 			parser.restore(pos)
-			return nil
+			return nil, nil
 		}
 
 		if parser.accept(ast.T_COLON) == nil {
 			parser.restore(pos)
-			return nil
+			return nil, nil
 		}
 
-		var valueExpr = parser.ParseExpr(false)
+		valueExpr, err := parser.ParseExpr(false)
+		if err != nil {
+			return nil, err
+		}
 		if valueExpr == nil {
 			parser.restore(pos)
-			return nil
+			return nil, nil
 		}
 
 		// register the map value
@@ -804,27 +973,27 @@ func (parser *Parser) ParseMap() ast.Expr {
 		tok = parser.peek()
 	}
 	if parser.accept(ast.T_PAREN_CLOSE) == nil {
-		return nil
+		return nil, nil
 	}
-	return mapval
+	return mapval, nil
 }
 
-func (parser *Parser) ParseString() ast.Expr {
+func (parser *Parser) ParseString() (ast.Expr, error) {
 	if tok := parser.accept(ast.T_QQ_STRING); tok != nil {
 
-		return ast.NewStringWithQuote('"', tok)
+		return ast.NewStringWithQuote('"', tok), nil
 
 	} else if tok := parser.accept(ast.T_Q_STRING); tok != nil {
 
-		return ast.NewStringWithQuote('\'', tok)
+		return ast.NewStringWithQuote('\'', tok), nil
 
 	} else if tok := parser.accept(ast.T_UNQUOTE_STRING); tok != nil {
 
-		return ast.NewStringWithQuote(0, tok)
+		return ast.NewStringWithQuote(0, tok), nil
 
 	} else if tok := parser.accept(ast.T_IDENT); tok != nil {
 
-		return ast.NewStringWithToken(tok)
+		return ast.NewStringWithToken(tok), nil
 
 	}
 
@@ -832,27 +1001,40 @@ func (parser *Parser) ParseString() ast.Expr {
 	if tok.Type == ast.T_INTERPOLATION_START {
 		return parser.ParseInterp()
 	}
-	return nil
+	return nil, nil
 }
 
-func (parser *Parser) ParseInterp() ast.Expr {
-	var startTok = parser.expect(ast.T_INTERPOLATION_START)
-	var innerExpr = parser.ParseExpr(true)
-	var endTok = parser.expect(ast.T_INTERPOLATION_END)
-	return ast.NewInterpolation(innerExpr, startTok, endTok)
+func (parser *Parser) ParseInterp() (ast.Expr, error) {
+	startTok, err := parser.expect(ast.T_INTERPOLATION_START)
+	if err != nil {
+		return nil, err
+	}
+	innerExpr, err := parser.ParseExpr(true)
+	if err != nil {
+		return nil, err
+	}
+	endTok, err := parser.expect(ast.T_INTERPOLATION_END)
+	if err != nil {
+		return nil, err
+	}
+	return ast.NewInterpolation(innerExpr, startTok, endTok), nil
 }
 
-func (parser *Parser) ParseValueStrict() ast.Expr {
+func (parser *Parser) ParseValueStrict() (ast.Expr, error) {
 	var pos = parser.Pos
 
 	if tok := parser.accept(ast.T_PAREN_OPEN); tok != nil {
-		if mapValue := parser.ParseMap(); mapValue != nil {
-			return mapValue
+		if mapValue, err := parser.ParseMap(); err != nil {
+			return nil, err
+		} else if mapValue != nil {
+			return mapValue, nil
 		}
 		parser.restore(pos)
 
-		if listValue := parser.ParseList(); listValue != nil {
-			return listValue
+		if listValue, err := parser.ParseList(); err != nil {
+			return nil, err
+		} else if listValue != nil {
+			return listValue, nil
 		}
 		parser.restore(pos)
 	}
@@ -863,16 +1045,20 @@ func (parser *Parser) ParseValueStrict() ast.Expr {
 /*
 Parse string literal expression (literal concat with interpolation)
 */
-func (parser *Parser) ParseLiteralExpr() ast.Expr {
-	if expr := parser.ParseExpr(false); expr != nil {
+func (parser *Parser) ParseLiteralExpr() (ast.Expr, error) {
+	if expr, err := parser.ParseExpr(false); err != nil {
+		return nil, err
+	} else if expr != nil {
 		for tok := parser.accept(ast.T_LITERAL_CONCAT); tok != nil; tok = parser.accept(ast.T_LITERAL_CONCAT) {
-			var rightExpr = parser.ParseExpr(false)
-			if rightExpr == nil {
-				panic(SyntaxError{
+			rightExpr, err := parser.ParseExpr(false)
+			if err != nil {
+				return nil, err
+			} else if rightExpr == nil {
+				return nil, SyntaxError{
 					Reason:      "Expecting expression or ident after the literal concat operator.",
 					ActualToken: parser.peek(),
 					File:        parser.File,
-				})
+				}
 			}
 			expr = ast.NewLiteralConcat(expr, rightExpr)
 		}
@@ -880,8 +1066,10 @@ func (parser *Parser) ParseLiteralExpr() ast.Expr {
 		// Check if the expression is reduce-able
 		// For now, division looks like CSS slash at the first level, should be string.
 		if runtime.CanReduceExpr(expr) {
-			if reducedExpr, ok := runtime.ReduceExpr(expr, parser.GlobalContext); ok {
-				return reducedExpr
+			if reducedExpr, ok, err := runtime.ReduceExpr(expr, parser.GlobalContext); err != nil {
+				return nil, err
+			} else if ok {
+				return reducedExpr, nil
 			}
 		} else {
 			// Return expression as css slash syntax string
@@ -890,12 +1078,13 @@ func (parser *Parser) ParseLiteralExpr() ast.Expr {
 		}
 
 		// if we can't evaluate the value, just return the expression tree
-		return expr
+		return expr, nil
 	}
-	return nil
+	return nil, nil
 }
 
-/**
+/*
+*
 Parse Value loosely
 
 This parse method allows space/comma separated tokens of list.
@@ -907,27 +1096,31 @@ To parse mixin argument or function argument, we only allow comma-separated list
 The stop token is used from variable assignment expression,
 We expect ';' semicolon at the end of expression to avoid the ambiguity of list, map and expression.
 */
-func (parser *Parser) ParseValue(stopTokType ast.TokenType) ast.Expr {
+func (parser *Parser) ParseValue(stopTokType ast.TokenType) (ast.Expr, error) {
 	var pos = parser.Pos
 
 	// try parse map
 	debug("ParseMap")
-	if mapValue := parser.ParseMap(); mapValue != nil {
+	if mapValue, err := parser.ParseMap(); err != nil {
+		return nil, err
+	} else if mapValue != nil {
 		var tok = parser.peek()
 		if stopTokType == 0 || tok.Type == stopTokType {
 			debug("OK Map Meet Stop Token")
-			return mapValue
+			return mapValue, nil
 		}
 	}
 	debug("Map parse failed, restoring to %d", pos)
 	parser.restore(pos)
 
 	debug("Trying List")
-	if listValue := parser.ParseList(); listValue != nil {
-		var tok = parser.peek()
-		if stopTokType == 0 || tok.Type == stopTokType {
-			debug("OK List: %+v", listValue)
-			return listValue
+	if listValue, err := parser.ParseList(); err != nil {
+		if listValue != nil {
+			var tok = parser.peek()
+			if stopTokType == 0 || tok.Type == stopTokType {
+				debug("OK List: %+v", listValue)
+				return listValue, nil
+			}
 		}
 	}
 
@@ -938,17 +1131,19 @@ func (parser *Parser) ParseValue(stopTokType ast.TokenType) ast.Expr {
 	return parser.ParseLiteralExpr()
 }
 
-func (parser *Parser) ParseList() ast.Expr {
+func (parser *Parser) ParseList() (ast.Expr, error) {
 	debug("ParseList at %d", parser.Pos)
 	var pos = parser.Pos
-	if list := parser.ParseCommaSepList(); list != nil {
-		return list
+	if list, err := parser.ParseCommaSepList(); err != nil {
+		return nil, err
+	} else if list != nil {
+		return list, nil
 	}
 	parser.restore(pos)
-	return nil
+	return nil, nil
 }
 
-func (parser *Parser) ParseCommaSepList() ast.Expr {
+func (parser *Parser) ParseCommaSepList() (ast.Expr, error) {
 	debug("ParseCommaSepList at %d", parser.Pos)
 	var list = ast.NewCommaSepList()
 
@@ -959,15 +1154,22 @@ func (parser *Parser) ParseCommaSepList() ast.Expr {
 		if tok.Type == ast.T_PAREN_OPEN {
 
 			parser.next()
-			if sublist := parser.ParseCommaSepList(); sublist != nil {
+			if sublist, err := parser.ParseCommaSepList(); err != nil {
+				return nil, err
+			} else if sublist != nil {
 				debug("Appending sublist %+v", list)
 				list.Append(sublist)
 			}
 			// allow empty list here
-			parser.expect(ast.T_PAREN_CLOSE)
+			if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
+				return nil, err
+			}
 
 		} else {
-			var sublist = parser.ParseSpaceSepList()
+			sublist, err := parser.ParseSpaceSepList()
+			if err != nil {
+				return nil, err
+			}
 			if sublist != nil {
 				debug("Appending sublist %+v", list)
 				list.Append(sublist)
@@ -986,47 +1188,58 @@ func (parser *Parser) ParseCommaSepList() ast.Expr {
 
 	if list.Len() == 0 {
 
-		return nil
+		return nil, nil
 
 	} else if list.Len() == 1 {
 
-		return list.Exprs[0]
+		return list.Exprs[0], nil
 
 	}
-	return list
+	return list, nil
 }
 
-func (parser *Parser) ParseVariable() *ast.Variable {
+func (parser *Parser) ParseVariable() (*ast.Variable, error) {
 	if tok := parser.accept(ast.T_VARIABLE); tok != nil {
-		return ast.NewVariableWithToken(tok)
+		return ast.NewVariableWithToken(tok), nil
 	}
-	return nil
+	return nil, nil
 }
 
-func (parser *Parser) ParseAssignStmt() ast.Stmt {
-	var variable = parser.ParseVariable()
+func (parser *Parser) ParseAssignStmt() (ast.Stmt, error) {
+	variable, err := parser.ParseVariable()
+	if err != nil {
+		return nil, err
+	}
 
 	// skip ":", T_COLON token
-	parser.expect(ast.T_COLON)
+	if _, err := parser.expect(ast.T_COLON); err != nil {
+		return nil, err
+	}
 
 	// Expecting semicolon at the end of the statement
-	var valExpr = parser.ParseValue(ast.T_SEMICOLON)
-	if valExpr == nil {
-		panic(SyntaxError{
+	valExpr, err := parser.ParseValue(ast.T_SEMICOLON)
+	if err != nil {
+		return nil, err
+	} else if valExpr == nil {
+		return nil, SyntaxError{
 			Reason:      "Expecting value after variable assignment.",
 			ActualToken: parser.peek(),
 			File:        parser.File,
-		})
+		}
 	}
 
 	// Optimize the expression only when it's an expression
 	// TODO: for expression inside a map or list we should also optmise them too
 	if bexpr, ok := valExpr.(ast.BinaryExpr); ok {
-		if reducedExpr, ok := runtime.ReduceExpr(bexpr, parser.GlobalContext); ok {
+		if reducedExpr, ok, err := runtime.ReduceExpr(bexpr, parser.GlobalContext); err != nil {
+			return nil, err
+		} else if ok {
 			valExpr = reducedExpr
 		}
 	} else if uexpr, ok := valExpr.(ast.UnaryExpr); ok {
-		if reducedExpr, ok := runtime.ReduceExpr(uexpr, parser.GlobalContext); ok {
+		if reducedExpr, ok, err := runtime.ReduceExpr(uexpr, parser.GlobalContext); err != nil {
+			return nil, err
+		} else if ok {
 			valExpr = reducedExpr
 		}
 	}
@@ -1045,7 +1258,7 @@ func (parser *Parser) ParseAssignStmt() ast.Stmt {
 	var stm = ast.NewAssignStmt(variable, valExpr)
 	parser.ParseFlags(stm)
 	parser.accept(ast.T_SEMICOLON)
-	return stm
+	return stm, nil
 }
 
 /*
@@ -1070,22 +1283,29 @@ func (parser *Parser) ParseFlags(stm *ast.AssignStmt) {
 	}
 }
 
-func (parser *Parser) ParseSpaceSepList() ast.Expr {
+func (parser *Parser) ParseSpaceSepList() (ast.Expr, error) {
 	debug("ParseSpaceSepList at %d", parser.Pos)
 
 	var list = ast.NewSpaceSepList()
 	list.Separator = " "
 
 	if tok := parser.accept(ast.T_PAREN_OPEN); tok != nil {
-		if sublist := parser.ParseCommaSepList(); sublist != nil {
+		if sublist, err := parser.ParseCommaSepList(); err != nil {
+			return nil, err
+		} else if sublist != nil {
 			list.Append(sublist)
 		}
-		parser.expect(ast.T_PAREN_CLOSE)
+		if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
+			return nil, err
+		}
 	}
 
 	var tok = parser.peek()
 	for tok.Type != ast.T_SEMICOLON && tok.Type != ast.T_BRACE_CLOSE {
-		var subexpr = parser.ParseExpr(true)
+		subexpr, err := parser.ParseExpr(true)
+		if err != nil {
+			return nil, err
+		}
 		if subexpr != nil {
 			debug("Parsed Expr: %+v", subexpr)
 			list.Append(subexpr)
@@ -1099,26 +1319,30 @@ func (parser *Parser) ParseSpaceSepList() ast.Expr {
 	}
 	debug("Returning space-sep list: %+v", list)
 	if list.Len() == 0 {
-		return nil
+		return nil, nil
 	} else if list.Len() == 1 {
-		return list.Exprs[0]
+		return list.Exprs[0], nil
 	} else if list.Len() > 1 {
-		return list
+		return list, nil
 	}
-	return nil
+	return nil, nil
 }
 
-/**
+/*
+*
 We treat the property value section as a list value, which is separated by ',' or ' '
 */
-func (parser *Parser) ParsePropertyValue(parentRuleSet *ast.RuleSet, property *ast.Property) *ast.List {
+func (parser *Parser) ParsePropertyValue(parentRuleSet *ast.RuleSet, property *ast.Property) (*ast.List, error) {
 	debug("ParsePropertyValue")
 	// var tok = parser.peek()
 	var list = ast.NewSpaceSepList()
 
 	var tok = parser.peek()
 	for tok.Type != ast.T_SEMICOLON && tok.Type != ast.T_BRACE_CLOSE {
-		var sublist = parser.ParseList()
+		sublist, err := parser.ParseList()
+		if err != nil {
+			return nil, err
+		}
 		if sublist != nil {
 			list.Append(sublist)
 			debug("ParsePropertyValue list: %+v", list)
@@ -1128,64 +1352,84 @@ func (parser *Parser) ParsePropertyValue(parentRuleSet *ast.RuleSet, property *a
 		tok = parser.peek()
 	}
 
-	return list
+	return list, nil
 }
 
-func (parser *Parser) ParsePropertyName() ast.Expr {
-	var ident = parser.ParsePropertyNameToken()
+func (parser *Parser) ParsePropertyName() (ast.Expr, error) {
+	ident, err := parser.ParsePropertyNameToken()
+	if err != nil {
+		return nil, err
+	}
 	if ident == nil {
-		return nil
+		return nil, nil
 	}
 
 	var tok = parser.peek()
 	for tok.Type == ast.T_LITERAL_CONCAT {
 		parser.next()
-		_ = parser.ParsePropertyNameToken()
+		_, err := parser.ParsePropertyNameToken()
+		if err != nil {
+			return nil, err
+		}
 		tok = parser.peek()
 	}
-	parser.expect(ast.T_COLON)
-	return ident // TODO: new literal concat ast
+	if _, err := parser.expect(ast.T_COLON); err != nil {
+		return nil, err
+	}
+	return ident, nil // TODO: new literal concat ast
 }
 
-func (parser *Parser) ParsePropertyNameToken() ast.Expr {
+func (parser *Parser) ParsePropertyNameToken() (ast.Expr, error) {
 	if tok := parser.accept(ast.T_PROPERTY_NAME_TOKEN); tok != nil {
-		return ast.NewIdentWithToken(tok)
+		return ast.NewIdentWithToken(tok), nil
 	}
 
 	var tok = parser.peek()
 	if tok.Type == ast.T_INTERPOLATION_START {
 		return parser.ParseInterpolation()
 	}
-	return nil
+	return nil, nil
 }
 
-func (parser *Parser) ParseInterpolation() ast.Expr {
+func (parser *Parser) ParseInterpolation() (ast.Expr, error) {
 	debug("ParseInterpolation")
 	var startToken *ast.Token
 	if startToken = parser.accept(ast.T_INTERPOLATION_START); startToken == nil {
-		return nil
+		return nil, nil
 	}
-	var expr = parser.ParseExpr(true)
-	var endToken = parser.expect(ast.T_INTERPOLATION_END)
-	return ast.NewInterpolation(expr, startToken, endToken)
+	expr, err := parser.ParseExpr(true)
+	if err != nil {
+		return nil, err
+	}
+	endToken, err := parser.expect(ast.T_INTERPOLATION_END)
+	if err != nil {
+		return nil, err
+	}
+	return ast.NewInterpolation(expr, startToken, endToken), nil
 }
 
 func (parser *Parser) ParseDeclaration() ast.Stmt {
 	return nil
 }
 
-func (parser *Parser) ParseDeclBlock() *ast.DeclBlock {
+func (parser *Parser) ParseDeclBlock() (*ast.DeclBlock, error) {
 	var parentRuleSet = parser.GlobalContext.TopRuleSet()
 	var declBlock = ast.NewDeclBlock(parentRuleSet)
 
-	parser.expect(ast.T_BRACE_OPEN)
+	if _, err := parser.expect(ast.T_BRACE_OPEN); err != nil {
+		return nil, err
+	}
 
 	var tok = parser.peek()
 	for tok != nil && tok.Type != ast.T_BRACE_CLOSE {
-		if propertyName := parser.ParsePropertyName(); propertyName != nil {
+		if propertyName, err := parser.ParsePropertyName(); err != nil {
+			return nil, err
+		} else if propertyName != nil {
 			var property = ast.NewProperty(tok)
 
-			if valueList := parser.ParsePropertyValue(parentRuleSet, property); valueList != nil {
+			if valueList, err := parser.ParsePropertyValue(parentRuleSet, property); err != nil {
+				return nil, err
+			} else if valueList != nil {
 				for _, v := range valueList.Exprs {
 					property.AppendValue(v)
 				}
@@ -1197,7 +1441,13 @@ func (parser *Parser) ParseDeclBlock() *ast.DeclBlock {
 			// if nested property found
 			if tok2.Type == ast.T_BRACE_OPEN {
 				// TODO: merge them back to current block
-				parser.ParseDeclBlock()
+				_, err := parser.ParseDeclBlock()
+
+				if err != nil {
+					return nil, err
+				}
+
+				return nil, fmt.Errorf("TODO: nested declaration block not implemented")
 			}
 
 			if parser.accept(ast.T_SEMICOLON) == nil {
@@ -1205,58 +1455,78 @@ func (parser *Parser) ParseDeclBlock() *ast.DeclBlock {
 					// normal break
 					break
 				} else {
-					panic("missing semicolon after the property value.")
+					return nil, fmt.Errorf("missing semicolon after the property value.")
 				}
 			}
 
-		} else if stm := parser.ParseStmt(); stm != nil {
-
+		} else if stm, err := parser.ParseStmt(); err != nil {
+			return nil, err
+		} else if stm != nil {
+			return nil, fmt.Errorf("parse declaration empty branch  at token %s", tok)
 		} else {
-			panic(fmt.Errorf("Parse failed at token %s", tok))
+			return nil, fmt.Errorf("Parse failed at token %s", tok)
 		}
 		tok = parser.peek()
 
 	}
-	parser.expect(ast.T_BRACE_CLOSE)
-	return declBlock
+	if _, err := parser.expect(ast.T_BRACE_CLOSE); err != nil {
+		return nil, err
+	}
+	return declBlock, nil
 }
 
-func (parser *Parser) ParseCharsetStmt() ast.Stmt {
-	parser.expect(ast.T_CHARSET)
+func (parser *Parser) ParseCharsetStmt() (ast.Stmt, error) {
+	if _, err := parser.expect(ast.T_CHARSET); err != nil {
+		return nil, err
+	}
 	var tok = parser.next()
 	var stm = ast.NewCharsetStmtWithToken(tok)
-	parser.expect(ast.T_SEMICOLON)
-	return stm
+	if _, err := parser.expect(ast.T_SEMICOLON); err != nil {
+		return nil, err
+	}
+	return stm, nil
 }
 
 /*
-	Media Query Syntax:
-	https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Media_queries
+Media Query Syntax:
+https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Media_queries
 */
-func (parser *Parser) ParseMediaQueryStmt() ast.Stmt {
+func (parser *Parser) ParseMediaQueryStmt() (ast.Stmt, error) {
 	// expect the '@media' token
 	var stm = ast.NewMediaQueryStmt()
 	parser.expect(ast.T_MEDIA)
-	if list := parser.ParseMediaQueryList(); list != nil {
+	if list, err := parser.ParseMediaQueryList(); err != nil {
+		return nil, err
+	} else if list != nil {
 		stm.MediaQueryList = list
 	}
-	stm.Block = parser.ParseDeclBlock()
-	return stm
+	bl, err := parser.ParseDeclBlock()
+	if err != nil {
+		return nil, err
+	}
+	stm.Block = bl
+	return stm, nil
 }
 
-func (parser *Parser) ParseMediaQueryList() *ast.MediaQueryList {
-	var query = parser.ParseMediaQuery()
+func (parser *Parser) ParseMediaQueryList() (*ast.MediaQueryList, error) {
+	query, err := parser.ParseMediaQuery()
+	if err != nil {
+		return nil, err
+	}
+
 	if query == nil {
-		return nil
+		return nil, nil
 	}
 
 	var queries = &ast.MediaQueryList{query}
 	for parser.accept(ast.T_COMMA) != nil {
-		if query := parser.ParseMediaQuery(); query != nil {
+		if query, err := parser.ParseMediaQuery(); err != nil {
+			return nil, err
+		} else if query != nil {
 			queries.Append(query)
 		}
 	}
-	return queries
+	return queries, nil
 }
 
 /*
@@ -1264,94 +1534,133 @@ This method parses media type first, then expecting more that on media
 expressions.
 
 media_query: [[only | not]? <media_type> [ and <expression> ]*]
-  | <expression> [ and <expression> ]*
+
+	| <expression> [ and <expression> ]*
+
 expression: ( <media_feature> [: <value>]? )
 
 Specification: http://dev.w3.org/csswg/mediaqueries-3
 */
-func (parser *Parser) ParseMediaQuery() *ast.MediaQuery {
+func (parser *Parser) ParseMediaQuery() (*ast.MediaQuery, error) {
 
 	// the leading media type is optional
-	var mediaType = parser.ParseMediaType()
+	mediaType, err := parser.ParseMediaType()
+	if err != nil {
+		return nil, err
+	}
 	if mediaType != nil {
 		// Check if there is an expression after the media type.
 		var tok = parser.peek()
 		if tok.Type != ast.T_LOGICAL_AND {
-			return ast.NewMediaQuery(mediaType, nil)
+			return ast.NewMediaQuery(mediaType, nil), nil
 		}
 		parser.advance() // skip the and operator token
 	}
 
 	// parse the media expression after the media type.
-	var mediaExpr = parser.ParseMediaQueryExpr()
+	mediaExpr, err := parser.ParseMediaQueryExpr()
+	if err != nil {
+		return nil, err
+	}
 	if mediaExpr == nil {
 		if mediaType == nil {
-			return nil
+			return nil, nil
 		}
-		return ast.NewMediaQuery(mediaType, mediaExpr)
+		return ast.NewMediaQuery(mediaType, mediaExpr), nil
 	}
 
 	// @media query only allows AND operator here..
 	for tok := parser.accept(ast.T_LOGICAL_AND); tok != nil; tok = parser.accept(ast.T_LOGICAL_AND) {
 		// parse another mediq query expression
-		var expr2 = parser.ParseMediaQueryExpr()
+		expr2, err := parser.ParseMediaQueryExpr()
+		if err != nil {
+			return nil, err
+		}
 		mediaExpr = ast.NewBinaryExpr(ast.NewOpWithToken(tok), mediaExpr, expr2, false)
 	}
-	return ast.NewMediaQuery(mediaType, mediaExpr)
+	return ast.NewMediaQuery(mediaType, mediaExpr), nil
 }
 
 /*
 ParseMediaType returns Ident Node or UnaryExpr as ast.Expr
 */
-func (parser *Parser) ParseMediaType() *ast.MediaType {
+func (parser *Parser) ParseMediaType() (*ast.MediaType, error) {
 	if tok := parser.acceptAnyOf2(ast.T_LOGICAL_NOT, ast.T_ONLY); tok != nil {
-		var mediaType = parser.expect(ast.T_IDENT)
-		return ast.NewMediaType(ast.NewUnaryExpr(ast.NewOpWithToken(tok), mediaType))
+		mediaType, err := parser.expect(ast.T_IDENT)
+		if err != nil {
+			return nil, err
+		}
+
+		return ast.NewMediaType(ast.NewUnaryExpr(ast.NewOpWithToken(tok), mediaType)), nil
 	}
 
 	var tok = parser.peek()
 	if tok.Type == ast.T_PAREN_OPEN {
 		// the begining of the media expression
-		return nil
+		return nil, nil
 	}
 
-	var expr = parser.ParseExpr(false)
+	expr, err := parser.ParseExpr(false)
+	if err != nil {
+		return nil, err
+	}
+
 	if expr != nil {
-		return ast.NewMediaType(expr)
+		return ast.NewMediaType(expr), nil
 	}
 
 	// parse media type fail
-	return nil
+	return nil, nil
 }
 
 /*
 An media query expression must start with a '(' and ends with ')'
 */
-func (parser *Parser) ParseMediaQueryExpr() ast.Expr {
+func (parser *Parser) ParseMediaQueryExpr() (ast.Expr, error) {
 
 	// it's not an media query expression
 	if openTok := parser.accept(ast.T_PAREN_OPEN); openTok != nil {
-		var featureExpr = parser.ParseExpr(false)
+		featureExpr, err := parser.ParseExpr(false)
+		if err != nil {
+			return nil, err
+		}
 		var feature = ast.NewMediaFeature(featureExpr, nil)
 
 		// if the next token is a colon, then we expect a feature value
 		// after the colon.
 		if tok := parser.accept(ast.T_COLON); tok != nil {
-			feature.Value = parser.ParseExpr(false)
+			val, err := parser.ParseExpr(false)
+			if err != nil {
+				return nil, err
+			}
+			feature.Value = val
 		}
-		var closeTok = parser.expect(ast.T_PAREN_CLOSE)
+		closeTok, err := parser.expect(ast.T_PAREN_CLOSE)
+
+		if err != nil {
+			return nil, err
+		}
 		feature.Open = openTok
 		feature.Close = closeTok
-		return feature
+		return feature, nil
 	}
-	return nil
+	return nil, nil
 }
 
-func (parser *Parser) ParseWhileStmt() ast.Stmt {
-	parser.expect(ast.T_WHILE)
-	var condition = parser.ParseCondition()
-	var block = parser.ParseDeclBlock()
-	return ast.NewWhileStmt(condition, block)
+func (parser *Parser) ParseWhileStmt() (ast.Stmt, error) {
+	if _, err := parser.expect(ast.T_WHILE); err != nil {
+		return nil, err
+	}
+
+	condition, err := parser.ParseCondition()
+	if err != nil {
+		return nil, err
+	}
+	block, err := parser.ParseDeclBlock()
+	if err != nil {
+		return nil, err
+	}
+	return ast.NewWhileStmt(condition, block), nil
 }
 
 /*
@@ -1363,17 +1672,28 @@ Parse the SASS @for statement.
 
 @see http://sass-lang.com/documentation/file.SASS_REFERENCE.html#_10
 */
-func (parser *Parser) ParseForStmt() ast.Stmt {
-	parser.expect(ast.T_FOR)
+func (parser *Parser) ParseForStmt() (ast.Stmt, error) {
+	if _, err := parser.expect(ast.T_FOR); err != nil {
+		return nil, err
+	}
 
 	// get the variable token
-	var variable = parser.ParseVariable()
+	variable, err := parser.ParseVariable()
+	if err != nil {
+		return nil, err
+	}
 	var stm = ast.NewForStmt(variable)
 
 	if parser.accept(ast.T_FOR_FROM) != nil {
 
-		var fromExpr = parser.ParseExpr(true)
-		if reducedExpr, ok := runtime.ReduceExpr(fromExpr, parser.GlobalContext); ok {
+		fromExpr, err := parser.ParseExpr(true)
+		if err != nil {
+			return nil, err
+		}
+
+		if reducedExpr, ok, err := runtime.ReduceExpr(fromExpr, parser.GlobalContext); err != nil {
+			return nil, err
+		} else if ok {
 			fromExpr = reducedExpr
 		}
 		stm.From = fromExpr
@@ -1382,15 +1702,20 @@ func (parser *Parser) ParseForStmt() ast.Stmt {
 		var tok = parser.next()
 
 		if tok.Type != ast.T_FOR_THROUGH && tok.Type != ast.T_FOR_TO {
-			panic(SyntaxError{
+			return nil, SyntaxError{
 				Reason:      "Expecting 'through' or 'to' of range syntax.",
 				ActualToken: tok,
 				File:        parser.File,
-			})
+			}
 		}
 
-		var endExpr = parser.ParseExpr(true)
-		if reducedExpr, ok := runtime.ReduceExpr(endExpr, parser.GlobalContext); ok {
+		endExpr, err := parser.ParseExpr(true)
+		if err != nil {
+			return nil, err
+		}
+		if reducedExpr, ok, err := runtime.ReduceExpr(endExpr, parser.GlobalContext); err != nil {
+			return nil, err
+		} else if ok {
 			endExpr = reducedExpr
 		}
 
@@ -1406,28 +1731,42 @@ func (parser *Parser) ParseForStmt() ast.Stmt {
 
 	} else if parser.accept(ast.T_FOR_IN) != nil {
 
-		var fromExpr = parser.ParseExpr(true)
-		if reducedExpr, ok := runtime.ReduceExpr(fromExpr, parser.GlobalContext); ok {
+		fromExpr, err := parser.ParseExpr(true)
+		if err != nil {
+			return nil, err
+		}
+		if reducedExpr, ok, err := runtime.ReduceExpr(fromExpr, parser.GlobalContext); err != nil {
+			return nil, err
+		} else if ok {
 			fromExpr = reducedExpr
 		}
 		stm.From = fromExpr
 
-		parser.expect(ast.T_RANGE)
+		if _, err := parser.expect(ast.T_RANGE); err != nil {
+			return nil, err
+		}
 
-		var endExpr = parser.ParseExpr(true)
-		if reducedExpr, ok := runtime.ReduceExpr(endExpr, parser.GlobalContext); ok {
+		endExpr, err := parser.ParseExpr(true)
+		if err != nil {
+			return nil, err
+		}
+		if reducedExpr, ok, err := runtime.ReduceExpr(endExpr, parser.GlobalContext); err != nil {
+			return nil, err
+		} else if ok {
 			endExpr = reducedExpr
 		}
 
 		stm.To = endExpr
 	}
 
-	if b := parser.ParseDeclBlock(); b != nil {
+	if b, err := parser.ParseDeclBlock(); err != nil {
+		return nil, err
+	} else if b != nil {
 		stm.Block = b
 	} else {
-		panic("The @for statement expecting block after the range syntax")
+		return nil, fmt.Errorf("The @for statement expecting block after the range syntax")
 	}
-	return stm
+	return stm, nil
 }
 
 /*
@@ -1437,9 +1776,11 @@ The @import syntax is described here:
 
 @see https://developer.mozilla.org/en-US/docs/Web/CSS/@import
 */
-func (parser *Parser) ParseImportStmt() ast.Stmt {
+func (parser *Parser) ParseImportStmt() (ast.Stmt, error) {
 	// skip the ast.T_IMPORT token
-	parser.expect(ast.T_IMPORT)
+	if _, err := parser.expect(ast.T_IMPORT); err != nil {
+		return nil, err
+	}
 
 	// Create the import statement node
 	var stm = ast.NewImportStmt()
@@ -1449,15 +1790,17 @@ func (parser *Parser) ParseImportStmt() ast.Stmt {
 	// if it's url(..)
 	if tok.Type == ast.T_FUNCTION_NAME {
 		parser.advance()
-		parser.expect(ast.T_PAREN_OPEN)
+		if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
+			return nil, err
+		}
 
 		var urlTok = parser.acceptAnyOf3(ast.T_QQ_STRING, ast.T_Q_STRING, ast.T_UNQUOTE_STRING)
 		if urlTok == nil {
-			panic(SyntaxError{
+			return nil, SyntaxError{
 				Reason:      "Expecting url string in the url() function expression",
 				ActualToken: parser.peek(),
 				File:        parser.File,
-			})
+			}
 		}
 
 		if HttpUrlPattern.MatchString(urlTok.Str) {
@@ -1466,7 +1809,9 @@ func (parser *Parser) ParseImportStmt() ast.Stmt {
 			stm.Url = ast.RelativeUrl(urlTok.Str)
 		}
 
-		parser.expect(ast.T_PAREN_CLOSE)
+		if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
+			return nil, err
+		}
 
 	} else if tok.IsString() {
 
@@ -1488,13 +1833,13 @@ func (parser *Parser) ParseImportStmt() ast.Stmt {
 		} else {
 			// check scss import url by file system
 			if parser.File != nil {
-				panic("Unknown scss file to detect import path.")
+				return nil, fmt.Errorf("Unknown scss file to detect import path.")
 			}
 
 			var importPath = tok.Str
-			var fi, err = os.Stat(importPath)
+			fi, err := fs.Stat(parser.fsys, importPath)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 
 			// go find the _index.scss if it's a local directory
@@ -1512,8 +1857,8 @@ func (parser *Parser) ParseImportStmt() ast.Stmt {
 				}
 			}
 
-			if _, err := os.Stat(importPath); err != nil {
-				panic(err)
+			if _, err := fs.Stat(parser.fsys, importPath); err != nil {
+				return nil, err
 			}
 			stm.Url = ast.ScssImportUrl(importPath)
 
@@ -1525,7 +1870,7 @@ func (parser *Parser) ParseImportStmt() ast.Stmt {
 				var subparser = NewParser(parser.GlobalContext)
 				var stmts, err = subparser.ParseScssFile(importPath)
 				if err != nil {
-					panic(err)
+					return nil, err
 				}
 
 				// Cache the compiled statement in the AST, so we can include the compiled AST nodes when watch mode is enabled
@@ -1548,38 +1893,71 @@ func (parser *Parser) ParseImportStmt() ast.Stmt {
 		}
 
 	} else {
-		panic(fmt.Errorf("Unexpected token: %s", tok))
+		return nil, fmt.Errorf("Unexpected token: %s", tok)
 	}
 
-	if mediaQueryList := parser.ParseMediaQueryList(); mediaQueryList != nil {
+	if mediaQueryList, err := parser.ParseMediaQueryList(); err != nil {
+		return nil, err
+	} else if mediaQueryList != nil {
 		stm.MediaQueryList = *mediaQueryList
 	}
 
 	// must be ast.T_SEMICOLON at the end
-	parser.expect(ast.T_SEMICOLON)
-	return stm
+	if _, err := parser.expect(ast.T_SEMICOLON); err != nil {
+		return nil, err
+	}
+	return stm, nil
 }
 
-func (parser *Parser) ParseReturnStmt() ast.Stmt {
-	var returnTok = parser.expect(ast.T_RETURN)
-	var valueExpr = parser.ParseExpr(true)
-	parser.expect(ast.T_SEMICOLON)
-	return ast.NewReturnStmtWithToken(returnTok, valueExpr)
+func (parser *Parser) ParseReturnStmt() (ast.Stmt, error) {
+	returnTok, err := parser.expect(ast.T_RETURN)
+	if err != nil {
+		return nil, err
+	}
+	valueExpr, err := parser.ParseExpr(true)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := parser.expect(ast.T_SEMICOLON); err != nil {
+		return nil, err
+	}
+
+	return ast.NewReturnStmtWithToken(returnTok, valueExpr), nil
 }
 
-func (parser *Parser) ParseFunctionDeclaration() ast.Stmt {
-	parser.expect(ast.T_FUNCTION)
-	var identTok = parser.expect(ast.T_FUNCTION_NAME)
-	var args = parser.ParseFunctionPrototype()
+func (parser *Parser) ParseFunctionDeclaration() (ast.Stmt, error) {
+	if _, err := parser.expect(ast.T_FUNCTION); err != nil {
+		return nil, err
+	}
+
+	identTok, err := parser.expect(ast.T_FUNCTION_NAME)
+	if err != nil {
+		return nil, err
+	}
+
+	args, err := parser.ParseFunctionPrototype()
+	if err != nil {
+		return nil, err
+	}
+
 	var fun = ast.NewFunctionWithToken(identTok)
 	fun.ArgumentList = args
-	fun.Block = parser.ParseBlock()
+
+	if bl, err := parser.ParseBlock(); err != nil {
+		return nil, err
+	} else {
+		fun.Block = bl
+	}
 	parser.GlobalContext.Functions.Set(identTok.Str, fun)
-	return fun
+	return fun, nil
 }
 
-func (parser *Parser) ParseMixinStmt() ast.Stmt {
-	var mixinTok = parser.expect(ast.T_MIXIN)
+func (parser *Parser) ParseMixinStmt() (ast.Stmt, error) {
+	mixinTok, err := parser.expect(ast.T_MIXIN)
+	if err != nil {
+		return nil, err
+	}
+
 	var stm = ast.NewMixinStmtWithToken(mixinTok)
 
 	var tok = parser.next()
@@ -1592,46 +1970,64 @@ func (parser *Parser) ParseMixinStmt() ast.Stmt {
 	} else if tok.Type == ast.T_FUNCTION_NAME {
 
 		stm.Ident = tok
-		stm.ArgumentList = parser.ParseFunctionPrototype()
+		l, err := parser.ParseFunctionPrototype()
+		if err != nil {
+			return nil, err
+		}
+
+		stm.ArgumentList = l
 
 	} else {
-
-		panic("Syntax error")
-
+		return nil, fmt.Errorf("Syntax error")
 	}
 
-	stm.Block = parser.ParseDeclBlock()
+	if b, err := parser.ParseDeclBlock(); err != nil {
+		return nil, err
+	} else {
+		stm.Block = b
+	}
+
 	parser.GlobalContext.Mixins.Set(stm.Ident.Str, stm)
-	return stm
+	return stm, nil
 }
 
-func (parser *Parser) ParseFunctionPrototypeArgument() *ast.Argument {
+func (parser *Parser) ParseFunctionPrototypeArgument() (*ast.Argument, error) {
 	debug("ParseFunctionPrototypeArgument")
 
 	var varTok *ast.Token = nil
 	if varTok = parser.accept(ast.T_VARIABLE); varTok == nil {
-		return nil
+		return nil, nil
 	}
 
 	if arg := ast.NewArgumentWithToken(varTok); arg != nil {
 		if parser.accept(ast.T_COLON) != nil {
-			arg.DefaultValue = parser.ParseValueStrict()
+			v, err := parser.ParseValueStrict()
+			if err != nil {
+				return nil, err
+			}
+			arg.DefaultValue = v
 		}
-		return arg
+		return arg, nil
 	}
-	return nil
+	return nil, nil
 }
 
-func (parser *Parser) ParseFunctionPrototype() *ast.ArgumentList {
+func (parser *Parser) ParseFunctionPrototype() (*ast.ArgumentList, error) {
 	debug("ParseFunctionPrototype")
 
 	var args = ast.NewArgumentList()
 
-	parser.expect(ast.T_PAREN_OPEN)
+	if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
+		return nil, err
+	}
+
 	var tok = parser.peek()
 	for tok.Type != ast.T_PAREN_CLOSE {
 		var arg *ast.Argument = nil
-		if arg = parser.ParseFunctionPrototypeArgument(); arg != nil {
+		var err error
+		if arg, err = parser.ParseFunctionPrototypeArgument(); err != nil {
+			return nil, err
+		} else if arg != nil {
 			args.Add(arg)
 		} else {
 			// if fail
@@ -1646,36 +2042,49 @@ func (parser *Parser) ParseFunctionPrototype() *ast.ArgumentList {
 			break
 		}
 	}
-	parser.expect(ast.T_PAREN_CLOSE)
-	return args
+	if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
+		return nil, err
+	}
+
+	return args, nil
 }
 
-func (parser *Parser) ParseFunctionCallArgument() *ast.Argument {
+func (parser *Parser) ParseFunctionCallArgument() (*ast.Argument, error) {
 	debug("ParseFunctionCallArgument")
 
 	var varTok *ast.Token = nil
 	if varTok = parser.accept(ast.T_VARIABLE); varTok == nil {
-		return nil
+		return nil, nil
 	}
 
 	var arg = ast.NewArgumentWithToken(varTok)
 
 	if parser.accept(ast.T_COLON) != nil {
-		arg.DefaultValue = parser.ParseValueStrict()
+		val, err := parser.ParseValueStrict()
+		if err != nil {
+			return nil, err
+		}
+
+		arg.DefaultValue = val
 	}
-	return arg
+	return arg, nil
 }
 
-func (parser *Parser) ParseFunctionCallArguments() *ast.ArgumentList {
+func (parser *Parser) ParseFunctionCallArguments() (*ast.ArgumentList, error) {
 	debug("ParseFunctionCallArguments")
 
 	var args = ast.NewArgumentList()
 
-	parser.expect(ast.T_PAREN_OPEN)
+	if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
+		return nil, err
+	}
 	var tok = parser.peek()
 	for tok.Type != ast.T_PAREN_CLOSE {
 		var arg *ast.Argument = nil
-		if arg = parser.ParseFunctionCallArgument(); arg != nil {
+		var err error
+		if arg, err = parser.ParseFunctionCallArgument(); err != nil {
+			return nil, err
+		} else if arg != nil {
 			args.Add(arg)
 		} else {
 			// if fail
@@ -1690,12 +2099,18 @@ func (parser *Parser) ParseFunctionCallArguments() *ast.ArgumentList {
 			break
 		}
 	}
-	parser.expect(ast.T_PAREN_CLOSE)
-	return args
+	if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
+		return nil, err
+	}
+	return args, nil
 }
 
-func (parser *Parser) ParseIncludeStmt() ast.Stmt {
-	var tok = parser.expect(ast.T_INCLUDE)
+func (parser *Parser) ParseIncludeStmt() (ast.Stmt, error) {
+	tok, err := parser.expect(ast.T_INCLUDE)
+	if err != nil {
+		return nil, err
+	}
+
 	var stm = ast.NewIncludeStmtWithToken(tok)
 
 	var tok2 = parser.next()
@@ -1708,50 +2123,79 @@ func (parser *Parser) ParseIncludeStmt() ast.Stmt {
 
 		stm.MixinIdent = tok2
 
-		// TODO: revisit here later
-		stm.ArgumentList = parser.ParseFunctionPrototype()
+		if al, err := parser.ParseFunctionPrototype(); err != nil {
+			return nil, err
+		} else {
+			stm.ArgumentList = al
+		}
 
 	} else {
-		// TODO: report syntax error
-		panic("Unexpected token after @include.")
+		return nil, fmt.Errorf("Unexpected token after @include.")
 	}
 
 	var tok3 = parser.peek()
 	if tok3.Type == ast.T_BRACE_OPEN {
-		stm.ContentBlock = parser.ParseDeclBlock()
+		if bl, err := parser.ParseDeclBlock(); err != nil {
+			return nil, err
+		} else {
+			stm.ContentBlock = bl
+		}
 	}
 
-	parser.expect(ast.T_SEMICOLON)
-	return stm
+	if _, err := parser.expect(ast.T_SEMICOLON); err != nil {
+		return nil, err
+	}
+
+	return stm, nil
 }
 
-func (parser *Parser) ParseFontFaceStmt() ast.Stmt {
-	parser.expect(ast.T_FONT_FACE)
-	block := parser.ParseDeclBlock()
-	return &ast.FontFaceStmt{Block: block}
+func (parser *Parser) ParseFontFaceStmt() (ast.Stmt, error) {
+	if _, err := parser.expect(ast.T_FONT_FACE); err != nil {
+		return nil, err
+	}
+	block, err := parser.ParseDeclBlock()
+	if err != nil {
+		return nil, err
+	}
+
+	return &ast.FontFaceStmt{Block: block}, nil
 }
 
-func (parser *Parser) ParseLogStmt() ast.Stmt {
+func (parser *Parser) ParseLogStmt() (ast.Stmt, error) {
 	if directiveTok := parser.acceptAnyOf3(ast.T_ERROR, ast.T_WARN, ast.T_INFO); directiveTok != nil {
-		var expr = parser.ParseExpr(false)
-		parser.expect(ast.T_SEMICOLON)
+		expr, err := parser.ParseExpr(false)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := parser.expect(ast.T_SEMICOLON); err != nil {
+			return nil, err
+		}
+
 		return &ast.LogStmt{
 			Directive: directiveTok,
 			Expr:      expr,
-		}
+		}, nil
 
 	}
-	panic(SyntaxError{
+	return nil, SyntaxError{
 		Reason:      "Expecting @error, @warn, @info directive",
 		ActualToken: parser.peek(),
-	})
+	}
 }
 
 /*
 @content directive is only allowed in mixin block
 */
-func (parser *Parser) ParseContentStmt() ast.Stmt {
-	var tok = parser.expect(ast.T_CONTENT)
-	parser.expect(ast.T_SEMICOLON)
-	return ast.NewContentStmtWithToken(tok)
+func (parser *Parser) ParseContentStmt() (ast.Stmt, error) {
+	tok, err := parser.expect(ast.T_CONTENT)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := parser.expect(ast.T_SEMICOLON); err != nil {
+		return nil, err
+	}
+
+	return ast.NewContentStmtWithToken(tok), nil
 }

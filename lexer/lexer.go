@@ -4,12 +4,15 @@ package lexer
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import "io/ioutil"
-import "unicode/utf8"
-import "strings"
-import "fmt"
-import "unicode"
-import "github.com/c9s/c6/ast"
+import (
+	"fmt"
+	"io/fs"
+	"strings"
+	"unicode"
+	"unicode/utf8"
+
+	"github.com/c9s/c6/ast"
+)
 
 const TOKEN_CHANNEL_BUFFER = 1024
 
@@ -62,7 +65,8 @@ func (l *Lexer) lastToken() *ast.Token {
 	return nil
 }
 
-/**
+/*
+*
 Create a lexer object with bytes
 */
 func NewLexerWithBytes(data []byte) *Lexer {
@@ -76,7 +80,8 @@ func NewLexerWithBytes(data []byte) *Lexer {
 	return l
 }
 
-/**
+/*
+*
 Create a lexer object with string
 */
 func NewLexerWithString(body string) *Lexer {
@@ -89,13 +94,14 @@ func NewLexerWithString(body string) *Lexer {
 	}
 }
 
-/**
+/*
+*
 Create a lexer object with file path
 
 TODO: detect encoding here
 */
-func NewLexerWithFile(file string) (*Lexer, error) {
-	data, err := ioutil.ReadFile(file)
+func NewLexerWithFile(fsys fs.FS, file string) (*Lexer, error) {
+	data, err := fs.ReadFile(fsys, file)
 	if err != nil {
 		return nil, err
 	}
@@ -137,10 +143,12 @@ func (l *Lexer) acceptAndEmit(valid string, tokenType ast.TokenType) bool {
 	return false
 }
 
-func (l *Lexer) expect(valid string) {
+func (l *Lexer) expect(valid string) error {
 	if !l.accept(valid) {
-		panic(fmt.Errorf("Expecting %s at %d", valid, l.Offset))
+		return fmt.Errorf("Expecting %s at %d", valid, l.Offset)
 	}
+
+	return nil
 }
 
 // test the next character, if it's not matched, go back to the original
@@ -293,6 +301,7 @@ func (l *Lexer) createToken(tokenType ast.TokenType) *ast.Token {
 		Line:       l.Line,
 		LineOffset: l.LineOffset,
 	}
+
 	return &token
 }
 
@@ -444,16 +453,20 @@ func (l *Lexer) ignoreComment() {
 	}
 }
 
-func (l *Lexer) DispatchFn(fn stateFn) stateFn {
+func (l *Lexer) DispatchFn(fn stateFn) (stateFn, error) {
 	for l.State = fn; l.State != nil; {
-		fn := l.State(l)
+		fn, err := l.State(l)
+		if err != nil {
+			return nil, err
+		}
+
 		if fn != nil {
 			l.State = fn
 		} else {
 			break
 		}
 	}
-	return l.State
+	return l.State, nil
 }
 
 func (l *Lexer) Dump() {

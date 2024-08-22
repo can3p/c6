@@ -1,16 +1,22 @@
 package compiler
 
-import "testing"
-import "github.com/c9s/c6/runtime"
-import "github.com/c9s/c6/parser"
-import "github.com/stretchr/testify/assert"
+import (
+	"testing"
+
+	"github.com/c9s/c6/parser"
+	"github.com/c9s/c6/runtime"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
 func AssertCompile(t *testing.T, code string, expected string) {
 	var context = runtime.NewContext()
 	var parser = parser.NewParser(context)
-	var stmts = parser.ParseScss(code)
+	stmts, err := parser.ParseScss(code)
+	require.NoError(t, err)
 	var compiler = NewCompactCompiler(context)
-	var out = compiler.CompileString(stmts)
+	out, err := compiler.CompileString(stmts)
+	require.NoError(t, err)
 	assert.Equal(t, expected, out)
 }
 

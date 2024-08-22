@@ -7,18 +7,21 @@ import (
 	"github.com/c9s/c6/parser"
 	"github.com/c9s/c6/runtime"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func AssertPrettyCompile(t *testing.T, code string, expected string) {
 	var context = runtime.NewContext()
 	var parser = parser.NewParser(context)
-	var stmts = parser.ParseScss(code)
+	stmts, err := parser.ParseScss(code)
+	require.NoError(t, err)
+
 	var buf bytes.Buffer
 
 	var compiler = NewPrettyCompiler(context, &buf)
 
-	err := compiler.Compile(stmts)
-	assert.NoError(t, err)
+	err = compiler.Compile(stmts)
+	require.NoError(t, err)
 	assert.Equal(t, expected, buf.String())
 }
 

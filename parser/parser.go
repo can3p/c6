@@ -93,7 +93,10 @@ func (parser *Parser) ParseFile(fsys fs.FS, path string) (*ast.StmtList, error) 
 
 	switch filetype {
 	case ScssFileType:
-		stmts = parser.ParseScss(parser.Content)
+		stmts, err = parser.ParseScss(parser.Content)
+		if err != nil {
+			return nil, err
+		}
 	default:
 		return nil, fmt.Errorf("Unsupported file format: %s", path)
 	}
@@ -159,17 +162,17 @@ func (parser *Parser) acceptAnyOf3(tokType1, tokType2, tokType3 ast.TokenType) *
 	return nil
 }
 
-func (parser *Parser) expect(tokenType ast.TokenType) *ast.Token {
+func (parser *Parser) expect(tokenType ast.TokenType) (*ast.Token, error) {
 	var tok = parser.next()
 	if tok != nil && tok.Type != tokenType {
 		parser.backup()
-		panic(SyntaxError{
+		return nil, SyntaxError{
 			Reason:      tokenType.String(),
 			ActualToken: tok,
 			File:        parser.File,
-		})
+		}
 	}
-	return tok
+	return tok, nil
 }
 
 func (parser *Parser) next() *ast.Token {

@@ -1,9 +1,12 @@
 package lexer
 
-import "unicode"
-import "github.com/c9s/c6/ast"
+import (
+	"unicode"
 
-func lexPropertyNameToken(l *Lexer) stateFn {
+	"github.com/c9s/c6/ast"
+)
+
+func lexPropertyNameToken(l *Lexer) (stateFn, error) {
 	var r = l.next()
 	for unicode.IsLetter(r) || unicode.IsDigit(r) || r == '-' {
 		r = l.next()
@@ -11,12 +14,12 @@ func lexPropertyNameToken(l *Lexer) stateFn {
 	l.backup()
 	if l.precedeStartOffset() {
 		l.emit(ast.T_PROPERTY_NAME_TOKEN)
-		return lexPropertyNameToken
+		return lexPropertyNameToken, nil
 	}
-	return nil
+	return nil, nil
 }
 
-func lexMicrosoftProgIdFunction(l *Lexer) stateFn {
+func lexMicrosoftProgIdFunction(l *Lexer) (stateFn, error) {
 	var r = l.next()
 	for unicode.IsLetter(r) || unicode.IsDigit(r) || r == '.' || r == '_' {
 		r = l.next()
@@ -27,7 +30,7 @@ func lexMicrosoftProgIdFunction(l *Lexer) stateFn {
 	// here starts the sproperty
 	r = l.next()
 	if r != '(' {
-		l.errorf("Expecting '(' after the MS function name. Got %c", r)
+		return nil, l.errorf("Expecting '(' after the MS function name. Got %c", r)
 	}
 	l.emit(ast.T_PAREN_OPEN)
 
@@ -61,20 +64,19 @@ func lexMicrosoftProgIdFunction(l *Lexer) stateFn {
 			break
 		}
 	}
-	return nil
+	return nil, nil
 }
 
 /*
 Possible property value syntax:
 
-   width: 10px;        // numeric
-   width: 10px + 10px; // expression
-   border: 1px #{solid} #000;   // interpolation
-   color: rgba( 0, 0, 255, 1.0);  // rgba function
-   width: auto;    // string constant
-
+	width: 10px;        // numeric
+	width: 10px + 10px; // expression
+	border: 1px #{solid} #000;   // interpolation
+	color: rgba( 0, 0, 255, 1.0);  // rgba function
+	width: auto;    // string constant
 */
-func lexProperty(l *Lexer) stateFn {
+func lexProperty(l *Lexer) (stateFn, error) {
 	var r = l.peek()
 	for r != ':' {
 		if l.peek() == '#' && l.peekBy(2) == '{' {
@@ -87,7 +89,9 @@ func lexProperty(l *Lexer) stateFn {
 		}
 
 		// we have something
-		if lexPropertyNameToken(l) != nil {
+		if t, err := lexPropertyNameToken(l); err != nil {
+			return nil, err
+		} else if t != nil {
 			r = l.peek()
 			if !unicode.IsSpace(r) && r != ':' {
 				l.emit(ast.T_LITERAL_CONCAT)
@@ -119,9 +123,12 @@ func lexProperty(l *Lexer) stateFn {
 
 			l.next()
 			l.emit(ast.T_BRACE_OPEN)
-			return lexStart
+			return lexStart, nil
 
-		} else if lexExpr(l) == nil {
+			//} else if lexExpr(l) == nil {
+		} else if expr, err := lexExpr(l); err != nil {
+			return nil, err
+		} else if expr == nil {
 			break
 		}
 
@@ -142,7 +149,7 @@ func lexProperty(l *Lexer) stateFn {
 	if l.accept("}") {
 		l.emit(ast.T_BRACE_CLOSE)
 	}
-	return lexStart
+	return lexStart, nil
 }
 
 func lexColon(l *Lexer) stateFn {

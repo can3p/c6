@@ -2,7 +2,7 @@ package lexer
 
 import "github.com/c9s/c6/ast"
 
-func lexFunctionParams(l *Lexer) stateFn {
+func lexFunctionParams(l *Lexer) (stateFn, error) {
 	var r = l.next()
 	if r != '(' {
 		l.errorf("Expecting '('. Got '%c'.", r)
@@ -19,7 +19,9 @@ func lexFunctionParams(l *Lexer) stateFn {
 			l.emit(ast.T_PAREN_CLOSE)
 			break
 		}
-		if lexExpr(l) == nil {
+		if expr, err := lexExpr(l); err != nil {
+			return nil, err
+		} else if expr == nil {
 			break
 		}
 
@@ -30,5 +32,5 @@ func lexFunctionParams(l *Lexer) stateFn {
 			l.emit(ast.T_COMMA)
 		}
 	}
-	return nil
+	return nil, nil
 }

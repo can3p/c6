@@ -1,8 +1,11 @@
 package runtime
 
-import "github.com/c9s/c6/ast"
-import "testing"
-import "github.com/stretchr/testify/assert"
+import (
+	"testing"
+
+	"github.com/c9s/c6/ast"
+	"github.com/stretchr/testify/assert"
+)
 
 /*
 func TestReduceExprForUnsolveableExpr(t *testing.T) {
@@ -45,7 +48,8 @@ func TestReduceExprForUnsolveableExpr2(t *testing.T) {
 func TestReduceExprForSolveableExpr(t *testing.T) {
 	expr := ast.NewBinaryExpr(ast.NewOp(ast.T_PLUS), ast.NewNumber(10, nil, nil), ast.NewNumber(3, nil, nil), false)
 	expr2 := ast.NewBinaryExpr(ast.NewOp(ast.T_PLUS), expr, ast.NewNumber(3, nil, nil), false)
-	val, ok := ReduceExpr(expr2, nil)
+	val, ok, err := ReduceExpr(expr2, nil)
+	assert.NoError(t, err)
 	assert.True(t, ok)
 	assert.NotNil(t, val)
 
@@ -62,19 +66,22 @@ func TestReduceCSSSlashExpr(t *testing.T) {
 }
 
 func TestComputeNumberAddNumber(t *testing.T) {
-	val := Compute(ast.NewOp(ast.T_PLUS), ast.NewNumber(10, nil, nil), ast.NewNumber(3, nil, nil))
+	val, err := Compute(ast.NewOp(ast.T_PLUS), ast.NewNumber(10, nil, nil), ast.NewNumber(3, nil, nil))
+	assert.NoError(t, err)
 	num, ok := val.(*ast.Number)
 	assert.True(t, ok)
 	assert.Equal(t, 13.0, num.Value)
 }
 
 func TestComputeNumberAddNumberIncompatibleUnit(t *testing.T) {
-	val := Compute(ast.NewOp(ast.T_PLUS), ast.NewNumber(10, ast.NewUnit(ast.T_UNIT_PX, nil), nil), ast.NewNumber(3, ast.NewUnit(ast.T_UNIT_PT, nil), nil))
+	val, err := Compute(ast.NewOp(ast.T_PLUS), ast.NewNumber(10, ast.NewUnit(ast.T_UNIT_PX, nil), nil), ast.NewNumber(3, ast.NewUnit(ast.T_UNIT_PT, nil), nil))
+	assert.NoError(t, err)
 	assert.Nil(t, val)
 }
 
 func TestComputeNumberMulWithUnit(t *testing.T) {
-	val := Compute(ast.NewOp(ast.T_MUL), ast.NewNumber(10, ast.NewUnit(ast.T_UNIT_PX, nil), nil), ast.NewNumber(3, nil, nil))
+	val, err := Compute(ast.NewOp(ast.T_MUL), ast.NewNumber(10, ast.NewUnit(ast.T_UNIT_PX, nil), nil), ast.NewNumber(3, nil, nil))
+	assert.NoError(t, err)
 	num, ok := val.(*ast.Number)
 	assert.True(t, ok)
 	assert.Equal(t, ast.T_UNIT_PX, num.Unit.Type)
@@ -82,9 +89,10 @@ func TestComputeNumberMulWithUnit(t *testing.T) {
 }
 
 func TestComputeNumberDivWithUnit(t *testing.T) {
-	val := Compute(ast.NewOp(ast.T_DIV),
+	val, err := Compute(ast.NewOp(ast.T_DIV),
 		ast.NewNumber(10, ast.NewUnit(ast.T_UNIT_PX, nil), nil),
 		ast.NewNumber(2, nil, nil))
+	assert.NoError(t, err)
 
 	num, ok := val.(*ast.Number)
 	assert.True(t, ok)
@@ -94,14 +102,16 @@ func TestComputeNumberDivWithUnit(t *testing.T) {
 }
 
 func TestComputeRGBAColorWithNumber(t *testing.T) {
-	val := Compute(ast.NewOp(ast.T_PLUS), ast.NewRGBAColor(10, 10, 10, 0.2, nil), ast.NewNumber(3, nil, nil))
+	val, err := Compute(ast.NewOp(ast.T_PLUS), ast.NewRGBAColor(10, 10, 10, 0.2, nil), ast.NewNumber(3, nil, nil))
+	assert.NoError(t, err)
 	c, ok := val.(*ast.RGBAColor)
 	assert.True(t, ok)
 	assert.Equal(t, "rgba(13, 13, 13, 0.2)", c.String())
 }
 
 func TestComputeRGBColorWithNumber(t *testing.T) {
-	val := Compute(ast.NewOp(ast.T_PLUS), ast.NewRGBColor(10, 10, 10, nil), ast.NewNumber(3, nil, nil))
+	val, err := Compute(ast.NewOp(ast.T_PLUS), ast.NewRGBColor(10, 10, 10, nil), ast.NewNumber(3, nil, nil))
+	assert.NoError(t, err)
 	c, ok := val.(*ast.RGBColor)
 	assert.True(t, ok)
 	assert.Equal(t, "rgb(13, 13, 13)", c.String())
