@@ -55,12 +55,28 @@ func getInputFiles(fsys fs.FS) ([]string, error) {
 }
 
 func TestSpec(t *testing.T) {
+	type specStat struct {
+		fname    string
+		success  bool
+		fileStat map[string]bool
+	}
+
 	testFiles, err := getHrxFiles(hrxPath)
 	require.NoError(t, err)
 
 	assert.Positive(t, len(testFiles))
 
+	totalFiles := len(testFiles)
+	success := 0
+	stats := []*specStat{}
+
 	for _, fname := range testFiles {
+		st := &specStat{
+			fname:    fname,
+			success:  true,
+			fileStat: map[string]bool{},
+		}
+
 		archive, err := hrx.OpenReader(path.Join(hrxPath, fname))
 		t.Logf("Processing file %s", fname)
 		require.NoErrorf(t, err, "[example %s] open hrx file", fname)
@@ -80,29 +96,59 @@ func TestSpec(t *testing.T) {
 			var context = runtime.NewContext()
 			var parser = parser.NewParser(context)
 			var stmts, err = parser.ParseFile(archive, input)
-			require.NoErrorf(t, err, "[example %s] Input: %s, parse failed", fname, input)
+			if !assert.NoErrorf(t, err, "[example %s] Input: %s, parse failed", fname, input) {
+				st.fileStat[input] = false
+				st.success = false
+				stats = append(stats, st)
+				continue
+			}
 
 			var b bytes.Buffer
 			var compiler = compiler.NewPrettyCompiler(context, &b)
-			err = compiler.Compile(stmts)
+			compileErr := compiler.Compile(stmts)
 
 			baseName := path.Dir(input)
 			errFname := path.Join(baseName, "error")
 			outputFname := path.Join(baseName, "output.css")
 
 			if _, err := fs.Stat(archive, errFname); err == nil {
-				assert.Errorf(t, err, "[example %s] Input: %s", fname, input)
-				if err != nil {
-					expected, err := fs.ReadFile(archive, outputFname)
-					assert.NoErrorf(t, err, "[example %s] Input: %s", fname, input)
-					assert.Equalf(t, expected, err.Error(), "[example %s] Input: %s", fname, input)
+				if !assert.Errorf(t, compileErr, "[example %s] Input: %s", fname, input) {
+					st.fileStat[input] = false
+					st.success = false
+					stats = append(stats, st)
+					continue
 				}
-			}
-			assert.NoErrorf(t, err, "[example %s] get input files", fname)
-		}
 
-		break
+				expected, err := fs.ReadFile(archive, errFname)
+
+				if !assert.NoErrorf(t, err, "[example %s] Input: %s", fname, errFname) ||
+					!assert.Equalf(t, string(expected), compileErr.Error(), "[example %s] Input: %s", fname, errFname) {
+					st.fileStat[input] = false
+					stats = append(stats, st)
+					continue
+				}
+
+				st.fileStat[input] = true
+				success++
+				stats = append(stats, st)
+
+			} else {
+				expected, err := fs.ReadFile(archive, outputFname)
+				if !assert.NoErrorf(t, err, "[example %s] Input: %s", fname, input) ||
+					!assert.Equalf(t, expected, err.Error(), "[example %s] Input: %s", fname, input) {
+					st.fileStat[input] = false
+					stats = append(stats, st)
+					continue
+				}
+
+				st.fileStat[input] = true
+				success++
+				stats = append(stats, st)
+			}
+		}
 	}
+
+	t.Logf("%d/%d spec files were successful", success, totalFiles)
 
 	require.True(t, false)
 }
