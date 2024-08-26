@@ -167,7 +167,7 @@ func (parser *Parser) expect(tokenType ast.TokenType) (*ast.Token, error) {
 	if tok != nil && tok.Type != tokenType {
 		parser.backup()
 		return nil, SyntaxError{
-			Reason:      tokenType.String(),
+			Reason:      fmt.Sprintf("expected: %s", tokenType.String()),
 			ActualToken: tok,
 			File:        parser.File,
 		}
