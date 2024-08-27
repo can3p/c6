@@ -70,8 +70,13 @@ func TestSpec(t *testing.T) {
 	totalFiles := len(testFiles)
 	success := 0
 	stats := []*specStat{}
+	testOnly := os.Getenv("TEST_ONLY")
 
 	for idx, fname := range testFiles {
+		if testOnly != "" && testOnly != fname {
+			continue
+		}
+
 		st := &specStat{
 			fname:    fname,
 			success:  true,
