@@ -28,38 +28,38 @@ type ComputeFunction func(a ast.Value, b ast.Value) ast.Value
 
 const ValueTypeNum = 7
 
-var computableMatrix [ValueTypeNum][ValueTypeNum]bool = [ValueTypeNum][ValueTypeNum]bool{
-	/* NumberValue */
-	{false, false, false, false, false, false, false},
+//var computableMatrix [ValueTypeNum][ValueTypeNum]bool = [ValueTypeNum][ValueTypeNum]bool{
+//[> NumberValue <]
+//{false, false, false, false, false, false, false},
 
-	/* HexColorValue */
-	{false, false, false, false, false, false, false},
+//[> HexColorValue <]
+//{false, false, false, false, false, false, false},
 
-	/* RGBAColorValue */
-	{false, false, false, false, false, false, false},
+//[> RGBAColorValue <]
+//{false, false, false, false, false, false, false},
 
-	/* RGBColorValue */
-	{false, false, false, false, false, false, false},
-}
+//[> RGBColorValue <]
+//{false, false, false, false, false, false, false},
+//}
 
-/*
-*
-Each row: [5]ComputeFunction{ NumberValue, HexColorValue, RGBAColorValue, RGBColorValue }
-*/
-var computeFunctionMatrix [5][5]ComputeFunction = [5][5]ComputeFunction{
+//[>
+//*
+//Each row: [5]ComputeFunction{ NumberValue, HexColorValue, RGBAColorValue, RGBColorValue }
+//*/
+//var computeFunctionMatrix [5][5]ComputeFunction = [5][5]ComputeFunction{
 
-	/* NumberValue */
-	{nil, nil, nil, nil, nil},
+//[> NumberValue <]
+//{nil, nil, nil, nil, nil},
 
-	/* HexColorValue */
-	{nil, nil, nil, nil, nil},
+//[> HexColorValue <]
+//{nil, nil, nil, nil, nil},
 
-	/* RGBAColorValue */
-	{nil, nil, nil, nil, nil},
+//[> RGBAColorValue <]
+//{nil, nil, nil, nil, nil},
 
-	/* RGBColorValue */
-	{nil, nil, nil, nil, nil},
-}
+//[> RGBColorValue <]
+//{nil, nil, nil, nil, nil},
+//}
 
 func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 	if op == nil {
@@ -81,7 +81,7 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 				if IsComparable(ta, tb) {
 					return ast.NewBoolean(ta.Value == tb.Value), nil
 				} else {
-					fmt.Errorf("Can't compare number (unit different)")
+					return nil, fmt.Errorf("Can't compare number (unit different)")
 				}
 			}
 		}
@@ -203,7 +203,7 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 		case *ast.Number:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return NumberAddNumber(ta, tb), nil
+				return NumberAddNumber(ta, tb)
 			case *ast.HexColor:
 				return HexColorAddNumber(tb, ta), nil
 			}
@@ -228,7 +228,7 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 		case *ast.Number:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return NumberSubNumber(ta, tb), nil
+				return NumberSubNumber(ta, tb)
 			}
 		case *ast.HexColor:
 			switch tb := b.(type) {
