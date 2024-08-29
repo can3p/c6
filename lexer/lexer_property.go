@@ -78,7 +78,8 @@ Possible property value syntax:
 */
 func lexProperty(l *Lexer) (stateFn, error) {
 	var r = l.peek()
-	for r != ':' {
+
+	for r != ':' && !unicode.IsSpace(r) {
 		if l.peek() == '#' && l.peekBy(2) == '{' {
 			lexInterpolation2(l)
 
@@ -98,6 +99,12 @@ func lexProperty(l *Lexer) (stateFn, error) {
 			}
 		}
 		r = l.peek()
+	}
+
+	l.ignoreSpaces()
+	if l.peek() == '/' {
+		lexComment(l, false)
+		l.ignoreSpaces()
 	}
 
 	lexColon(l)
