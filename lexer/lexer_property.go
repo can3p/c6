@@ -78,9 +78,7 @@ Possible property value syntax:
 */
 func lexProperty(l *Lexer) (stateFn, error) {
 	var r = l.peek()
-	// css/custom_properties/indentation.hrx
-	// newline as the property name turns this into the infinite loop
-	for r != ':' && r != 10 {
+	for r != ':' {
 		if l.peek() == '#' && l.peekBy(2) == '{' {
 			lexInterpolation2(l)
 

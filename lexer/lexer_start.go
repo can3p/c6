@@ -49,6 +49,13 @@ func lexStart(l *Lexer) (stateFn, error) {
 		return lexStart, nil
 
 	case '-':
+		// css/custom_properties/indentation.hrx
+		// lexProperty gets into endless loop while trying to parse
+		// a css variable.
+		// @TODO: remove and immplement css variables support properly
+		if r2 == '-' {
+			return nil, fmt.Errorf("CSS variables are not supported yet")
+		}
 		// Vendor prefix properties start with '-'
 		return lexProperty, nil
 
