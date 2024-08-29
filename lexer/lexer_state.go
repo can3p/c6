@@ -242,7 +242,7 @@ func lexNumber(l *Lexer) (stateFn, error) {
 			floatPoint = true
 			r = l.next()
 			if !unicode.IsDigit(r) {
-				l.errorf("Expecting at least one digit after the floating point, got '%c'", r)
+				return nil, l.errorf("Expecting at least one digit after the floating point, got '%c'", r)
 			}
 		} else if r == 'e' {
 			var r2, r3 = l.peek2()
