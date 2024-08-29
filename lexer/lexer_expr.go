@@ -38,7 +38,10 @@ func lexExpr(l *Lexer) (stateFn, error) {
 
 	} else if unicode.IsLetter(r) {
 
-		lexIdentifier(l)
+		_, err := lexIdentifier(l)
+		if err != nil {
+			return nil, err
+		}
 
 	} else if r == '.' && r2 == '.' {
 
