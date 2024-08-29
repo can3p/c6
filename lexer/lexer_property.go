@@ -8,7 +8,7 @@ import (
 
 func lexPropertyNameToken(l *Lexer) (stateFn, error) {
 	var r = l.next()
-	for unicode.IsLetter(r) || unicode.IsDigit(r) || r == '-' {
+	for unicode.IsLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_' {
 		r = l.next()
 	}
 	l.backup()
