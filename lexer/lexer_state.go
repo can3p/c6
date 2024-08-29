@@ -107,6 +107,9 @@ func lexAssignStmt(l *Lexer) (stateFn, error) {
 	lexVariableName(l)
 	lexColon(l)
 	var r = l.peek()
+	//for r != ';' && r != '}' && r != EOF && lexExpr(l) != nil {
+	//r = l.peek()
+	//}
 	for r != ';' && r != '}' && r != EOF {
 		fn, err := lexExpr(l)
 		if err != nil {
@@ -115,6 +118,8 @@ func lexAssignStmt(l *Lexer) (stateFn, error) {
 
 		if fn != nil {
 			r = l.peek()
+		} else {
+			break
 		}
 	}
 	// l.backup()
