@@ -218,6 +218,8 @@ func lexNumberUnit(l *Lexer) (stateFn, error) {
 	return lexExpr, nil
 }
 
+var ErrLexNaN = fmt.Errorf("Not a number")
+
 /*
 *
 @see https://developer.mozilla.org/en-US/docs/Web/CSS/number
@@ -253,6 +255,10 @@ func lexNumber(l *Lexer) (stateFn, error) {
 		}
 	}
 	l.backup()
+
+	if l.peek() == '\\' {
+		return nil, ErrLexNaN
+	}
 
 	if floatPoint {
 		l.emit(ast.T_FLOAT)

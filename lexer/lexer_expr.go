@@ -62,7 +62,14 @@ func lexExpr(l *Lexer) (stateFn, error) {
 	} else if unicode.IsDigit(r) {
 
 		if fn, err := lexNumber(l); err != nil {
-			return nil, err
+			if err == ErrLexNaN {
+				_, err := lexIdentifier(l)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				return nil, err
+			}
 		} else if fn != nil {
 			_, err := fn(l)
 			if err != nil {
