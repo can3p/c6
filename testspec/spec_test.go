@@ -203,7 +203,6 @@ func TestSpec(t *testing.T) {
 					stats = append(stats, st)
 				}
 			}, "[example %s] Input: %s", fname, input)
-			break
 		}
 	}
 
