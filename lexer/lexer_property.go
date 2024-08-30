@@ -116,7 +116,10 @@ func lexProperty(l *Lexer) (stateFn, error) {
 	//    progid:DXImageTransform.Microsoft.MotionBlur(strength=13, direction=310)
 	if l.match("progid:") {
 		l.emit(ast.T_MS_PROGID)
-		lexMicrosoftProgIdFunction(l)
+		_, err := lexMicrosoftProgIdFunction(l)
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		l.rollback()
 	}
