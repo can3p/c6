@@ -101,7 +101,9 @@ func lexExpr(l *Lexer) (stateFn, error) {
 			//         background-image: -moz-linear-gradient(top, #81a8cb, #4477a1);
 
 			l.next()
-			lexIdentifier(l)
+			if _, err := lexIdentifier(l); err != nil {
+				return nil, err
+			}
 
 		} else {
 

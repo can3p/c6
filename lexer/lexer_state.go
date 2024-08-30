@@ -46,9 +46,13 @@ func lexUnicodeRange(l *Lexer) (stateFn, error) {
 	return nil, nil
 }
 
-func lexUrlParam(l *Lexer) {
+func lexUrlParam(l *Lexer) error {
 	l.match("(")
 	l.emit(ast.T_PAREN_OPEN)
+	if err := l.ignoreComment(); err != nil {
+		return err
+	}
+
 	l.ignoreSpaces()
 
 	var q = l.peek()
@@ -61,6 +65,8 @@ func lexUrlParam(l *Lexer) {
 	l.ignoreSpaces()
 	l.expect(")")
 	l.emit(ast.T_PAREN_CLOSE)
+
+	return nil
 }
 
 func lexSpaces(l *Lexer) stateFn {
