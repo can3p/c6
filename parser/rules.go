@@ -51,7 +51,7 @@ func (parser *Parser) ParseScssFile(file string) (*ast.StmtList, error) {
 	// TODO: use concurrent method to consume the inputs, we also need to
 	// benchmark this when the file is large. Don't need to consider small files because small files
 	// can always be compiled fast (less than 500 millisecond).
-	var tok *ast.Token = nil
+	var tok *ast.Token
 	for tok = <-parser.Input; tok != nil; tok = <-parser.Input {
 		parser.Tokens = append(parser.Tokens, tok)
 	}
@@ -66,7 +66,7 @@ func (parser *Parser) ParseScss(code string) (*ast.StmtList, error) {
 	// Run lexer concurrently
 	go l.Run()
 
-	var tok *ast.Token = nil
+	var tok *ast.Token
 	for tok = <-parser.Input; tok != nil; tok = <-parser.Input {
 		parser.Tokens = append(parser.Tokens, tok)
 	}
@@ -284,7 +284,7 @@ func (parser *Parser) ParseLogicANDExpr() (ast.Expr, error) {
 func (parser *Parser) ParseComparisonExpr() (ast.Expr, error) {
 	debug("ParseComparisonExpr")
 
-	var expr ast.Expr = nil
+	var expr ast.Expr
 	var err error
 	if parser.accept(ast.T_PAREN_OPEN) != nil {
 		expr, err = parser.ParseLogicExpr()
@@ -861,7 +861,7 @@ func (parser *Parser) ParseExpr(inParenthesis bool) (ast.Expr, error) {
 
 	// plus or minus. This creates an unary expression that holds the later term.
 	// this is for:  +3 or -4
-	var expr ast.Expr = nil
+	var expr ast.Expr
 	var err error
 
 	if tok := parser.acceptAnyOf2(ast.T_PLUS, ast.T_MINUS); tok != nil {
@@ -1496,7 +1496,10 @@ https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Media_queries
 func (parser *Parser) ParseMediaQueryStmt() (ast.Stmt, error) {
 	// expect the '@media' token
 	var stm = ast.NewMediaQueryStmt()
-	parser.expect(ast.T_MEDIA)
+	if _, err := parser.expect(ast.T_MEDIA); err != nil {
+		return nil, err
+	}
+
 	if list, err := parser.ParseMediaQueryList(); err != nil {
 		return nil, err
 	} else if list != nil {
@@ -1996,7 +1999,7 @@ func (parser *Parser) ParseMixinStmt() (ast.Stmt, error) {
 func (parser *Parser) ParseFunctionPrototypeArgument() (*ast.Argument, error) {
 	debug("ParseFunctionPrototypeArgument")
 
-	var varTok *ast.Token = nil
+	var varTok *ast.Token
 	if varTok = parser.accept(ast.T_VARIABLE); varTok == nil {
 		return nil, nil
 	}
@@ -2025,7 +2028,7 @@ func (parser *Parser) ParseFunctionPrototype() (*ast.ArgumentList, error) {
 
 	var tok = parser.peek()
 	for tok.Type != ast.T_PAREN_CLOSE {
-		var arg *ast.Argument = nil
+		var arg *ast.Argument
 		var err error
 		if arg, err = parser.ParseFunctionPrototypeArgument(); err != nil {
 			return nil, err
@@ -2054,7 +2057,7 @@ func (parser *Parser) ParseFunctionPrototype() (*ast.ArgumentList, error) {
 func (parser *Parser) ParseFunctionCallArgument() (*ast.Argument, error) {
 	debug("ParseFunctionCallArgument")
 
-	var varTok *ast.Token = nil
+	var varTok *ast.Token
 	if varTok = parser.accept(ast.T_VARIABLE); varTok == nil {
 		return nil, nil
 	}
@@ -2082,7 +2085,7 @@ func (parser *Parser) ParseFunctionCallArguments() (*ast.ArgumentList, error) {
 	}
 	var tok = parser.peek()
 	for tok.Type != ast.T_PAREN_CLOSE {
-		var arg *ast.Argument = nil
+		var arg *ast.Argument
 		var err error
 		if arg, err = parser.ParseFunctionCallArgument(); err != nil {
 			return nil, err

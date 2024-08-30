@@ -69,16 +69,16 @@ func lexUrlParam(l *Lexer) error {
 	return nil
 }
 
-func lexSpaces(l *Lexer) stateFn {
-	for {
-		var t = l.next()
-		if t != ' ' {
-			l.backup()
-			return nil
-		}
-	}
-	///XXX return lexStart
-}
+//func lexSpaces(l *Lexer) stateFn {
+//for {
+//var t = l.next()
+//if t != ' ' {
+//l.backup()
+//return nil
+//}
+//}
+/////XXX return lexStart
+//}
 
 /*
 lex unquote string but stops at the exclude rune.
@@ -89,15 +89,15 @@ func lexUnquoteStringExclude(l *Lexer, exclude string) (stateFn, error) {
 	return nil, nil
 }
 
-func lexUnquoteStringStopAt(l *Lexer, stop rune) (stateFn, error) {
-	var r = l.next()
-	for r != stop {
-		r = l.next()
-	}
-	l.backup()
-	l.emit(ast.T_UNQUOTE_STRING)
-	return nil, nil
-}
+//func lexUnquoteStringStopAt(l *Lexer, stop rune) (stateFn, error) {
+//var r = l.next()
+//for r != stop {
+//r = l.next()
+//}
+//l.backup()
+//l.emit(ast.T_UNQUOTE_STRING)
+//return nil, nil
+//}
 
 func lexUnquoteString(l *Lexer) (stateFn, error) {
 	var r = l.next()
@@ -131,7 +131,10 @@ func lexAssignStmt(l *Lexer) (stateFn, error) {
 	// l.backup()
 
 	l.ignoreSpaces()
-	l.ignoreComment()
+	if err := l.ignoreComment(); err != nil {
+		return nil, err
+	}
+
 	l.ignoreSpaces()
 
 	if l.accept(";") {

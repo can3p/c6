@@ -135,13 +135,13 @@ func (l *Lexer) rollback() {
 	l.Offset = l.RollbackOffset
 }
 
-func (l *Lexer) acceptAndEmit(valid string, tokenType ast.TokenType) bool {
-	if l.accept(valid) {
-		l.emit(tokenType)
-		return true
-	}
-	return false
-}
+//func (l *Lexer) acceptAndEmit(valid string, tokenType ast.TokenType) bool {
+//if l.accept(valid) {
+//l.emit(tokenType)
+//return true
+//}
+//return false
+//}
 
 func (l *Lexer) expect(valid string) error {
 	if !l.accept(valid) {
@@ -156,7 +156,7 @@ func (l *Lexer) expect(valid string) error {
 // Note, this method only match the first character
 func (l *Lexer) accept(valid string) bool {
 	var r rune = l.next()
-	if strings.IndexRune(valid, r) >= 0 {
+	if strings.ContainsRune(valid, r) {
 		return true
 	}
 	l.backup()
@@ -166,26 +166,26 @@ func (l *Lexer) accept(valid string) bool {
 // Accept letter runes continuously
 // Return true if there are some letters.
 // Return false if there is no letter.
-func (l *Lexer) acceptLetters() bool {
-	var r rune = l.next()
-	for unicode.IsLetter(r) {
-		r = l.next()
-	}
-	l.backup()
-	return l.Offset > l.Start
-}
+//func (l *Lexer) acceptLetters() bool {
+//var r rune = l.next()
+//for unicode.IsLetter(r) {
+//r = l.next()
+//}
+//l.backup()
+//return l.Offset > l.Start
+//}
 
 // Accept letter|digits runes continuously
 // Return true if there are some letters.
 // Return false if there is no letter.
-func (l *Lexer) acceptLettersAndDigits() bool {
-	var r rune = l.next()
-	for unicode.IsLetter(r) || unicode.IsDigit(r) {
-		r = l.next()
-	}
-	l.backup()
-	return l.Offset > l.Start
-}
+//func (l *Lexer) acceptLettersAndDigits() bool {
+//var r rune = l.next()
+//for unicode.IsLetter(r) || unicode.IsDigit(r) {
+//r = l.next()
+//}
+//l.backup()
+//return l.Offset > l.Start
+//}
 
 // Return the current token string but not consume it
 func (l *Lexer) current() string {
@@ -247,10 +247,10 @@ func (l *Lexer) peek2() (r1, r2 rune) {
 }
 
 // advance offset by specific width
-func (l *Lexer) advance(w int) {
-	l.Offset += w
-	l.LineOffset++
-}
+//func (l *Lexer) advance(w int) {
+//l.Offset += w
+//l.LineOffset++
+//}
 
 // peek more characters
 // peekBy(1) == peek()
@@ -265,9 +265,9 @@ func (l *Lexer) peekBy(p int) (r rune) {
 	return r
 }
 
-func (l *Lexer) take() string {
-	return l.Input[l.Start:l.Offset]
-}
+//func (l *Lexer) take() string {
+//return l.Input[l.Start:l.Offset]
+//}
 
 func (l *Lexer) emitToken(token *ast.Token) {
 	// TODO: debug emit flag
@@ -277,16 +277,16 @@ func (l *Lexer) emitToken(token *ast.Token) {
 	l.Start = l.Offset
 }
 
-func (l *Lexer) createTokenWith0Offset(tokenType ast.TokenType) *ast.Token {
-	var token = ast.Token{
-		Type:       tokenType,
-		Str:        "",
-		Pos:        l.Start,
-		Line:       l.Line,
-		LineOffset: l.LineOffset,
-	}
-	return &token
-}
+//func (l *Lexer) createTokenWith0Offset(tokenType ast.TokenType) *ast.Token {
+//var token = ast.Token{
+//Type:       tokenType,
+//Str:        "",
+//Pos:        l.Start,
+//Line:       l.Line,
+//LineOffset: l.LineOffset,
+//}
+//return &token
+//}
 
 func (l *Lexer) createToken(tokenType ast.TokenType) *ast.Token {
 	/*
@@ -324,7 +324,7 @@ func (l *Lexer) emit(tokenType ast.TokenType, params ...bool) *ast.Token {
 func (l *Lexer) til(str string) {
 	var r = l.next()
 	for r != EOF {
-		if strings.IndexRune(str, r) >= 0 {
+		if strings.ContainsRune(str, r) {
 			break
 		}
 		r = l.next()
@@ -356,20 +356,20 @@ func (l *Lexer) match(str string) bool {
 	return true
 }
 
-func (l *Lexer) matchKeyword(str string, tokType ast.TokenType) bool {
-	l.remember()
-	if l.match(str) {
-		var r = l.peek()
-		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '-' {
-			// try next one
-			l.rollback()
-			return false
-		}
-		l.emit(tokType)
-		return true
-	}
-	return false
-}
+//func (l *Lexer) matchKeyword(str string, tokType ast.TokenType) bool {
+//l.remember()
+//if l.match(str) {
+//var r = l.peek()
+//if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '-' {
+//// try next one
+//l.rollback()
+//return false
+//}
+//l.emit(tokType)
+//return true
+//}
+//return false
+//}
 
 func (l *Lexer) matchKeywordList(keywords ast.KeywordTokenList) *ast.Token {
 	for _, keyword := range keywords {
@@ -387,22 +387,22 @@ func (l *Lexer) matchKeywordList(keywords ast.KeywordTokenList) *ast.Token {
 	return nil
 }
 
-func (l *Lexer) matchKeywordMap(keywords ast.KeywordTokenMap) ast.TokenType {
-	for str, tokType := range keywords {
-		l.remember()
-		if l.match(str) {
-			var r = l.peek()
-			if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '-' {
-				// try next one
-				l.rollback()
-				continue
-			}
-			l.emit(tokType)
-			return tokType
-		}
-	}
-	return 0
-}
+//func (l *Lexer) matchKeywordMap(keywords ast.KeywordTokenMap) ast.TokenType {
+//for str, tokType := range keywords {
+//l.remember()
+//if l.match(str) {
+//var r = l.peek()
+//if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '-' {
+//// try next one
+//l.rollback()
+//continue
+//}
+//l.emit(tokType)
+//return tokType
+//}
+//}
+//return 0
+//}
 
 func (l *Lexer) precedeStartOffset() bool {
 	return l.Offset > l.Start
@@ -479,7 +479,10 @@ func (l *Lexer) RunFrom(fn stateFn) {
 	if l.Output == nil {
 		l.Output = make(ast.TokenStream, TOKEN_CHANNEL_BUFFER)
 	}
-	l.DispatchFn(fn)
+	if _, err := l.DispatchFn(fn); err != nil {
+		panic(err)
+	}
+
 	l.Output <- nil
 }
 
@@ -487,7 +490,9 @@ func (l *Lexer) Run() {
 	if l.Output == nil {
 		l.Output = make(ast.TokenStream, TOKEN_CHANNEL_BUFFER)
 	}
-	l.DispatchFn(lexStart)
+	if _, err := l.DispatchFn(lexStart); err != nil {
+		panic(err)
+	}
 	l.Output <- nil
 }
 

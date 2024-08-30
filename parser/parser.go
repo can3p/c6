@@ -111,14 +111,14 @@ func (parser *Parser) restore(pos int) {
 	parser.Pos = pos
 }
 
-func (parser *Parser) remember() {
-	parser.RollbackPos = parser.Pos
-}
+//func (parser *Parser) remember() {
+//parser.RollbackPos = parser.Pos
+//}
 
 // rollback to the save position
-func (parser *Parser) rollback() {
-	parser.Pos = parser.RollbackPos
-}
+//func (parser *Parser) rollback() {
+//parser.Pos = parser.RollbackPos
+//}
 
 // accept() accepts one token type one time.
 // rolls back if the token type mismatch
@@ -133,16 +133,16 @@ func (parser *Parser) accept(tokenType ast.TokenType) *ast.Token {
 
 // acceptAny accepts some token types, or it rolls back when the token mismatch
 // the token types.
-func (parser *Parser) acceptAny(tokenTypes ...ast.TokenType) *ast.Token {
-	var tok = parser.next()
-	for _, tokType := range tokenTypes {
-		if tok.Type == tokType {
-			return tok
-		}
-	}
-	parser.backup()
-	return nil
-}
+//func (parser *Parser) acceptAny(tokenTypes ...ast.TokenType) *ast.Token {
+//var tok = parser.next()
+//for _, tokType := range tokenTypes {
+//if tok.Type == tokType {
+//return tok
+//}
+//}
+//parser.backup()
+//return nil
+//}
 
 func (parser *Parser) acceptAnyOf2(tokType1, tokType2 ast.TokenType) *ast.Token {
 	var tok = parser.next()
@@ -205,9 +205,9 @@ func (parser *Parser) advance() {
 	parser.Pos++
 }
 
-func (parser *Parser) current() *ast.Token {
-	return parser.Tokens[parser.Pos]
-}
+//func (parser *Parser) current() *ast.Token {
+//return parser.Tokens[parser.Pos]
+//}
 
 func (parser *Parser) peek() *ast.Token {
 	if parser.Pos < len(parser.Tokens) {
