@@ -5,7 +5,6 @@ import (
 	"io/fs"
 	"os"
 	"path"
-	"slices"
 	"strings"
 	"testing"
 
@@ -89,11 +88,6 @@ func TestSpec(t *testing.T) {
 		inputFiles, err := getInputFiles(archive)
 
 		require.NoErrorf(t, err, "[example %s] get input files", fname)
-
-		if testOnly == "" && slices.Contains([]int{529, 741, 821, 825, 882, 883, 944, 1265, 1266, 1325, 1339, 1340, 1345, 1370, 1829, 1831, 1832, 1833, 1835, 1837, 1838, 1839, 1853, 1855, 1856, 1857, 1871, 1873, 1874, 1875, 1889, 1891, 1892, 1893, 1907, 1909, 1910, 1911, 1925, 1927, 1928, 1929, 1931, 1935, 1941, 1974, 2118, 2206, 2416}, idx) {
-			t.Logf("file %s has an endless loop", fname)
-			continue
-		}
 
 		t.Logf("Processing file %s", fname)
 		t.Logf("Input files: %d - %v", idx, inputFiles)
