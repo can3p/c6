@@ -17,6 +17,31 @@ import (
 )
 
 const hrxPath = "../sass-spec/spec"
+const failuresList = "failures_list.go"
+
+func writeFailuresListP(names map[string][]string) {
+	var b bytes.Buffer
+
+	b.WriteString("package testspec\n\n")
+	b.WriteString("var failedSpecs = map[string]map[string]struct{}{\n")
+	for spec, n := range names {
+		b.WriteString("\t\"")
+		b.WriteString(spec)
+		b.WriteString("\": {\n")
+		for _, n := range n {
+			b.WriteString("\t\t\"")
+			b.WriteString(n)
+			b.WriteString("\": {},\n")
+		}
+		b.WriteString("\t},\n")
+	}
+
+	b.WriteString("}\n")
+
+	if err := os.WriteFile(failuresList, b.Bytes(), fs.ModePerm); err != nil {
+		panic(err)
+	}
+}
 
 func getHrxFiles(path string) ([]string, error) {
 	names := []string{}
@@ -70,6 +95,19 @@ func TestSpec(t *testing.T) {
 	success := 0
 	stats := []*specStat{}
 	testOnly := os.Getenv("TEST_ONLY")
+	generateFailuresList := os.Getenv("GENERATE_FAILURES_LIST") != ""
+	if testOnly != "" && generateFailuresList {
+		panic("TEST_ONLY and GENERATE_FAILURES_LIST vars can't be set together")
+	}
+
+	failedSpecs := map[string][]string{}
+
+	addFailure := func(spec, fname string) {
+		if _, ok := failedSpecs[spec]; !ok {
+			failedSpecs[spec] = []string{}
+			failedSpecs[spec] = append(failedSpecs[spec], fname)
+		}
+	}
 
 	for idx, fname := range testFiles {
 		if testOnly != "" && testOnly != fname {
@@ -93,6 +131,7 @@ func TestSpec(t *testing.T) {
 		t.Logf("Input files: %d - %v", idx, inputFiles)
 
 		for _, input := range inputFiles {
+			t.Logf("Processing Input file: %s", input)
 			assert.NotPanicsf(t, func() {
 				var context = runtime.NewContext()
 				var parser = parser.NewParser(context)
@@ -102,6 +141,7 @@ func TestSpec(t *testing.T) {
 					st.fileStat[input] = false
 					st.success = false
 					stats = append(stats, st)
+					addFailure(fname, input)
 					return
 				}
 
@@ -120,6 +160,7 @@ func TestSpec(t *testing.T) {
 						st.fileStat[input] = false
 						st.success = false
 						stats = append(stats, st)
+						addFailure(fname, input)
 						return
 					}
 				}
@@ -137,7 +178,9 @@ func TestSpec(t *testing.T) {
 					if !assert.NoErrorf(t, err, "[example %s] Input: %s", fname, errFname) ||
 						!assert.Equalf(t, string(expected), compileErr.Error(), "[example %s] Input: %s", fname, errFname) {
 						st.fileStat[input] = false
+						st.success = false
 						stats = append(stats, st)
+						addFailure(fname, input)
 						return
 					}
 
@@ -151,6 +194,7 @@ func TestSpec(t *testing.T) {
 						!assert.Equalf(t, expected, err.Error(), "[example %s] Input: %s", fname, input) {
 						st.fileStat[input] = false
 						stats = append(stats, st)
+						addFailure(fname, input)
 						return
 					}
 
@@ -161,6 +205,10 @@ func TestSpec(t *testing.T) {
 			}, "[example %s] Input: %s", fname, input)
 			break
 		}
+	}
+
+	if generateFailuresList {
+		writeFailuresListP(failedSpecs)
 	}
 
 	t.Logf("%d/%d spec files were successful", success, totalFiles)
