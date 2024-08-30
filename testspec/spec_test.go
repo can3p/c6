@@ -112,7 +112,17 @@ func TestSpec(t *testing.T) {
 
 				baseName := path.Dir(input)
 				errFname := path.Join(baseName, "error")
+				warnFname := path.Join(baseName, "warning")
 				outputFname := path.Join(baseName, "output.css")
+
+				if _, err := fs.Stat(archive, warnFname); err == nil {
+					if !assert.True(t, false, "[example %s] Input: %s - warning is expected, but we don't handle that yet", fname, input) {
+						st.fileStat[input] = false
+						st.success = false
+						stats = append(stats, st)
+						return
+					}
+				}
 
 				if _, err := fs.Stat(archive, errFname); err == nil {
 					if !assert.Errorf(t, compileErr, "[example %s] Input: %s", fname, input) {
