@@ -50,7 +50,9 @@ func lexMicrosoftProgIdFunction(l *Lexer) (stateFn, error) {
 		l.accept("=")
 		l.emit(ast.T_ATTR_EQUAL)
 
-		lexExpr(l)
+		if _, err := lexExpr(l); err != nil {
+			return nil, err
+		}
 
 		l.ignoreSpaces()
 		r = l.peek()
@@ -81,7 +83,9 @@ func lexProperty(l *Lexer) (stateFn, error) {
 
 	for r != ':' && r != '/' && !unicode.IsSpace(r) {
 		if l.peek() == '#' && l.peekBy(2) == '{' {
-			lexInterpolation2(l)
+			if _, err := lexInterpolation2(l); err != nil {
+				return nil, err
+			}
 
 			r = l.peek()
 			if !unicode.IsSpace(r) && r != ':' {
@@ -103,11 +107,15 @@ func lexProperty(l *Lexer) (stateFn, error) {
 
 	l.ignoreSpaces()
 	if l.peek() == '/' {
-		lexComment(l, false)
+		if _, err := lexComment(l, false); err != nil {
+			return nil, err
+		}
 		l.ignoreSpaces()
 	}
 
-	lexColon(l)
+	if _, err := lexColon(l); err != nil {
+		return nil, err
+	}
 
 	l.remember()
 	l.ignoreSpaces()
@@ -146,7 +154,9 @@ func lexProperty(l *Lexer) (stateFn, error) {
 	}
 
 	l.ignoreSpaces()
-	lexComment(l, false)
+	if _, err := lexComment(l, false); err != nil {
+		return nil, err
+	}
 	l.ignoreSpaces()
 
 	// the semicolon in the last declaration is optional.
@@ -162,14 +172,14 @@ func lexProperty(l *Lexer) (stateFn, error) {
 	return lexStart, nil
 }
 
-func lexColon(l *Lexer) stateFn {
+func lexColon(l *Lexer) (stateFn, error) {
 	l.ignoreSpaces()
 	var r = l.next()
 	if r != ':' {
-		l.errorf("Expecting ':' token, Got '%c'", r)
+		return nil, l.errorf("Expecting ':' token, Got '%c'", r)
 	}
 	l.emit(ast.T_COLON)
 
 	// We don't ignore space after the colon because we need spaces to detect literal concat.
-	return nil
+	return nil, nil
 }

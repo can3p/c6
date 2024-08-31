@@ -8,9 +8,9 @@ type WhileStmt struct {
 
 func (stm WhileStmt) CanBeStmt() {}
 
-func (stm WhileStmt) SetElseBlock(block *DeclBlock) {
-	stm.ElseBlock = block
-}
+//func (stm WhileStmt) SetElseBlock(block *DeclBlock) {
+//stm.ElseBlock = block
+//}
 
 func (stm WhileStmt) String() string {
 	return "(if statement STRING() un-implemented)"

@@ -160,10 +160,6 @@ func lexStart(l *Lexer) (stateFn, error) {
 		} else {
 			return lexSelectors, nil
 		}
-
-	} else {
-		return nil, l.errorf("Unexpected token: '%c'", r)
-
 	}
-	return nil, nil
+	return nil, l.errorf("Unexpected token: '%c'", r)
 }

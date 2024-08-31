@@ -61,7 +61,9 @@ func lexAttributeSelector(l *Lexer) (stateFn, error) {
 		for {
 			if IsInterpolationStartToken(r, l.peek()) {
 				l.backup()
-				lexInterpolation(l, false)
+				if _, err := lexInterpolation(l, false); err != nil {
+					return nil, err
+				}
 				foundInterpolation = true
 			} else if !unicode.IsLetter(r) && r != '-' && r != '_' {
 				break
@@ -149,13 +151,13 @@ func lexPseudoSelector(l *Lexer) (stateFn, error) {
 	var foundInterpolation = false
 
 	// the first ':'
-	var r = l.next()
+	l.next()
 
 	// support CSS3 syntax for `::before` and `::after`
 	// @see https://developer.mozilla.org/en-US/docs/Web/CSS/::before
 	l.accept(":")
 
-	r = l.next()
+	var r rune = l.next()
 	if !unicode.IsLetter(r) && !(r == '#' && l.peek() == '{') {
 		return nil, l.errorf("charater '%c' is not allowed in pseudo selector", r)
 	}
@@ -196,7 +198,9 @@ func lexPseudoSelector(l *Lexer) (stateFn, error) {
 				r = l.peek()
 			}
 
-			l.expect(")")
+			if err := l.expect(")"); err != nil {
+				return nil, err
+			}
 			l.emit(ast.T_PAREN_CLOSE)
 
 		} else {
@@ -207,7 +211,10 @@ func lexPseudoSelector(l *Lexer) (stateFn, error) {
 }
 
 func lexUniversalSelector(l *Lexer) (stateFn, error) {
-	l.expect("*")
+	if err := l.expect("*"); err != nil {
+		return nil, err
+	}
+
 	l.emit(ast.T_UNIVERSAL_SELECTOR)
 	return lexSimpleSelector, nil
 }
@@ -267,7 +274,9 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 			if unicode.IsSpace(r) {
 				foundSpace = true
 			}
-			lexComment(l, false)
+			if _, err := lexComment(l, false); err != nil {
+				return nil, err
+			}
 			r = l.next()
 		}
 		l.backup()
@@ -281,7 +290,9 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 		}
 	}
 
-	lexComment(l, false)
+	if _, err := lexComment(l, false); err != nil {
+		return nil, err
+	}
 
 	// re-peek again
 	r = l.peek()
@@ -305,7 +316,9 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 
 	} else if r == '&' {
 
-		l.expect("&")
+		if err := l.expect("&"); err != nil {
+			return nil, err
+		}
 		l.emit(ast.T_PARENT_SELECTOR)
 		return lexSelectors, nil
 
@@ -325,7 +338,9 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 				l.emit(ast.T_LITERAL_CONCAT)
 			}
 
-			lexInterpolation(l, false)
+			if _, err := lexInterpolation(l, false); err != nil {
+				return nil, err
+			}
 			// end of interpolation
 
 			// find stop point of a selector.
@@ -333,7 +348,9 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 			for {
 				if IsInterpolationStartToken(r, l.peek()) {
 					l.backup()
-					lexInterpolation(l, false)
+					if _, err := lexInterpolation(l, false); err != nil {
+						return nil, err
+					}
 				} else if !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '-' && r != '_' || IsSelectorStopToken(r) || isDescendantCombinatorSeparator(r) {
 					break
 				}
@@ -428,45 +445,45 @@ func lexTypeSelector(l *Lexer) (stateFn, error) {
 	return lexSimpleSelector, nil
 }
 
-func lexLang(l *Lexer) stateFn {
-	/*
-		html:lang(fr-ca) { quotes: '« ' ' »' }
-		html:lang(de) { quotes: '»' '«' '\2039' '\203A' }
-		:lang(fr) > Q { quotes: '« ' ' »' }
-		:lang(de) > Q { quotes: '»' '«' '\2039' '\203A' }
-	*/
-	// [a-z]{2} - [a-z]{2}
-	// [a-z]{2}
-	var r = l.next()
-	if !unicode.IsLetter(r) {
-		l.errorf("Unexpected language token. Got '%c'", r)
-	}
+//func lexLang(l *Lexer) stateFn {
+//[>
+//html:lang(fr-ca) { quotes: '« ' ' »' }
+//html:lang(de) { quotes: '»' '«' '\2039' '\203A' }
+//:lang(fr) > Q { quotes: '« ' ' »' }
+//:lang(de) > Q { quotes: '»' '«' '\2039' '\203A' }
+//*/
+//// [a-z]{2} - [a-z]{2}
+//// [a-z]{2}
+//var r = l.next()
+//if !unicode.IsLetter(r) {
+//l.errorf("Unexpected language token. Got '%c'", r)
+//}
 
-	r = l.next()
-	if !unicode.IsLetter(r) {
-		l.errorf("Unexpected language token. Got '%c'", r)
-	}
+//r = l.next()
+//if !unicode.IsLetter(r) {
+//l.errorf("Unexpected language token. Got '%c'", r)
+//}
 
-	r = l.peek()
-	if r == '-' {
-		l.next() // skip '-'
-		r = l.next()
-		if !unicode.IsLetter(r) {
-			l.errorf("Unexpected language token. Got '%c'", r)
-		}
-		r = l.next()
-		if !unicode.IsLetter(r) {
-			l.errorf("Unexpected language token. Got '%c'", r)
-		}
-	}
-	l.emit(ast.T_LANG_CODE)
-	return nil
-}
+//r = l.peek()
+//if r == '-' {
+//l.next() // skip '-'
+//r = l.next()
+//if !unicode.IsLetter(r) {
+//l.errorf("Unexpected language token. Got '%c'", r)
+//}
+//r = l.next()
+//if !unicode.IsLetter(r) {
+//l.errorf("Unexpected language token. Got '%c'", r)
+//}
+//}
+//l.emit(ast.T_LANG_CODE)
+//return nil
+//}
 
 func lexIdSelector(l *Lexer) (stateFn, error) {
 	var foundInterpolation = false
+	l.next()
 	var r = l.next()
-	r = l.next()
 	if !unicode.IsLetter(r) && r != '#' && l.peek() != '{' {
 		return nil, l.errorf("An identifier should start with at least a letter, Got '%c'", r)
 	}

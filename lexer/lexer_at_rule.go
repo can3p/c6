@@ -35,7 +35,9 @@ func lexAtRule(l *Lexer) (stateFn, error) {
 
 			// lex pseudo selector ... if any
 			if l.peek() == ':' {
-				lexPseudoSelector(l)
+				if _, err := lexPseudoSelector(l); err != nil {
+					return nil, err
+				}
 			}
 			return lexStart, nil
 

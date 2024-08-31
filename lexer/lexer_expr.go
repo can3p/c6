@@ -232,7 +232,9 @@ func lexExpr(l *Lexer) (stateFn, error) {
 
 	} else if r == '$' {
 
-		lexVariableName(l)
+		if _, err := lexVariableName(l); err != nil {
+			return nil, err
+		}
 
 	} else if r == EOF || r == '}' || r == '{' || r == ';' { // let expression lexer stop before the start or end of block.
 

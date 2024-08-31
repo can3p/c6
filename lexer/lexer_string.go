@@ -26,7 +26,9 @@ func lexString(l *Lexer) (stateFn, error) {
 				// skip the escape character
 			} else if IsInterpolationStartToken(r, l.peek()) {
 				l.backup()
-				lexInterpolation(l, false)
+				if _, err := lexInterpolation(l, false); err != nil {
+					return nil, err
+				}
 				containsInterpolation = true
 			} else if r == EOF {
 				return nil, fmt.Errorf("Expecting end of string")

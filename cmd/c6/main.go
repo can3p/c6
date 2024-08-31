@@ -87,5 +87,7 @@ func main() {
 	rootCmd.Flags().Int("precision", 0, "I don't know the meaning of this flag")
 
 	rootCmd.AddCommand(compileCmd)
-	rootCmd.Execute()
+	if err := rootCmd.Execute(); err != nil {
+		panic(err)
+	}
 }

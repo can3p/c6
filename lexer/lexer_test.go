@@ -52,8 +52,7 @@ func TestLexerIgnoreSpace(t *testing.T) {
 
 	l.ignoreSpaces()
 
-	var r rune
-	r = l.next()
+	var r rune = l.next()
 	assert.Equal(t, '.', r)
 
 	l.backup()
@@ -64,7 +63,8 @@ func TestLexerString(t *testing.T) {
 	l := NewLexerWithString(`   "foo"`)
 	assert.NotNil(t, l)
 	l.til("\"")
-	lexString(l)
+	_, err := lexString(l)
+	assert.NoError(t, err)
 	token := l.Tokens[0]
 	assert.Equal(t, ast.T_QQ_STRING, token.Type)
 }

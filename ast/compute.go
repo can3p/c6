@@ -8,9 +8,9 @@ type ValueType uint16
 
 const (
 	NumberValue    ValueType = 0
-	HexColorValue            = 1
-	RGBAColorValue           = 2
-	RGBColorValue            = 3
-	ListValue                = 4
-	MapValue                 = 5
+	HexColorValue  ValueType = 1
+	RGBAColorValue ValueType = 2
+	RGBColorValue  ValueType = 3
+	ListValue      ValueType = 4
+	MapValue       ValueType = 5
 )

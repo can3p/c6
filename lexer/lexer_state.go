@@ -57,13 +57,19 @@ func lexUrlParam(l *Lexer) error {
 
 	var q = l.peek()
 	if q == '"' || q == '\'' {
-		lexString(l)
+		if _, err := lexString(l); err != nil {
+			return err
+		}
 	} else {
-		lexUnquoteStringExclude(l, "()")
+		if _, err := lexUnquoteStringExclude(l, "()"); err != nil {
+			return err
+		}
 	}
 
 	l.ignoreSpaces()
-	l.expect(")")
+	if err := l.expect(")"); err != nil {
+		return err
+	}
 	l.emit(ast.T_PAREN_CLOSE)
 
 	return nil
@@ -110,8 +116,14 @@ func lexUnquoteString(l *Lexer) (stateFn, error) {
 }
 
 func lexAssignStmt(l *Lexer) (stateFn, error) {
-	lexVariableName(l)
-	lexColon(l)
+	if _, err := lexVariableName(l); err != nil {
+		return nil, err
+	}
+
+	if _, err := lexColon(l); err != nil {
+		return nil, err
+	}
+
 	var r = l.peek()
 	//for r != ';' && r != '}' && r != EOF && lexExpr(l) != nil {
 	//r = l.peek()
@@ -147,7 +159,9 @@ func lexAssignStmt(l *Lexer) (stateFn, error) {
 
 func lexForStmt(l *Lexer) (stateFn, error) {
 	l.ignoreSpaces()
-	lexVariableName(l)
+	if _, err := lexVariableName(l); err != nil {
+		return nil, err
+	}
 
 	fn, err := lexExpr(l)
 
@@ -173,7 +187,7 @@ func lexHexColor(l *Lexer) (stateFn, error) {
 	l.ignoreSpaces()
 	var r rune = l.next()
 	if r != '#' {
-		l.errorf("Expecting hex color, got '%c'", r)
+		return nil, l.errorf("Expecting hex color, got '%c'", r)
 	}
 
 	r = l.next()
@@ -242,7 +256,7 @@ func lexNumber(l *Lexer) (stateFn, error) {
 	if r == '.' {
 		r = l.next()
 		if !unicode.IsDigit(r) {
-			l.errorf("Expecting digits after '.'. Got %c", r)
+			return nil, l.errorf("Expecting digits after '.'. Got %c", r)
 		}
 		floatPoint = true
 	}

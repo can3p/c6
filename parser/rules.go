@@ -1513,7 +1513,7 @@ func (parser *Parser) ParseMediaQueryList() (*ast.MediaQueryList, error) {
 		return nil, nil
 	}
 
-	var queries = &ast.MediaQueryList{query}
+	var queries = &ast.MediaQueryList{List: []*ast.MediaQuery{query}}
 	for parser.accept(ast.T_COMMA) != nil {
 		if query, err := parser.ParseMediaQuery(); err != nil {
 			return nil, err
@@ -1894,7 +1894,7 @@ func (parser *Parser) ParseImportStmt() (ast.Stmt, error) {
 	if mediaQueryList, err := parser.ParseMediaQueryList(); err != nil {
 		return nil, err
 	} else if mediaQueryList != nil {
-		stm.MediaQueryList = *mediaQueryList
+		stm.MediaQueryList = mediaQueryList.List
 	}
 
 	// must be ast.T_SEMICOLON at the end
