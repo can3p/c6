@@ -52,15 +52,12 @@ type Lexer struct {
 	// character offset from the begining of line
 	LineOffset int
 
-	// the token output channel
-	Output chan *ast.Token
-
-	Tokens []ast.Token
+	Tokens []*ast.Token
 }
 
 func (l *Lexer) lastToken() *ast.Token {
 	if len(l.Tokens) > 0 {
-		return &l.Tokens[len(l.Tokens)-1]
+		return l.Tokens[len(l.Tokens)-1]
 	}
 	return nil
 }
@@ -112,14 +109,6 @@ func NewLexerWithFile(fsys fs.FS, file string) (*Lexer, error) {
 		LineOffset: 0,
 		Input:      string(data),
 	}, nil
-}
-
-func (l *Lexer) TokenStream() ast.TokenStream {
-	if l.Output != nil {
-		return l.Output
-	}
-	l.Output = make(chan *ast.Token, TOKEN_CHANNEL_BUFFER)
-	return l.Output
 }
 
 // remember the current offset, can be rolled back by using the `rollback`
@@ -201,9 +190,9 @@ func (l *Lexer) length() int {
 }
 
 // If there are remaining tokens
-func (l *Lexer) remaining() bool {
-	return l.Offset+1 < len(l.Input)
-}
+//func (l *Lexer) remaining() bool {
+//return l.Offset+1 < len(l.Input)
+//}
 
 // next returns the next rune in the input.
 func (l *Lexer) next() (r rune) {
@@ -272,8 +261,7 @@ func (l *Lexer) peekBy(p int) (r rune) {
 func (l *Lexer) emitToken(token *ast.Token) {
 	// TODO: debug emit flag
 	// fmt.Printf("emit: %+v\n", token)
-	l.Tokens = append(l.Tokens, *token)
-	l.Output <- token
+	l.Tokens = append(l.Tokens, token)
 	l.Start = l.Offset
 }
 
@@ -475,30 +463,18 @@ func (l *Lexer) Dump() {
 	fmt.Printf("Lexer: %+v\n", l)
 }
 
-func (l *Lexer) RunFrom(fn stateFn) {
-	if l.Output == nil {
-		l.Output = make(ast.TokenStream, TOKEN_CHANNEL_BUFFER)
-	}
+func (l *Lexer) RunFrom(fn stateFn) ([]*ast.Token, error) {
 	if _, err := l.DispatchFn(fn); err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	l.Output <- nil
+	return l.Tokens, nil
 }
 
-func (l *Lexer) Run() {
-	if l.Output == nil {
-		l.Output = make(ast.TokenStream, TOKEN_CHANNEL_BUFFER)
-	}
+func (l *Lexer) Run() ([]*ast.Token, error) {
 	if _, err := l.DispatchFn(lexStart); err != nil {
-		panic(err)
+		return nil, err
 	}
-	l.Output <- nil
-}
 
-func (l *Lexer) Close() {
-	if l.Output != nil {
-		close(l.Output)
-	}
-	l.Output = nil
+	return l.Tokens, nil
 }

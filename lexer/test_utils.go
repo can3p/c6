@@ -1,25 +1,28 @@
 package lexer
 
-import "github.com/stretchr/testify/assert"
-import "testing"
-import "github.com/c9s/c6/ast"
+import (
+	"testing"
+
+	"github.com/c9s/c6/ast"
+	"github.com/stretchr/testify/assert"
+)
 
 func AssertLexerTokenSequenceFromState(t *testing.T, scss string, fn stateFn, tokenList []ast.TokenType) {
 	t.Logf("Testing SCSS: %s\n", scss)
 	var lexer = NewLexerWithString(scss)
 	assert.NotNil(t, lexer)
-	lexer.RunFrom(fn)
+	_, err := lexer.RunFrom(fn)
+	assert.NoError(t, err)
 	AssertTokenSequence(t, lexer, tokenList)
-	lexer.Close()
 }
 
 func AssertLexerTokenSequence(t *testing.T, scss string, tokenList []ast.TokenType) {
 	t.Logf("Testing SCSS: %s\n", scss)
 	var lexer = NewLexerWithString(scss)
 	assert.NotNil(t, lexer)
-	lexer.Run()
+	_, err := lexer.Run()
+	assert.NoError(t, err)
 	AssertTokenSequence(t, lexer, tokenList)
-	lexer.Close()
 }
 
 func OutputGreen(t *testing.T, msg string, args ...interface{}) {
@@ -40,7 +43,7 @@ func AssertTokenSequence(t *testing.T, l *Lexer, tokenList []ast.TokenType) []as
 	var failure = false
 	for idx, expectingToken := range tokenList {
 
-		var token = <-l.Output
+		var token = l.Tokens[idx]
 
 		if token == nil {
 			failure = true
@@ -59,9 +62,8 @@ func AssertTokenSequence(t *testing.T, l *Lexer, tokenList []ast.TokenType) []as
 		assert.Equal(t, expectingToken, token.Type)
 	}
 
-	if l.remaining() {
-		var token *ast.Token = nil
-		for token = <-l.Output; token != nil; token = <-l.Output {
+	if len(tokenList) < len(l.Tokens) {
+		for _, token := range l.Tokens[len(tokenList):] {
 			OutputRed(t, "not ok ---- Remaining expecting %s '%s'", token.Type.String(), token.Str)
 		}
 	}

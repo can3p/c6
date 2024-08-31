@@ -42,35 +42,25 @@ func (parser *Parser) ParseScssFile(file string) (*ast.StmtList, error) {
 
 	// XXX: this seems to copy the whole string, we should avoid this.
 	l := lexer.NewLexerWithString(parser.Content)
-	parser.Input = l.TokenStream()
+	tokens, err := l.Run()
 
-	// Run lexer concurrently
-	go l.Run()
-
-	// consume the tokens from the input channel of the lexer
-	// TODO: use concurrent method to consume the inputs, we also need to
-	// benchmark this when the file is large. Don't need to consider small files because small files
-	// can always be compiled fast (less than 500 millisecond).
-	var tok *ast.Token
-	for tok = <-parser.Input; tok != nil; tok = <-parser.Input {
-		parser.Tokens = append(parser.Tokens, tok)
+	if err != nil {
+		return nil, err
 	}
-	l.Close()
+
+	parser.Tokens = tokens
 	return parser.ParseStmts()
 }
 
 func (parser *Parser) ParseScss(code string) (*ast.StmtList, error) {
 	l := lexer.NewLexerWithString(code)
-	parser.Input = l.TokenStream()
+	tokens, err := l.Run()
 
-	// Run lexer concurrently
-	go l.Run()
-
-	var tok *ast.Token
-	for tok = <-parser.Input; tok != nil; tok = <-parser.Input {
-		parser.Tokens = append(parser.Tokens, tok)
+	if err != nil {
+		return nil, err
 	}
-	l.Close()
+
+	parser.Tokens = tokens
 	return parser.ParseStmts()
 }
 

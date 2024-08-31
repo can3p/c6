@@ -49,9 +49,6 @@ type Parser struct {
 	// file content
 	Content string
 
-	// The token input channel, feeded by github.com/c9s/c6/lexer
-	Input chan *ast.Token
-
 	// Integer for counting token
 	Pos int
 
@@ -67,7 +64,6 @@ type Parser struct {
 func NewParser(context *runtime.Context) *Parser {
 	return &Parser{
 		GlobalContext: context,
-		Input:         nil,
 		Pos:           0,
 		RollbackPos:   0,
 	}
