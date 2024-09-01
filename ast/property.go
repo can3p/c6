@@ -1,11 +1,8 @@
 package ast
 
-import (
-	"strings"
-)
+import "strings"
 
-/*
-*
+/**
 An property may contains interpolation
 */
 type Property struct {
@@ -18,19 +15,18 @@ type Property struct {
 	Values []Expr
 }
 
-/*
-*
+/**
 Property is one of the declaration
 */
 func (self Property) CanBeDeclaration() {}
 func (self Property) CanBeStmt()        {}
 
-func (self *Property) AppendValue(value Expr) {
+func (self Property) AppendValue(value Expr) {
 	self.Values = append(self.Values, value)
 }
 
 func (self Property) String() (out string) {
-	out = self.Name.String() + ": "
+	out = self.Name.String() + ":"
 
 	var items = []string{}
 

@@ -1,11 +1,8 @@
 package lexer
 
-import (
-	_ "fmt"
-	"unicode"
-
-	"github.com/c9s/c6/ast"
-)
+import "unicode"
+import _ "fmt"
+import "github.com/c9s/c6/ast"
 
 func IsInterpolationStartToken(r rune, r2 rune) bool {
 	return r == '#' && r2 == '{'
@@ -26,8 +23,7 @@ func IsSelector(t ast.TokenType) bool {
 		t == ast.T_FUNCTIONAL_PSEUDO
 }
 
-/*
-*
+/**
 Pass peek() rune to check if it's a selector stop token
 */
 func IsSelectorStopToken(r rune) bool {
@@ -47,7 +43,7 @@ func isDescendantCombinatorSeparator(r rune) bool {
 	return r == ' '
 }
 
-func lexAttributeSelector(l *Lexer) (stateFn, error) {
+func lexAttributeSelector(l *Lexer) stateFn {
 	var r = l.next()
 	if r == '[' {
 		l.emit(ast.T_BRACKET_OPEN)
@@ -56,14 +52,12 @@ func lexAttributeSelector(l *Lexer) (stateFn, error) {
 
 		r = l.next()
 		if !unicode.IsLetter(r) && !IsInterpolationStartToken(r, l.peek()) {
-			return nil, l.errorf("Unexpected token for attribute name. Got '%c'", r)
+			l.errorf("Unexpected token for attribute name. Got '%c'", r)
 		}
 		for {
 			if IsInterpolationStartToken(r, l.peek()) {
 				l.backup()
-				if _, err := lexInterpolation(l, false); err != nil {
-					return nil, err
-				}
+				lexInterpolation(l, false)
 				foundInterpolation = true
 			} else if !unicode.IsLetter(r) && r != '-' && r != '_' {
 				break
@@ -110,13 +104,9 @@ func lexAttributeSelector(l *Lexer) (stateFn, error) {
 		if attrOp {
 			r = l.peek()
 			if r == '"' {
-				if _, err := lexString(l); err != nil {
-					return nil, err
-				}
+				lexString(l)
 			} else {
-				if _, err := lexUnquoteString(l); err != nil {
-					return nil, err
-				}
+				lexUnquoteString(l)
 			}
 		}
 
@@ -124,18 +114,21 @@ func lexAttributeSelector(l *Lexer) (stateFn, error) {
 		if r == ']' {
 			l.next()
 			l.emit(ast.T_BRACKET_CLOSE)
-			return lexStart, nil
+			return lexStart
 		}
+
 	}
-	return nil, l.errorf("Unexpected token for attribute selector. Got '%c'", r)
+	l.errorf("Unexpected token for attribute selector. Got '%c'", r)
+	return nil
 }
 
-func lexClassSelector(l *Lexer) (stateFn, error) {
+func lexClassSelector(l *Lexer) stateFn {
 	l.accept(".")
 
 	var r = l.next()
 	if !unicode.IsLetter(r) {
-		return nil, l.errorf("Expecting letter for class selector. got '%c'", r)
+		l.errorf("Expecting letter for class selector. got '%c'", r)
+		return nil
 	}
 
 	// skip valid class name characters
@@ -144,30 +137,27 @@ func lexClassSelector(l *Lexer) (stateFn, error) {
 	}
 	l.backup()
 	l.emit(ast.T_CLASS_SELECTOR)
-	return lexSelectors, nil
+	return lexSelectors
 }
 
-func lexPseudoSelector(l *Lexer) (stateFn, error) {
+func lexPseudoSelector(l *Lexer) stateFn {
 	var foundInterpolation = false
 
 	// the first ':'
-	l.next()
+	var r = l.next()
 
 	// support CSS3 syntax for `::before` and `::after`
 	// @see https://developer.mozilla.org/en-US/docs/Web/CSS/::before
 	l.accept(":")
 
-	var r rune = l.next()
+	r = l.next()
 	if !unicode.IsLetter(r) && !(r == '#' && l.peek() == '{') {
-		return nil, l.errorf("charater '%c' is not allowed in pseudo selector", r)
+		l.errorf("charater '%c' is not allowed in pseudo selector", r)
 	}
 	for r != EOF && (unicode.IsLetter(r) || r == '-' || r == '#') {
 		if IsInterpolationStartToken(r, l.peek()) {
 			l.backup()
-			if _, err := lexInterpolation(l, false); err != nil {
-				return nil, err
-			}
-
+			lexInterpolation(l, false)
 			foundInterpolation = true
 		}
 		r = l.next()
@@ -186,85 +176,72 @@ func lexPseudoSelector(l *Lexer) (stateFn, error) {
 
 			r = l.peek()
 			for r != ')' && r != EOF {
-				fn, err := lexExpr(l)
-
-				if err != nil {
-					return nil, err
-				}
-
-				if fn == nil {
+				if fn := lexExpr(l); fn == nil {
 					break
 				}
 				r = l.peek()
 			}
 
-			if err := l.expect(")"); err != nil {
-				return nil, err
-			}
+			l.expect(")")
 			l.emit(ast.T_PAREN_CLOSE)
 
 		} else {
 			l.emit(ast.T_PSEUDO_SELECTOR)
 		}
 	}
-	return lexSelectors, nil
+	return lexSelectors
 }
 
-func lexUniversalSelector(l *Lexer) (stateFn, error) {
-	if err := l.expect("*"); err != nil {
-		return nil, err
-	}
-
+func lexUniversalSelector(l *Lexer) stateFn {
+	l.expect("*")
 	l.emit(ast.T_UNIVERSAL_SELECTOR)
-	return lexSimpleSelector, nil
+	return lexSimpleSelector
 }
 
-func lexSimpleSelector(l *Lexer) (stateFn, error) {
+func lexSimpleSelector(l *Lexer) stateFn {
 
 	var r = l.peek()
 
 	if r == '.' {
 
-		return lexClassSelector, nil
+		return lexClassSelector
 
 	} else if r == '[' {
 
-		return lexAttributeSelector, nil
+		return lexAttributeSelector
 
 	} else if r == ':' {
 
-		return lexPseudoSelector, nil
+		return lexPseudoSelector
 
 	} else if r == '#' && l.peekBy(2) != '{' {
 
-		return lexIdSelector, nil
+		return lexIdSelector
 
 	} else if r == '&' {
 
 		l.next()
 		l.emit(ast.T_PARENT_SELECTOR)
-		return lexSelectors, nil
+		return lexSelectors
 
 	} else if r == '*' {
 
-		return lexUniversalSelector, nil
+		return lexUniversalSelector
 
 	} else if unicode.IsLetter(r) {
 
-		return lexTypeSelector, nil
+		return lexTypeSelector
 
 	}
 
-	return lexSelectors, nil
+	return lexSelectors
 }
 
 // Dispath selector lexing method
-func lexSelectors(l *Lexer) (stateFn, error) {
+func lexSelectors(l *Lexer) stateFn {
 	var r rune
 
-	if _, err := lexComment(l, false); err != nil {
-		return nil, err
-	}
+	lexComment(l, false)
 
 	// space between selector means descendant selector
 	if tok := l.lastToken(); tok != nil && IsSelector(tok.Type) {
@@ -274,14 +251,12 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 			if unicode.IsSpace(r) {
 				foundSpace = true
 			}
-			if _, err := lexComment(l, false); err != nil {
-				return nil, err
-			}
+			lexComment(l, false)
 			r = l.next()
 		}
 		l.backup()
 		if r == EOF {
-			return nil, nil
+			return nil
 		}
 		if foundSpace && r != ',' && r != '{' && !IsCombinatorToken(r) {
 			l.emit(ast.T_DESCENDANT_COMBINATOR)
@@ -290,9 +265,7 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 		}
 	}
 
-	if _, err := lexComment(l, false); err != nil {
-		return nil, err
-	}
+	lexComment(l, false)
 
 	// re-peek again
 	r = l.peek()
@@ -300,31 +273,29 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 	// lex the first selector
 	if unicode.IsLetter(r) {
 
-		return lexTypeSelector, nil
+		return lexTypeSelector
 
 	} else if r == '[' {
 
-		return lexAttributeSelector, nil
+		return lexAttributeSelector
 
 	} else if r == '.' {
 
-		return lexClassSelector, nil
+		return lexClassSelector
 
 	} else if r == ':' {
 
-		return lexPseudoSelector, nil
+		return lexPseudoSelector
 
 	} else if r == '&' {
 
-		if err := l.expect("&"); err != nil {
-			return nil, err
-		}
+		l.expect("&")
 		l.emit(ast.T_PARENT_SELECTOR)
-		return lexSelectors, nil
+		return lexSelectors
 
 	} else if r == '*' {
 
-		return lexUniversalSelector, nil
+		return lexUniversalSelector
 
 	} else if r == '#' {
 		// for selector syntax like:
@@ -338,9 +309,7 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 				l.emit(ast.T_LITERAL_CONCAT)
 			}
 
-			if _, err := lexInterpolation(l, false); err != nil {
-				return nil, err
-			}
+			lexInterpolation(l, false)
 			// end of interpolation
 
 			// find stop point of a selector.
@@ -348,9 +317,7 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 			for {
 				if IsInterpolationStartToken(r, l.peek()) {
 					l.backup()
-					if _, err := lexInterpolation(l, false); err != nil {
-						return nil, err
-					}
+					lexInterpolation(l, false)
 				} else if !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '-' && r != '_' || IsSelectorStopToken(r) || isDescendantCombinatorSeparator(r) {
 					break
 				}
@@ -362,22 +329,22 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 			var token = l.createToken(ast.T_INTERPOLATION_SELECTOR)
 			token.ContainsInterpolation = true
 			l.emitToken(token)
-			return lexSelectors, nil
+			return lexSelectors
 		} else {
-			return lexIdSelector, nil
+			return lexIdSelector
 		}
 
 	} else if r == '>' {
 
 		l.next()
 		l.emit(ast.T_CHILD_COMBINATOR)
-		return lexSelectors, nil
+		return lexSelectors
 
 	} else if r == '~' {
 
 		l.next()
 		l.emit(ast.T_GENERAL_SIBLING_COMBINATOR)
-		return lexSelectors, nil
+		return lexSelectors
 
 	} else if r == ',' {
 
@@ -385,13 +352,13 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 		l.emit(ast.T_COMMA)
 
 		// lex next selector
-		return lexSelectors, nil
+		return lexSelectors
 
 	} else if r == '+' {
 
 		l.next()
 		l.emit(ast.T_ADJACENT_SIBLING_COMBINATOR)
-		return lexSelectors, nil
+		return lexSelectors
 
 	} else if unicode.IsSpace(r) {
 
@@ -402,21 +369,22 @@ func lexSelectors(l *Lexer) (stateFn, error) {
 		l.backup()
 		l.ignore()
 
-		return lexSelectors, nil
+		return lexSelectors
 
 	} else if r == '{' || r == ';' {
 
-		return lexStart, nil
+		return lexStart
 
+	} else {
+		l.errorf("Unexpected token '%c' for lexing selector.", r)
 	}
-
-	return nil, l.errorf("Unexpected token '%c' for lexing selector.", r)
+	return nil
 }
 
-func lexTypeSelector(l *Lexer) (stateFn, error) {
+func lexTypeSelector(l *Lexer) stateFn {
 	var r = l.next()
 	if !unicode.IsLetter(r) && !IsInterpolationStartToken(r, l.peekBy(2)) {
-		return nil, l.errorf("Expecting letter token for tag name selector. got %c", r)
+		l.errorf("Expecting letter token for tag name selector. got %c", r)
 	}
 
 	var foundInterpolation = false
@@ -424,10 +392,7 @@ func lexTypeSelector(l *Lexer) (stateFn, error) {
 	for {
 		if IsInterpolationStartToken(r, l.peek()) {
 			l.backup()
-			if _, err := lexInterpolation(l, false); err != nil {
-				return nil, err
-			}
-
+			lexInterpolation(l, false)
 			foundInterpolation = true
 		} else if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
 			break
@@ -442,58 +407,55 @@ func lexTypeSelector(l *Lexer) (stateFn, error) {
 		l.emit(ast.T_TYPE_SELECTOR)
 	}
 
-	return lexSimpleSelector, nil
+	return lexSimpleSelector
 }
 
-//func lexLang(l *Lexer) stateFn {
-//[>
-//html:lang(fr-ca) { quotes: '« ' ' »' }
-//html:lang(de) { quotes: '»' '«' '\2039' '\203A' }
-//:lang(fr) > Q { quotes: '« ' ' »' }
-//:lang(de) > Q { quotes: '»' '«' '\2039' '\203A' }
-//*/
-//// [a-z]{2} - [a-z]{2}
-//// [a-z]{2}
-//var r = l.next()
-//if !unicode.IsLetter(r) {
-//l.errorf("Unexpected language token. Got '%c'", r)
-//}
-
-//r = l.next()
-//if !unicode.IsLetter(r) {
-//l.errorf("Unexpected language token. Got '%c'", r)
-//}
-
-//r = l.peek()
-//if r == '-' {
-//l.next() // skip '-'
-//r = l.next()
-//if !unicode.IsLetter(r) {
-//l.errorf("Unexpected language token. Got '%c'", r)
-//}
-//r = l.next()
-//if !unicode.IsLetter(r) {
-//l.errorf("Unexpected language token. Got '%c'", r)
-//}
-//}
-//l.emit(ast.T_LANG_CODE)
-//return nil
-//}
-
-func lexIdSelector(l *Lexer) (stateFn, error) {
-	var foundInterpolation = false
-	l.next()
+func lexLang(l *Lexer) stateFn {
+	/*
+		html:lang(fr-ca) { quotes: '« ' ' »' }
+		html:lang(de) { quotes: '»' '«' '\2039' '\203A' }
+		:lang(fr) > Q { quotes: '« ' ' »' }
+		:lang(de) > Q { quotes: '»' '«' '\2039' '\203A' }
+	*/
+	// [a-z]{2} - [a-z]{2}
+	// [a-z]{2}
 	var r = l.next()
+	if !unicode.IsLetter(r) {
+		l.errorf("Unexpected language token. Got '%c'", r)
+	}
+
+	r = l.next()
+	if !unicode.IsLetter(r) {
+		l.errorf("Unexpected language token. Got '%c'", r)
+	}
+
+	r = l.peek()
+	if r == '-' {
+		l.next() // skip '-'
+		r = l.next()
+		if !unicode.IsLetter(r) {
+			l.errorf("Unexpected language token. Got '%c'", r)
+		}
+		r = l.next()
+		if !unicode.IsLetter(r) {
+			l.errorf("Unexpected language token. Got '%c'", r)
+		}
+	}
+	l.emit(ast.T_LANG_CODE)
+	return nil
+}
+
+func lexIdSelector(l *Lexer) stateFn {
+	var foundInterpolation = false
+	var r = l.next()
+	r = l.next()
 	if !unicode.IsLetter(r) && r != '#' && l.peek() != '{' {
-		return nil, l.errorf("An identifier should start with at least a letter, Got '%c'", r)
+		l.errorf("An identifier should start with at least a letter, Got '%c'", r)
 	}
 	for {
 		if IsInterpolationStartToken(r, l.peek()) {
 			l.backup()
-			if _, err := lexInterpolation(l, false); err != nil {
-				return nil, err
-			}
-
+			lexInterpolation(l, false)
 			foundInterpolation = true
 		} else if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
 			break
@@ -513,5 +475,5 @@ func lexIdSelector(l *Lexer) (stateFn, error) {
 	} else {
 		l.emit(ast.T_ID_SELECTOR)
 	}
-	return lexSelectors, nil
+	return lexSelectors
 }

@@ -5,12 +5,11 @@ type Stmt interface {
 	String() string
 }
 
-type StmtList struct {
-	Stmts []Stmt
-}
+type StmtList []Stmt
 
-func (list *StmtList) Append(stm Stmt) {
-	list.Stmts = append(list.Stmts, stm)
+func (list StmtList) Append(stm Stmt) {
+	newlist := append(list, stm)
+	list = newlist
 }
 
 /*

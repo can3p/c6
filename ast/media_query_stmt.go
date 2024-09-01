@@ -6,12 +6,11 @@ type MediaQueryStmt struct {
 	Scope          *Scope
 }
 
-type MediaQueryList struct {
-	List []*MediaQuery
-}
+type MediaQueryList []*MediaQuery
 
-func (list *MediaQueryList) Append(query *MediaQuery) {
-	list.List = append(list.List, query)
+func (list MediaQueryList) Append(query *MediaQuery) {
+	newlist := append(list, query)
+	list = newlist
 }
 
 func NewMediaQueryList() *MediaQueryList {
@@ -25,7 +24,7 @@ func NewMediaQueryStmt() *MediaQueryStmt {
 }
 
 func (stm MediaQueryStmt) String() (out string) {
-	for _, mediaQuery := range stm.MediaQueryList.List {
+	for _, mediaQuery := range *stm.MediaQueryList {
 		out += ", " + mediaQuery.String()
 	}
 	return out[2:]

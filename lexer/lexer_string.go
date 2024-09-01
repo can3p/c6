@@ -1,12 +1,10 @@
 package lexer
 
 import (
-	"fmt"
-
 	"github.com/c9s/c6/ast"
 )
 
-func lexString(l *Lexer) (stateFn, error) {
+func lexString(l *Lexer) stateFn {
 	var r = l.next()
 	if r == '"' {
 		var containsInterpolation = false
@@ -21,17 +19,15 @@ func lexString(l *Lexer) (stateFn, error) {
 				l.emitToken(token)
 				l.next()
 				l.ignore()
-				return lexStart, nil
+				return lexStart
 			} else if r == '\\' {
 				// skip the escape character
 			} else if IsInterpolationStartToken(r, l.peek()) {
 				l.backup()
-				if _, err := lexInterpolation(l, false); err != nil {
-					return nil, err
-				}
+				lexInterpolation(l, false)
 				containsInterpolation = true
 			} else if r == EOF {
-				return nil, fmt.Errorf("Expecting end of string")
+				panic("Expecting end of string")
 			}
 			r = l.next()
 		}
@@ -48,16 +44,16 @@ func lexString(l *Lexer) (stateFn, error) {
 				l.emit(ast.T_Q_STRING)
 				l.next()
 				l.ignore()
-				return lexStart, nil
+				return lexStart
 			} else if r == '\\' {
 				// skip the escape character
 				l.next()
 			} else if r == EOF {
-				return nil, fmt.Errorf("Expecting end of string")
+				panic("Expecting end of string")
 			}
 		}
 		//XXX return lexStart
 	}
 	l.backup()
-	return nil, nil
+	return nil
 }

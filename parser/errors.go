@@ -1,10 +1,7 @@
 package parser
 
-import (
-	"fmt"
-
-	"github.com/c9s/c6/ast"
-)
+import "fmt"
+import "github.com/c9s/c6/ast"
 
 /*
 User's fault, probably.
@@ -13,10 +10,11 @@ Struct for common syntax error.
 
 Examples:
 
-	panic(SyntaxError{
-		Reason: ...,
-		ActualToken: tok,
-	})
+
+panic(SyntaxError{
+	Reason: ...,
+	ActualToken: tok,
+})
 */
 type SyntaxError struct {
 	Reason      string

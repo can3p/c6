@@ -2,18 +2,18 @@ package lexer
 
 import (
 	"fmt"
-	"unicode"
-
 	"github.com/c9s/c6/ast"
+	"unicode"
 )
 
-type stateFn func(*Lexer) (stateFn, error)
+type stateFn func(*Lexer) stateFn
 
 const LETTERS = "zxcvbnmasdfghjklqwertyuiop"
 const DIGITS = "1234567890"
 
-func (l *Lexer) errorf(msg string, r rune) error {
-	return fmt.Errorf(msg, string(r))
+func (l *Lexer) errorf(msg string, r rune) {
+	var err = fmt.Errorf(msg, string(r))
+	panic(err)
 }
 
 /*
@@ -22,15 +22,15 @@ Lex unicode range, used in `content` property.
 @see https://developer.mozilla.org/en-US/docs/Web/CSS/unicode-range
 
 Formal syntax: <urange>#
+        where: <urange> = single_codepoint | codepoint_range | wildcard_range
 
-	        where: <urange> = single_codepoint | codepoint_range | wildcard_range
+	unicode-range: U+26               // single_codepoint
+	unicode-range: U+0025-00FF        // codepoint_range
+	unicode-range: U+4??              // wildcard_range
+	unicode-range: U+0025-00FF, U+4?? // multiple values can be separated by commas
 
-		unicode-range: U+26               // single_codepoint
-		unicode-range: U+0025-00FF        // codepoint_range
-		unicode-range: U+4??              // wildcard_range
-		unicode-range: U+0025-00FF, U+4?? // multiple values can be separated by commas
 */
-func lexUnicodeRange(l *Lexer) (stateFn, error) {
+func lexUnicodeRange(l *Lexer) stateFn {
 	l.match("U+")
 
 	var r = l.next()
@@ -40,113 +40,80 @@ func lexUnicodeRange(l *Lexer) (stateFn, error) {
 	l.backup()
 
 	if l.length() < 4 {
-		return nil, fmt.Errorf("Unicode-range requires at least 4 characters, we got %d. see https://developer.mozilla.org/en-US/docs/Web/CSS/unicode-range for more information", l.length())
+		panic(fmt.Errorf("Unicode-range requires at least 4 characters, we got %d. see https://developer.mozilla.org/en-US/docs/Web/CSS/unicode-range for more information", l.length()))
 	}
 	l.emit(ast.T_UNICODE_RANGE)
-	return nil, nil
+	return nil
 }
 
-func lexUrlParam(l *Lexer) error {
+func lexUrlParam(l *Lexer) {
 	l.match("(")
 	l.emit(ast.T_PAREN_OPEN)
-	if err := l.ignoreComment(); err != nil {
-		return err
-	}
-
 	l.ignoreSpaces()
 
 	var q = l.peek()
 	if q == '"' || q == '\'' {
-		if _, err := lexString(l); err != nil {
-			return err
-		}
+		lexString(l)
 	} else {
-		if _, err := lexUnquoteStringExclude(l, "()"); err != nil {
-			return err
-		}
+		lexUnquoteStringExclude(l, "()")
 	}
 
 	l.ignoreSpaces()
-	if err := l.expect(")"); err != nil {
-		return err
-	}
+	l.expect(")")
 	l.emit(ast.T_PAREN_CLOSE)
-
-	return nil
 }
 
-//func lexSpaces(l *Lexer) stateFn {
-//for {
-//var t = l.next()
-//if t != ' ' {
-//l.backup()
-//return nil
-//}
-//}
-/////XXX return lexStart
-//}
+func lexSpaces(l *Lexer) stateFn {
+	for {
+		var t = l.next()
+		if t != ' ' {
+			l.backup()
+			return nil
+		}
+	}
+	///XXX return lexStart
+}
 
 /*
 lex unquote string but stops at the exclude rune.
 */
-func lexUnquoteStringExclude(l *Lexer, exclude string) (stateFn, error) {
+func lexUnquoteStringExclude(l *Lexer, exclude string) stateFn {
 	l.til(exclude)
 	l.emit(ast.T_UNQUOTE_STRING)
-	return nil, nil
+	return nil
 }
 
-//func lexUnquoteStringStopAt(l *Lexer, stop rune) (stateFn, error) {
-//var r = l.next()
-//for r != stop {
-//r = l.next()
-//}
-//l.backup()
-//l.emit(ast.T_UNQUOTE_STRING)
-//return nil, nil
-//}
+func lexUnquoteStringStopAt(l *Lexer, stop rune) stateFn {
+	var r = l.next()
+	for r != stop {
+		r = l.next()
+	}
+	l.backup()
+	l.emit(ast.T_UNQUOTE_STRING)
+	return nil
+}
 
-func lexUnquoteString(l *Lexer) (stateFn, error) {
+func lexUnquoteString(l *Lexer) stateFn {
 	var r = l.next()
 	for unicode.IsLetter(r) || unicode.IsDigit(r) {
 		r = l.next()
 	}
 	l.backup()
 	l.emit(ast.T_UNQUOTE_STRING)
-	return nil, nil
+	return nil
 }
 
-func lexAssignStmt(l *Lexer) (stateFn, error) {
-	if _, err := lexVariableName(l); err != nil {
-		return nil, err
-	}
-
-	if _, err := lexColon(l); err != nil {
-		return nil, err
-	}
-
+func lexAssignStmt(l *Lexer) stateFn {
+	lexVariableName(l)
+	lexColon(l)
 	var r = l.peek()
-	//for r != ';' && r != '}' && r != EOF && lexExpr(l) != nil {
-	//r = l.peek()
-	//}
-	for r != ';' && r != '}' && r != EOF {
-		fn, err := lexExpr(l)
-		if err != nil {
-			return nil, err
-		}
-
-		if fn != nil {
-			r = l.peek()
-		} else {
-			break
-		}
+	for r != ';' && r != '}' && r != EOF && lexExpr(l) != nil {
+		r = l.peek()
 	}
 	// l.backup()
 
 	l.ignoreSpaces()
-	if err := l.ignoreComment(); err != nil {
-		return nil, err
-	}
-
+	l.ignoreComment()
 	l.ignoreSpaces()
 
 	if l.accept(";") {
@@ -154,40 +121,28 @@ func lexAssignStmt(l *Lexer) (stateFn, error) {
 	} else if l.accept("}") {
 		l.emit(ast.T_BRACE_CLOSE)
 	}
-	return lexStart, nil
+	return lexStart
 }
 
-func lexForStmt(l *Lexer) (stateFn, error) {
+func lexForStmt(l *Lexer) stateFn {
 	l.ignoreSpaces()
-	if _, err := lexVariableName(l); err != nil {
-		return nil, err
-	}
+	lexVariableName(l)
 
-	fn, err := lexExpr(l)
-
-	if err != nil {
-		return nil, err
-	}
-
+	fn := lexExpr(l)
 	if fn == nil {
-		return nil, fmt.Errorf("Expecting range expression after 'from'.")
+		panic("Expecting range expression after 'from'.")
 	}
-
 	for fn != nil {
-		fn, err = lexExpr(l)
-
-		if err != nil {
-			return nil, err
-		}
+		fn = lexExpr(l)
 	}
-	return lexStart, nil
+	return lexStart
 }
 
-func lexHexColor(l *Lexer) (stateFn, error) {
+func lexHexColor(l *Lexer) stateFn {
 	l.ignoreSpaces()
 	var r rune = l.next()
 	if r != '#' {
-		return nil, l.errorf("Expecting hex color, got '%c'", r)
+		l.errorf("Expecting hex color, got '%c'", r)
 	}
 
 	r = l.next()
@@ -198,19 +153,18 @@ func lexHexColor(l *Lexer) (stateFn, error) {
 
 	var length = l.length() - 1
 	if length != 3 && length != 6 && length != 8 {
-		return nil, fmt.Errorf("Invalid hex color, expecting 3, 6 or 8 hex characters, got %d - %s", length, l.current())
+		panic(fmt.Errorf("Invalid hex color, expecting 3, 6 or 8 hex characters, got %d - %s", length, l.current()))
 	}
 	l.emit(ast.T_HEX_COLOR)
-	return lexExpr, nil
+	return lexExpr
 }
 
-/*
-*
+/**
 CSS time unit
 
 @see https://developer.mozilla.org/zh-TW/docs/Web/CSS/time
 */
-func lexNumberUnit(l *Lexer) (stateFn, error) {
+func lexNumberUnit(l *Lexer) stateFn {
 	tok := l.matchKeywordList(ast.UnitTokenList)
 
 	if tok == nil {
@@ -236,18 +190,15 @@ func lexNumberUnit(l *Lexer) (stateFn, error) {
 	}
 
 	if l.peek() == ';' {
-		return lexStart, nil
+		return lexStart
 	}
-	return lexExpr, nil
+	return lexExpr
 }
 
-var ErrLexNaN = fmt.Errorf("Not a number")
-
-/*
-*
+/**
 @see https://developer.mozilla.org/en-US/docs/Web/CSS/number
 */
-func lexNumber(l *Lexer) (stateFn, error) {
+func lexNumber(l *Lexer) stateFn {
 	var r = l.next()
 
 	var floatPoint = false
@@ -256,7 +207,7 @@ func lexNumber(l *Lexer) (stateFn, error) {
 	if r == '.' {
 		r = l.next()
 		if !unicode.IsDigit(r) {
-			return nil, l.errorf("Expecting digits after '.'. Got %c", r)
+			l.errorf("Expecting digits after '.'. Got %c", r)
 		}
 		floatPoint = true
 	}
@@ -267,7 +218,7 @@ func lexNumber(l *Lexer) (stateFn, error) {
 			floatPoint = true
 			r = l.next()
 			if !unicode.IsDigit(r) {
-				return nil, l.errorf("Expecting at least one digit after the floating point, got '%c'", r)
+				l.errorf("Expecting at least one digit after the floating point, got '%c'", r)
 			}
 		} else if r == 'e' {
 			var r2, r3 = l.peek2()
@@ -279,14 +230,10 @@ func lexNumber(l *Lexer) (stateFn, error) {
 	}
 	l.backup()
 
-	if l.peek() == '\\' {
-		return nil, ErrLexNaN
-	}
-
 	if floatPoint {
 		l.emit(ast.T_FLOAT)
 	} else {
 		l.emit(ast.T_INTEGER)
 	}
-	return lexNumberUnit, nil
+	return lexNumberUnit
 }

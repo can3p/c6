@@ -1,13 +1,11 @@
 package lexer
 
-import (
-	"github.com/c9s/c6/ast"
-)
+import "github.com/c9s/c6/ast"
 
-func lexFunctionParams(l *Lexer) (stateFn, error) {
+func lexFunctionParams(l *Lexer) stateFn {
 	var r = l.next()
 	if r != '(' {
-		return nil, l.errorf("Expecting '('. Got '%c'.", r)
+		l.errorf("Expecting '('. Got '%c'.", r)
 	}
 	l.emit(ast.T_PAREN_OPEN)
 	l.ignoreSpaces()
@@ -21,9 +19,7 @@ func lexFunctionParams(l *Lexer) (stateFn, error) {
 			l.emit(ast.T_PAREN_CLOSE)
 			break
 		}
-		if expr, err := lexExpr(l); err != nil {
-			return nil, err
-		} else if expr == nil {
+		if lexExpr(l) == nil {
 			break
 		}
 
@@ -34,5 +30,5 @@ func lexFunctionParams(l *Lexer) (stateFn, error) {
 			l.emit(ast.T_COMMA)
 		}
 	}
-	return nil, nil
+	return nil
 }

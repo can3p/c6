@@ -1,17 +1,16 @@
 package parser
 
 import (
-	"os"
+	"io/ioutil"
 	"testing"
 
 	"github.com/c9s/c6/ast"
 	"github.com/c9s/c6/runtime"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-func RunParserTest(code string) (*ast.StmtList, error) {
+func RunParserTest(code string) *ast.StmtList {
 	var p = NewParser(runtime.NewContext())
 	return p.ParseScss(code)
 }
@@ -32,9 +31,9 @@ func TestParserGetFileType(t *testing.T) {
 
 func TestParserParseFile(t *testing.T) {
 	testPath := "test/file.scss"
-	bs, _ := os.ReadFile(testPath)
+	bs, _ := ioutil.ReadFile(testPath)
 	p := NewParser(runtime.NewContext())
-	_, err := p.ParseFile(os.DirFS("."), testPath)
+	err := p.ParseFile(testPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,237 +48,201 @@ func TestParserParseFile(t *testing.T) {
 }
 
 func TestParserEmptyRuleSetWithUniversalSelector(t *testing.T) {
-	stmts, err := RunParserTest(`* { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`* { }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserEmptyRuleSetWithClassSelector(t *testing.T) {
-	stmts, err := RunParserTest(`.first-name { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`.first-name { }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserEmptyRuleSetWithIdSelector(t *testing.T) {
-	stmts, err := RunParserTest(`#myId { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`#myId { }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserEmptyRuleSetWithTypeSelector(t *testing.T) {
-	stmts, err := RunParserTest(`div { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`div { }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserEmptyRuleSetWithAttributeSelectorAttributeNameOnly(t *testing.T) {
-	stmts, err := RunParserTest(`[href] { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`[href] { }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserEmptyRuleSetWithAttributeSelectorPrefixMatch(t *testing.T) {
-	stmts, err := RunParserTest(`[href^=http] { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`[href^=http] { }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserEmptyRuleSetWithAttributeSelectorSuffixMatch(t *testing.T) {
-	stmts, err := RunParserTest(`[href$=pdf] { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`[href$=pdf] { }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserEmptyRuleSetWithTypeSelectorGroup(t *testing.T) {
-	stmts, err := RunParserTest(`div, span, html { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`div, span, html { }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserEmptyRuleSetWithComplexSelector(t *testing.T) {
-	stmts, err := RunParserTest(`div#myId.first-name.last-name, span, html, .first-name, .last-name { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`div#myId.first-name.last-name, span, html, .first-name, .last-name { }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserNestedRuleSetSimple(t *testing.T) {
-	stmts, err := RunParserTest(`div, span, html { .foo { color: red; } }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`div, span, html { .foo { color: red; } }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserNestedRuleSetSimple2(t *testing.T) {
-	stmts, err := RunParserTest(`div, span, html { .foo { color: red; background: blue; } text-align: text; float: left; }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`div, span, html { .foo { color: red; background: blue; } text-align: text; float: left; }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserNestedRuleWithParentSelector(t *testing.T) {
-	stmts, err := RunParserTest(`div, span, html { & { color: red; } }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`div, span, html { & { color: red; } }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserPropertyNameBorderWidth(t *testing.T) {
-	stmts, err := RunParserTest(`div { border-width: 3px 3px 3px 3px; }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`div { border-width: 3px 3px 3px 3px; }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserNestedProperty(t *testing.T) {
-	stmts, err := RunParserTest(`div {
+	var stmts = RunParserTest(`div {
 		border: {
 			width: 3px;
 			color: #000;
 		}
 	}`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
-	assert.Equal(t, 1, len(stmts.Stmts))
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserPropertyNameBorderWidthInterpolation(t *testing.T) {
-	stmts, err := RunParserTest(`div { border-#{ $width }: 3px 3px 3px 3px; }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`div { border-#{ $width }: 3px 3px 3px 3px; }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserPropertyNameBorderWidthInterpolation2(t *testing.T) {
-	stmts, err := RunParserTest(`div { #{ $name }: 3px 3px 3px 3px; }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`div { #{ $name }: 3px 3px 3px 3px; }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserPropertyNameBorderWidthInterpolation3(t *testing.T) {
-	stmts, err := RunParserTest(`div { #{ $name }-left: 3px; }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`div { #{ $name }-left: 3px; }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserImportRuleWithUnquoteUrl(t *testing.T) {
-	stmts, err := RunParserTest(`@import url(../foo.css);`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@import url(../foo.css);`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserImportRuleWithUrl(t *testing.T) {
 	p := NewParser(runtime.NewContext())
-	stmts, err := p.ParseScss(`@import url("http://foo.com/bar.css");`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	stmts := p.ParseScss(`@import url("http://foo.com/bar.css");`)
+	assert.Equal(t, 1, len(*stmts))
 
-	rule, ok := (stmts.Stmts)[0].(*ast.ImportStmt)
+	rule, ok := (*stmts)[0].(*ast.ImportStmt)
 	assert.True(t, ok, "Convert to ImportStmt OK")
 	assert.NotNil(t, rule)
 }
 
 func TestParserImportRuleWithString(t *testing.T) {
 	p := NewParser(runtime.NewContext())
-	stmts, err := p.ParseScss(`@import "foo.css";`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	stmts := p.ParseScss(`@import "foo.css";`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserImportRuleWithMedia(t *testing.T) {
-	stmts, err := RunParserTest(`@import url("foo.css") screen;`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@import url("foo.css") screen;`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserImportRuleWithMultipleMediaTypes(t *testing.T) {
-	stmts, err := RunParserTest(`@import url("bluish.css") projection, tv;`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@import url("bluish.css") projection, tv;`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserImportRuleWithMediaTypeAndColorFeature(t *testing.T) {
-	stmts, err := RunParserTest(`@import url(color.css) screen and (color);`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@import url(color.css) screen and (color);`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserImportRuleWithMediaTypeAndMaxWidthFeature(t *testing.T) {
-	stmts, err := RunParserTest(`@import url(color.css) screen and (max-width: 300px);`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@import url(color.css) screen and (max-width: 300px);`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserImportRuleWithMedia2(t *testing.T) {
-	stmts, err := RunParserTest(`@import url("foo.css") screen and (orientation:landscape);`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@import url("foo.css") screen and (orientation:landscape);`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQuerySimple(t *testing.T) {
-	stmts, err := RunParserTest(`@media screen { .red { color: red; } }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@media screen { .red { color: red; } }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryNotScreen(t *testing.T) {
-	stmts, err := RunParserTest(`@media not screen { .red { color: red; } }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@media not screen { .red { color: red; } }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryOnlyScreen(t *testing.T) {
-	stmts, err := RunParserTest(`@media only screen { .red { color: red; } }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@media only screen { .red { color: red; } }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryAllAndMinWidth(t *testing.T) {
-	stmts, err := RunParserTest(`@media all and (min-width:500px) {  .red { color: red; } }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@media all and (min-width:500px) {  .red { color: red; } }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryMinWidth(t *testing.T) {
-	stmts, err := RunParserTest(`@media (min-width:500px) {  .red { color: red; } }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@media (min-width:500px) {  .red { color: red; } }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryOrientationPortrait(t *testing.T) {
-	stmts, err := RunParserTest(`@media (orientation: portrait) { .red { color: red; } }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@media (orientation: portrait) { .red { color: red; } }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryMultipleWithComma(t *testing.T) {
-	stmts, err := RunParserTest(`@media screen and (color), projection and (color) { .red { color: red; } }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@media screen and (color), projection and (color) { .red { color: red; } }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryNone(t *testing.T) {
-	stmts, err := RunParserTest(`@media { .red { color: red; } }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@media { .red { color: red; } }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryNotAndMonoChrome(t *testing.T) {
-	stmts, err := RunParserTest(`@media not all and (monochrome) { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@media not all and (monochrome) { }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryJustAll(t *testing.T) {
-	stmts, err := RunParserTest(`@media all { .red { color: red; } }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@media all { .red { color: red; } }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryWithExpr1(t *testing.T) {
@@ -290,9 +253,8 @@ func TestParserMediaQueryWithExpr1(t *testing.T) {
   }
 }
 	`
-	stmts, err := RunParserTest(code)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(code)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryWithExpr2(t *testing.T) {
@@ -303,9 +265,8 @@ func TestParserMediaQueryWithExpr2(t *testing.T) {
   }
 }
 	`
-	stmts, err := RunParserTest(code)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(code)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 /*
@@ -322,16 +283,15 @@ h6, .h6 {
   }
 }
 	`
-	stmts, err := RunParserTest(code)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(code)
+	assert.Equal(t, 1, len(*stmts))
 }
 */
 
 func TestParserMediaQueryWithVendorPrefixFeature(t *testing.T) {
 	// FIXME: 'min--moz-device-pixel-ratio' will become '-moz-device-pixel-ratio'
-	stmts, err := RunParserTest(`@media (-webkit-min-device-pixel-ratio: 2), (min--moz-device-pixel-ratio: 2) {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@media (-webkit-min-device-pixel-ratio: 2), (min--moz-device-pixel-ratio: 2) {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserMediaQueryNested(t *testing.T) {
@@ -344,91 +304,77 @@ func TestParserMediaQueryNested(t *testing.T) {
   }
 }
 	`
-	stmts, err := RunParserTest(code)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(code)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfTrueStmt(t *testing.T) {
-	stmts, err := RunParserTest(`@if true {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if true {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfFalseElseStmt(t *testing.T) {
-	stmts, err := RunParserTest(`@if false {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if false {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfFalseOrTrueElseStmt(t *testing.T) {
-	stmts, err := RunParserTest(`@if false or true {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if false or true {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfTrueAndTrueOrFalseElseStmt(t *testing.T) {
-	stmts, err := RunParserTest(`@if true and true or true {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if true and true or true {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfTrueAndTrueOrFalseElseStmt2(t *testing.T) {
-	stmts, err := RunParserTest(`@if (true and true) or true {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if (true and true) or true {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfComparisonGreaterThan(t *testing.T) {
-	stmts, err := RunParserTest(`@if (3+3) > 2 {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if (3+3) > 2 {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfComparisonGreaterEqual(t *testing.T) {
-	stmts, err := RunParserTest(`@if (3+3) >= 2 {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if (3+3) >= 2 {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfComparisonLessThan(t *testing.T) {
-	stmts, err := RunParserTest(`@if (3+3) < 2 {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if (3+3) < 2 {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfComparisonLessEqual(t *testing.T) {
-	stmts, err := RunParserTest(`@if (3+3) <= 2 {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if (3+3) <= 2 {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfComparisonEqual(t *testing.T) {
-	stmts, err := RunParserTest(`@if (3+3) == 6 {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if (3+3) == 6 {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfComparisonUnequal(t *testing.T) {
-	stmts, err := RunParserTest(`@if (3+3) != 6 {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if (3+3) != 6 {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfComparisonUnequalElseIf(t *testing.T) {
-	stmts, err := RunParserTest(`@if (3+3) != 6 {  } @else if (3+3) == 6 {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if (3+3) != 6 {  } @else if (3+3) == 6 {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfComparisonAndLogicalExpr(t *testing.T) {
-	stmts, err := RunParserTest(`@if 3 > 1 and 4 < 10 and 5 > 3 {  } @else if (3+3) == 6 {  } @else {  }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@if 3 > 1 and 4 < 10 and 5 > 3 {  } @else if (3+3) == 6 {  } @else {  }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserIfDeclBlock(t *testing.T) {
-	_, err := RunParserTest(`
+	RunParserTest(`
 @if $i == 1 {
 	color: #111;
 } @else if $i == 2 {
@@ -440,33 +386,28 @@ func TestParserIfDeclBlock(t *testing.T) {
 	background: url(../background.png);
 }
 	`)
-	require.NoError(t, err)
 }
 
 func TestParserForStmtSimple(t *testing.T) {
-	stmts, err := RunParserTest(`@for $var from 1 through 20 { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@for $var from 1 through 20 { }`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserForStmtExprReduce(t *testing.T) {
-	stmts, err := RunParserTest(`@for $var from 2 * 3 through 20 * 5 + 10 { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@for $var from 2 * 3 through 20 * 5 + 10 { }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserForStmtRangeOperator(t *testing.T) {
-	stmts, err := RunParserTest(`@for $var in 1 .. 10 { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@for $var in 1 .. 10 { }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
 func TestParserForStmtRangeOperatorWithExpr(t *testing.T) {
-	stmts, err := RunParserTest(`@for $var in 2 + 3 .. 10 * 10 { }`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`@for $var in 2 + 3 .. 10 * 10 { }`)
+	assert.Equal(t, 1, len(*stmts))
 
 }
 
@@ -475,9 +416,8 @@ func TestParserWhileStmt(t *testing.T) {
 $i: 6;
 @while $i > 0 { $i: $i - 2; }
 `
-	stmts, err := RunParserTest(code)
-	require.NoError(t, err)
-	assert.Equal(t, 2, len(stmts.Stmts))
+	var stmts = RunParserTest(code)
+	assert.Equal(t, 2, len(*stmts))
 }
 
 func TestParserCSS3Gradient(t *testing.T) {
@@ -492,9 +432,8 @@ func TestParserCSS3Gradient(t *testing.T) {
 		`div { background: -webkit-radial-gradient(100px 200px, circle closest-side, black, white); }`,
 	}
 	for _, buffer := range buffers {
-		stmts, err := RunParserTest(buffer)
-		require.NoError(t, err)
-		assert.Equal(t, 1, len(stmts.Stmts))
+		var stmts = RunParserTest(buffer)
+		assert.Equal(t, 1, len(*stmts))
 	}
 }
 
@@ -508,176 +447,150 @@ func TestParserPropertyListExpr(t *testing.T) {
 		// `div { width: 10px, 3px + 7px, 20px; }`,
 	}
 	for _, buffer := range buffers {
-		stmts, err := RunParserTest(buffer)
-		require.NoError(t, err)
-		assert.Equal(t, 1, len(stmts.Stmts))
+		var stmts = RunParserTest(buffer)
+		assert.Equal(t, 1, len(*stmts))
 	}
 }
 
 func TestParserFontCssSlash(t *testing.T) {
 	// should be plain CSS, no division
 	// TODO: verify this case
-	stmts, err := RunParserTest(`.foo { font: 12px/24px; }`)
-	require.NoError(t, err)
+	var stmts = RunParserTest(`.foo { font: 12px/24px; }`)
 	t.Logf("%+v\n", stmts)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserAssignStmtWithBooleanTrue(t *testing.T) {
-	block, err := RunParserTest(`$foo: true;`)
-	require.NoError(t, err)
+	var block = RunParserTest(`$foo: true;`)
 	t.Logf("%+v\n", block)
 }
 
 func TestParserAssignStmtWithBooleanFalse(t *testing.T) {
-	block, err := RunParserTest(`$foo: false;`)
-	require.NoError(t, err)
+	var block = RunParserTest(`$foo: false;`)
 	t.Logf("%+v\n", block)
 }
 
 func TestParserAssignStmtWithNull(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: null;`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`$foo: null;`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserAssignStmtList(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: 1 2 3 4;`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`$foo: 1 2 3 4;`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserAssignStmtListWithParenthesis(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: (1 2 3 4);`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`$foo: (1 2 3 4);`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserAssignStmtMap(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: (bar: 1, foo: 2);`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`$foo: (bar: 1, foo: 2);`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserAssignStmtCommaSepList(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: (1,2,3,4);`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`$foo: (1,2,3,4);`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserAssignStmtWithMorePlus(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: 12px + 20px + 20px;`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`$foo: 12px + 20px + 20px;`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserAssignStmtWithExprDefaultFlag(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: 12px + 20px + 20px !default;`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`$foo: 12px + 20px + 20px !default;`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserAssignStmtWithExprOptionalFlag(t *testing.T) {
-	block, err := RunParserTest(`$foo: 12px + 20px + 20px !optional;`)
-	require.NoError(t, err)
+	var block = RunParserTest(`$foo: 12px + 20px + 20px !optional;`)
 	t.Logf("%+v\n", block)
 }
 
 func TestParserAssignStmtWithComplexExpr(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: 12px * (20px + 20px) + 4px / 2;`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`$foo: 12px * (20px + 20px) + 4px / 2;`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserAssignStmtWithInterpolation(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: #{ 10 + 20 }px;`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`$foo: #{ 10 + 20 }px;`)
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserAssignStmtLengthPlusLength(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: 10px + 20px;`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	var stmts = RunParserTest(`$foo: 10px + 20px;`)
+	assert.Equal(t, 1, len(*stmts))
 	t.Logf("%+v\n", stmts)
 }
 
 func TestParserAssignStmtNumberPlusNumberMulLength(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: (10 + 20) * 3px;`)
-	require.NoError(t, err)
+	var stmts = RunParserTest(`$foo: (10 + 20) * 3px;`)
 	t.Logf("%+v\n", stmts)
 }
 
 func TestParserAssignStmtWithHexColorAddOperation(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: #000 + 10;`)
-	require.NoError(t, err)
+	var stmts = RunParserTest(`$foo: #000 + 10;`)
 	t.Logf("%+v\n", stmts)
 }
 
 func TestParserAssignStmtWithHexColorMulOperation(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: #010101 * 20;`)
-	require.NoError(t, err)
+	var stmts = RunParserTest(`$foo: #010101 * 20;`)
 	t.Logf("%+v\n", stmts)
 }
 
 func TestParserAssignStmtWithHexColorDivOperation(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: #121212 / 2;`)
-	require.NoError(t, err)
+	var stmts = RunParserTest(`$foo: #121212 / 2;`)
 	t.Logf("%+v\n", stmts)
 }
 
 func TestParserAssignStmtWithPxValue(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: 10px;`)
-	require.NoError(t, err)
+	var stmts = RunParserTest(`$foo: 10px;`)
 	t.Logf("%+v\n", stmts)
 }
 
 func TestParserAssignStmtWithSolveableVariableRef(t *testing.T) {
-	stmts, err := RunParserTest(`
+	var stmts = RunParserTest(`
 	$a: 10px; 
 	$b: 10px;
 	$c: $a + $b;
 	`)
-	require.NoError(t, err)
 	t.Logf("%+v\n", stmts)
 }
 
 func TestParserAssignStmtWithUnknownVariableRef(t *testing.T) {
-	stmts, err := RunParserTest(`
+	var stmts = RunParserTest(`
 	$a: 10px; 
 	$b: 10px;
 	$c: 3 * ($a + $b) + $c;
 	`)
-	require.NoError(t, err)
 	t.Logf("%+v\n", stmts) // should be 60px + $c
 }
 
 func TestParserAssignStmtWithFunctionCall(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: go();`)
-	require.NoError(t, err)
+	var stmts = RunParserTest(`$foo: go();`)
 	t.Logf("%+v\n", stmts)
 }
 
 func TestParserAssignStmtWithFunctionCallIntegerArgument(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: go(1,2,3);`)
-	require.NoError(t, err)
+	var stmts = RunParserTest(`$foo: go(1,2,3);`)
 	t.Logf("%+v\n", stmts)
 }
 
 func TestParserAssignStmtWithFunctionCallFunctionCallArgument(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: go(bar());`)
-	require.NoError(t, err)
+	var stmts = RunParserTest(`$foo: go(bar());`)
 	t.Logf("%+v\n", stmts)
 }
 
 func TestParserAssignStmtWithFunctionCallVariableArgument(t *testing.T) {
-	stmts, err := RunParserTest(`$foo: go($a,$b,$c);`)
-	require.NoError(t, err)
+	var stmts = RunParserTest(`$foo: go($a,$b,$c);`)
 	t.Logf("%+v\n", stmts)
 }
 
 func TestParserMixinSimple(t *testing.T) {
-	_, err := RunParserTest(`
+	RunParserTest(`
 @mixin silly-links {
   a {
     color: blue;
@@ -685,132 +598,117 @@ func TestParserMixinSimple(t *testing.T) {
   }
 }
 	`)
-	require.NoError(t, err)
 }
 
 func TestParserMixinArguments(t *testing.T) {
-	_, err := RunParserTest(`
+	RunParserTest(`
 @mixin colors($text, $background, $border) {
   color: $text;
   background-color: $background;
   border-color: $border;
 }
 	`)
-	require.NoError(t, err)
 }
 
 func TestParserMixinContentDirective(t *testing.T) {
-	_, err := RunParserTest(`
+	RunParserTest(`
 @mixin apply-to-ie6-only {
   * html {
     @content;
   }
 }
 	`)
-	require.NoError(t, err)
 }
 
 func TestParserExtendClassSelector(t *testing.T) {
-	_, err := RunParserTest(`@extend .foo-bar;`)
-	require.NoError(t, err)
+	RunParserTest(`@extend .foo-bar;`)
 }
 
 func TestParserExtendIdSelector(t *testing.T) {
-	_, err := RunParserTest(`@extend #myId;`)
-	require.NoError(t, err)
+	RunParserTest(`@extend #myId;`)
 }
 
 func TestParserExtendComplexSelector(t *testing.T) {
-	_, err := RunParserTest(`@extend #myId > .foo-bar;`)
-	require.NoError(t, err)
+	RunParserTest(`@extend #myId > .foo-bar;`)
 }
 
 func TestParserInclude(t *testing.T) {
-	_, err := RunParserTest(`
+	RunParserTest(`
 		@include apply-to-ie6-only;
 	`)
-	require.NoError(t, err)
 }
 
 func TestParserIncludeWithContentBlock(t *testing.T) {
-	stmts, err := RunParserTest(`
+	var stmts = RunParserTest(`
 		@include apply-to-ie6-only {
 			color: white;
 		};
 	`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserFunctionSimple(t *testing.T) {
-	stmts, err := RunParserTest(`
+	var stmts = RunParserTest(`
 @function grid-width($n) {
   @return $n * $grid-width + ($n - 1) * $gutter-width;
 }
 	`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserFunctionSimple2(t *testing.T) {
-	stmts, err := RunParserTest(`
+	var stmts = RunParserTest(`
 @function exists($name) {
   @return variable-exists($name);
 }
 	`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserFunctionSimple3(t *testing.T) {
-	stmts, err := RunParserTest(`
+	var stmts = RunParserTest(`
 @function f() { }
 	`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserFunctionSimple4(t *testing.T) {
-	stmts, err := RunParserTest(`
+	var stmts = RunParserTest(`
 @function f() {
   $foo: hi;
   @return g();
 }
 	`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserFunctionSimple5(t *testing.T) {
-	stmts, err := RunParserTest(`
+	var stmts = RunParserTest(`
 @function g() {
   @return variable-exists(foo);
 }
 	`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserFunctionWithAssignments(t *testing.T) {
-	stmts, err := RunParserTest(`
+	var stmts = RunParserTest(`
 @function g() {
   $a: 2 * 10;
   @return $a * 99;
 }
 	`)
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(stmts.Stmts))
+	assert.Equal(t, 1, len(*stmts))
 }
 
 func TestParserFunctionCallKeywordArguments(t *testing.T) {
-	stmts, err := RunParserTest(`
+	var stmts = RunParserTest(`
 	@function foo($a, $b) {
 		@return $a + $b;
 	}
 	$c: foo($b: 2, $a: 1);
 	`)
-	require.NoError(t, err)
-	assert.Equal(t, 2, len(stmts.Stmts))
+	assert.Equal(t, 2, len(*stmts))
 }
 
 func TestParserMassiveRules(t *testing.T) {
@@ -833,8 +731,7 @@ func TestParserMassiveRules(t *testing.T) {
 	for _, buffer := range buffers {
 		t.Logf("%s\n", buffer)
 		var p = NewParser(runtime.NewContext())
-		stmts, err := p.ParseScss(buffer)
-		require.NoError(t, err)
+		var stmts = p.ParseScss(buffer)
 		t.Logf("%+v\n", stmts)
 	}
 }
@@ -855,57 +752,51 @@ func TestParserIfStmtTrueCondition(t *testing.T) {
 
 func TestParserTypeSelector(t *testing.T) {
 	p := NewParser(runtime.NewContext())
-	stmts, err := p.ParseScss(`div { width: auto; }`)
-	require.NoError(t, err)
-	ruleset, ok := (stmts.Stmts)[0].(*ast.RuleSet)
+	stmts := p.ParseScss(`div { width: auto; }`)
+	ruleset, ok := (*stmts)[0].(*ast.RuleSet)
 	assert.True(t, ok)
 	assert.NotNil(t, ruleset)
 }
 
 func TestParserClassSelector(t *testing.T) {
 	p := NewParser(runtime.NewContext())
-	stmts, err := p.ParseScss(`.foo-bar { width: auto; }`)
-	require.NoError(t, err)
-	ruleset, ok := (stmts.Stmts)[0].(*ast.RuleSet)
+	stmts := p.ParseScss(`.foo-bar { width: auto; }`)
+	ruleset, ok := (*stmts)[0].(*ast.RuleSet)
 	assert.True(t, ok)
 	assert.NotNil(t, ruleset)
 }
 
 func TestParserDescendantCombinatorSelector(t *testing.T) {
 	p := NewParser(runtime.NewContext())
-	stmts, err := p.ParseScss(`
+	stmts := p.ParseScss(`
 	.foo
 	.bar
 	.zoo { width: auto; }`)
-	require.NoError(t, err)
-	ruleset, ok := (stmts.Stmts)[0].(*ast.RuleSet)
+	ruleset, ok := (*stmts)[0].(*ast.RuleSet)
 	assert.True(t, ok)
 	assert.NotNil(t, ruleset)
 }
 
 func TestParserAdjacentCombinator(t *testing.T) {
 	p := NewParser(runtime.NewContext())
-	stmts, err := p.ParseScss(`.foo + .bar { width: auto; }`)
-	require.NoError(t, err)
-	ruleset, ok := (stmts.Stmts)[0].(*ast.RuleSet)
+	stmts := p.ParseScss(`.foo + .bar { width: auto; }`)
+	ruleset, ok := (*stmts)[0].(*ast.RuleSet)
 	assert.True(t, ok)
 	assert.NotNil(t, ruleset)
 }
 
 func TestParserGeneralSiblingCombinator(t *testing.T) {
 	p := NewParser(runtime.NewContext())
-	stmts, err := p.ParseScss(`.foo ~ .bar { width: auto; }`)
-	require.NoError(t, err)
-	ruleset, ok := (stmts.Stmts)[0].(*ast.RuleSet)
+	stmts := p.ParseScss(`.foo ~ .bar { width: auto; }`)
+	ruleset, ok := (*stmts)[0].(*ast.RuleSet)
 	assert.True(t, ok)
 	assert.NotNil(t, ruleset)
 }
 
 func TestParserChildCombinator(t *testing.T) {
 	p := NewParser(runtime.NewContext())
-	stmts, err := p.ParseScss(`.foo > .bar { width: auto; }`)
-	require.NoError(t, err)
-	ruleset, ok := (stmts.Stmts)[0].(*ast.RuleSet)
+	stmts := p.ParseScss(`.foo > .bar { width: auto; }`)
+	ruleset, ok := (*stmts)[0].(*ast.RuleSet)
 	assert.True(t, ok)
 	assert.NotNil(t, ruleset)
 }
@@ -913,35 +804,35 @@ func TestParserChildCombinator(t *testing.T) {
 func BenchmarkParserClassSelector(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var p = NewParser(runtime.NewContext())
-		_, _ = p.ParseScss(`.foo-bar {}`)
+		p.ParseScss(`.foo-bar {}`)
 	}
 }
 
 func BenchmarkParserAttributeSelector(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var p = NewParser(runtime.NewContext())
-		_, _ = p.ParseScss(`input[type=text] {  }`)
+		p.ParseScss(`input[type=text] {  }`)
 	}
 }
 
 func BenchmarkParserComplexSelector(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var p = NewParser(runtime.NewContext())
-		_, _ = p.ParseScss(`div#myId.first-name.last-name, span, html, .first-name, .last-name { }`)
+		p.ParseScss(`div#myId.first-name.last-name, span, html, .first-name, .last-name { }`)
 	}
 }
 
 func BenchmarkParserMediaQueryAllAndMinWidth(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var p = NewParser(runtime.NewContext())
-		_, _ = p.ParseScss(`@media all and (min-width:500px) {  .red { color: red; } }`)
+		p.ParseScss(`@media all and (min-width:500px) {  .red { color: red; } }`)
 	}
 }
 
 func BenchmarkParserOverAll(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var p = NewParser(runtime.NewContext())
-		_, _ = p.ParseScss(`div#myId.first-name.last-name {
+		p.ParseScss(`div#myId.first-name.last-name {
 			.foo-bar {
 				color: red;
 				background: #fff;

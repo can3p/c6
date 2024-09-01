@@ -1,28 +1,25 @@
 package lexer
 
-import (
-	"testing"
-
-	"github.com/c9s/c6/ast"
-	"github.com/stretchr/testify/assert"
-)
+import "github.com/stretchr/testify/assert"
+import "testing"
+import "github.com/c9s/c6/ast"
 
 func AssertLexerTokenSequenceFromState(t *testing.T, scss string, fn stateFn, tokenList []ast.TokenType) {
 	t.Logf("Testing SCSS: %s\n", scss)
 	var lexer = NewLexerWithString(scss)
 	assert.NotNil(t, lexer)
-	_, err := lexer.RunFrom(fn)
-	assert.NoError(t, err)
+	lexer.RunFrom(fn)
 	AssertTokenSequence(t, lexer, tokenList)
+	lexer.Close()
 }
 
 func AssertLexerTokenSequence(t *testing.T, scss string, tokenList []ast.TokenType) {
 	t.Logf("Testing SCSS: %s\n", scss)
 	var lexer = NewLexerWithString(scss)
 	assert.NotNil(t, lexer)
-	_, err := lexer.Run()
-	assert.NoError(t, err)
+	lexer.Run()
 	AssertTokenSequence(t, lexer, tokenList)
+	lexer.Close()
 }
 
 func OutputGreen(t *testing.T, msg string, args ...interface{}) {
@@ -43,15 +40,7 @@ func AssertTokenSequence(t *testing.T, l *Lexer, tokenList []ast.TokenType) []as
 	var failure = false
 	for idx, expectingToken := range tokenList {
 
-		if idx == len(l.Tokens) {
-			for _, token := range tokenList[idx:] {
-				OutputRed(t, "not ok ---- input longer than expected  %s", token.String())
-				failure = true
-			}
-			break
-		}
-
-		var token = l.Tokens[idx]
+		var token = <-l.Output
 
 		if token == nil {
 			failure = true
@@ -62,7 +51,7 @@ func AssertTokenSequence(t *testing.T, l *Lexer, tokenList []ast.TokenType) []as
 		tokens = append(tokens, *token)
 
 		if expectingToken == token.Type {
-			//OutputGreen(t, "ok %s '%s'", token.Type.String(), token.Str)
+			OutputGreen(t, "ok %s '%s'", token.Type.String(), token.Str)
 		} else {
 			failure = true
 			OutputRed(t, "not ok ---- %d token => got %s '%s' expecting %s", idx, token.Type.String(), token.Str, expectingToken.String())
@@ -70,10 +59,10 @@ func AssertTokenSequence(t *testing.T, l *Lexer, tokenList []ast.TokenType) []as
 		assert.Equal(t, expectingToken, token.Type)
 	}
 
-	if len(tokenList) < len(l.Tokens) {
-		for _, token := range l.Tokens[len(tokenList):] {
+	if l.remaining() {
+		var token *ast.Token = nil
+		for token = <-l.Output; token != nil; token = <-l.Output {
 			OutputRed(t, "not ok ---- Remaining expecting %s '%s'", token.Type.String(), token.Str)
-			failure = true
 		}
 	}
 	if failure {

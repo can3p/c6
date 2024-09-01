@@ -21,11 +21,13 @@ func (self *Block) SetStmts(stms *StmtList) {
 }
 
 func (self *Block) MergeBlock(block *Block) {
-	self.Stmts.Stmts = append(self.Stmts.Stmts, block.Stmts.Stmts...)
+	for _, stm := range *block.Stmts {
+		*self.Stmts = append(*self.Stmts, stm)
+	}
 }
 
 func (self *Block) MergeStmts(stmts *StmtList) {
-	for _, stm := range stmts.Stmts {
+	for _, stm := range *stmts {
 		self.Stmts.Append(stm)
 	}
 }

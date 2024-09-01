@@ -1,21 +1,20 @@
 package lexer
 
 import (
-	"unicode"
-
 	"github.com/c9s/c6/ast"
+	"unicode"
 )
 
 // $var-rgba(255,255,0)
-func lexVariableName(l *Lexer) (stateFn, error) {
+func lexVariableName(l *Lexer) stateFn {
 	var r = l.next()
 	if r != '$' {
-		return nil, l.errorf("Unexpected token %c for lexVariable", r)
+		l.errorf("Unexpected token %c for lexVariable", r)
 	}
 
 	r = l.next()
 	if !unicode.IsLetter(r) {
-		return nil, l.errorf("The first character of a variable name must be letter. Got '%c'", r)
+		l.errorf("The first character of a variable name must be letter. Got '%c'", r)
 	}
 
 	r = l.next()
@@ -27,7 +26,7 @@ func lexVariableName(l *Lexer) (stateFn, error) {
 			} else if unicode.IsDigit(r2) { // $a-3 should be $a '-' 3
 				l.backup()
 				l.emit(ast.T_VARIABLE)
-				return lexExpr, nil
+				return lexExpr
 			} else {
 				break
 			}
@@ -38,7 +37,7 @@ func lexVariableName(l *Lexer) (stateFn, error) {
 		} else if r == '}' {
 			l.backup()
 			l.emit(ast.T_VARIABLE)
-			return lexStart, nil
+			return lexStart
 			///XXX break
 		} else if unicode.IsSpace(r) || r == ';' {
 			break
@@ -52,5 +51,5 @@ func lexVariableName(l *Lexer) (stateFn, error) {
 		l.emit(ast.T_VARIABLE_LENGTH_ARGUMENTS)
 	}
 
-	return lexStart, nil
+	return lexStart
 }

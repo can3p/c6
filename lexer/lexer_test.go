@@ -1,11 +1,8 @@
 package lexer
 
-import (
-	"testing"
-
-	"github.com/c9s/c6/ast"
-	"github.com/stretchr/testify/assert"
-)
+import "github.com/c9s/c6/ast"
+import "testing"
+import "github.com/stretchr/testify/assert"
 
 func TestLexerNext(t *testing.T) {
 	l := NewLexerWithString(`.test {  }`)
@@ -52,7 +49,8 @@ func TestLexerIgnoreSpace(t *testing.T) {
 
 	l.ignoreSpaces()
 
-	var r rune = l.next()
+	var r rune
+	r = l.next()
 	assert.Equal(t, '.', r)
 
 	l.backup()
@@ -61,11 +59,11 @@ func TestLexerIgnoreSpace(t *testing.T) {
 
 func TestLexerString(t *testing.T) {
 	l := NewLexerWithString(`   "foo"`)
+	output := l.TokenStream()
 	assert.NotNil(t, l)
 	l.til("\"")
-	_, err := lexString(l)
-	assert.NoError(t, err)
-	token := l.Tokens[0]
+	lexString(l)
+	token := <-output
 	assert.Equal(t, ast.T_QQ_STRING, token.Type)
 }
 
@@ -352,95 +350,95 @@ func TestLexerFontFace(t *testing.T) {
 	})
 }
 
-//func BenchmarkLexerBasic(b *testing.B) {
-//for n := 0; n < b.N; n++ {
-//// Fib(10)
-//var l = NewLexerWithString(`.test, .foo, .bar { color: #fff; }`)
-//var o = l.TokenStream()
-//l.Run()
-//var token = <-o
-//for ; token != nil; token = <-o {
-//}
-//l.Close()
-//}
-//}
+func BenchmarkLexerBasic(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		// Fib(10)
+		var l = NewLexerWithString(`.test, .foo, .bar { color: #fff; }`)
+		var o = l.TokenStream()
+		l.Run()
+		var token = <-o
+		for ; token != nil; token = <-o {
+		}
+		l.Close()
+	}
+}
 
-//func BenchmarkLexerTypeSelector(b *testing.B) {
-//for n := 0; n < b.N; n++ {
-//// Fib(10)
-//var l = NewLexerWithString(`div { }`)
-//var o = l.TokenStream()
-//l.Run()
-//var token = <-o
-//for ; token != nil; token = <-o {
-//}
-//l.Close()
-//}
-//}
+func BenchmarkLexerTypeSelector(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		// Fib(10)
+		var l = NewLexerWithString(`div { }`)
+		var o = l.TokenStream()
+		l.Run()
+		var token = <-o
+		for ; token != nil; token = <-o {
+		}
+		l.Close()
+	}
+}
 
-//func BenchmarkLexerIdSelector(b *testing.B) {
-//for n := 0; n < b.N; n++ {
-//// Fib(10)
-//var l = NewLexerWithString(`#myId { }`)
-//var o = l.TokenStream()
-//l.Run()
-//var token = <-o
-//for ; token != nil; token = <-o {
-//}
-//l.Close()
-//}
-//}
+func BenchmarkLexerIdSelector(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		// Fib(10)
+		var l = NewLexerWithString(`#myId { }`)
+		var o = l.TokenStream()
+		l.Run()
+		var token = <-o
+		for ; token != nil; token = <-o {
+		}
+		l.Close()
+	}
+}
 
-//func BenchmarkLexerClassSelector(b *testing.B) {
-//for n := 0; n < b.N; n++ {
-//// Fib(10)
-//var l = NewLexerWithString(`.foo-bar-zoo { }`)
-//var o = l.TokenStream()
-//l.Run()
-//var token = <-o
-//for ; token != nil; token = <-o {
-//}
-//l.Close()
-//}
-//}
+func BenchmarkLexerClassSelector(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		// Fib(10)
+		var l = NewLexerWithString(`.foo-bar-zoo { }`)
+		var o = l.TokenStream()
+		l.Run()
+		var token = <-o
+		for ; token != nil; token = <-o {
+		}
+		l.Close()
+	}
+}
 
-//func BenchmarkLexerAttributeSelector(b *testing.B) {
-//for n := 0; n < b.N; n++ {
-//// Fib(10)
-//var l = NewLexerWithString(`
-//[href*=ftp] { }
-//`)
-//var o = l.TokenStream()
-//l.Run()
-//var token = <-o
-//for ; token != nil; token = <-o {
-//}
-//l.Close()
-//}
-//}
+func BenchmarkLexerAttributeSelector(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		// Fib(10)
+		var l = NewLexerWithString(`
+		[href*=ftp] { }
+		`)
+		var o = l.TokenStream()
+		l.Run()
+		var token = <-o
+		for ; token != nil; token = <-o {
+		}
+		l.Close()
+	}
+}
 
-//func BenchmarkLexerImportRule(b *testing.B) {
-//for n := 0; n < b.N; n++ {
-//// Fib(10)
-//var l = NewLexerWithString(`@import url(../test.scss);`)
-//var o = l.TokenStream()
-//l.Run()
-//var token = <-o
-//for ; token != nil; token = <-o {
-//}
-//l.Close()
-//}
-//}
+func BenchmarkLexerImportRule(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		// Fib(10)
+		var l = NewLexerWithString(`@import url(../test.scss);`)
+		var o = l.TokenStream()
+		l.Run()
+		var token = <-o
+		for ; token != nil; token = <-o {
+		}
+		l.Close()
+	}
+}
 
-//func BenchmarkLexerVariableDeclaration(b *testing.B) {
-//for n := 0; n < b.N; n++ {
-//// Fib(10)
-//var l = NewLexerWithString(`$color: (3+1) * 4;`)
-//var o = l.TokenStream()
-//l.Run()
-//var token = <-o
-//for ; token != nil; token = <-o {
-//}
-//l.Close()
-//}
-//}
+func BenchmarkLexerVariableDeclaration(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		// Fib(10)
+		var l = NewLexerWithString(`$color: (3+1) * 4;`)
+		var o = l.TokenStream()
+		l.Run()
+		var token = <-o
+		for ; token != nil; token = <-o {
+		}
+		l.Close()
+	}
+}

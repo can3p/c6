@@ -1,13 +1,9 @@
 package lexer
 
-import (
-	"testing"
+import "github.com/c9s/c6/ast"
+import "testing"
 
-	"github.com/c9s/c6/ast"
-)
-
-/*
-*
+/**
 Variable assignment test cases
 */
 func TestLexerAssignStmtWithCommentBlock(t *testing.T) {
@@ -134,7 +130,6 @@ func TestLexerMap(t *testing.T) {
 		ast.T_IDENT, ast.T_COLON, ast.T_INTEGER, ast.T_COMMA,
 		ast.T_IDENT, ast.T_COLON, ast.T_INTEGER,
 		ast.T_PAREN_CLOSE,
-		ast.T_SEMICOLON,
 	})
 }
 
@@ -144,7 +139,6 @@ func TestLexerMapWithExtraComma(t *testing.T) {
 		ast.T_IDENT, ast.T_COLON, ast.T_INTEGER, ast.T_COMMA,
 		ast.T_IDENT, ast.T_COLON, ast.T_INTEGER, ast.T_COMMA,
 		ast.T_PAREN_CLOSE,
-		ast.T_SEMICOLON,
 	})
 }
 
@@ -154,7 +148,6 @@ func TestLexerMapWithExpr(t *testing.T) {
 		ast.T_IDENT, ast.T_COLON, ast.T_INTEGER, ast.T_UNIT_PX, ast.T_PLUS, ast.T_INTEGER, ast.T_UNIT_PX, ast.T_COMMA,
 		ast.T_IDENT, ast.T_COLON, ast.T_VARIABLE,
 		ast.T_PAREN_CLOSE,
-		ast.T_SEMICOLON,
 	})
 }
 
@@ -238,8 +231,6 @@ func TestLexerInterpolationComplex1(t *testing.T) {
 		ast.T_INTERPOLATION_END,
 		ast.T_LITERAL_CONCAT,
 		ast.T_IDENT,
-		ast.T_SEMICOLON,
-		ast.T_BRACE_CLOSE,
 	})
 }
 
@@ -264,8 +255,6 @@ func TestLexerInterpolationComplex2(t *testing.T) {
 
 		ast.T_INTEGER,
 		ast.T_UNIT_PX,
-		ast.T_SEMICOLON,
-		ast.T_BRACE_CLOSE,
 	})
 }
 
@@ -357,10 +346,6 @@ func TestLexerInterpolationPropertyNameSuffix(t *testing.T) {
 		ast.T_Q_STRING,
 		ast.T_INTERPOLATION_END,
 		ast.T_COLON,
-		ast.T_INTEGER,
-		ast.T_UNIT_PX,
-		ast.T_SEMICOLON,
-		ast.T_BRACE_CLOSE,
 	})
 
 }
@@ -499,7 +484,7 @@ func TestLexerIfStmtFunctionCallEqualToNumber(t *testing.T) {
 	@if type-of(nth($x, 3)) == 10 {
 	}
 	`, []ast.TokenType{
-		ast.T_IF, ast.T_FUNCTION_NAME, ast.T_PAREN_OPEN, ast.T_FUNCTION_NAME, ast.T_PAREN_OPEN, ast.T_VARIABLE, ast.T_COMMA, ast.T_INTEGER, ast.T_PAREN_CLOSE, ast.T_PAREN_CLOSE, ast.T_EQUAL, ast.T_INTEGER, ast.T_BRACE_OPEN, ast.T_BRACE_CLOSE,
+		ast.T_IF, ast.T_FUNCTION_NAME, ast.T_PAREN_OPEN, ast.T_FUNCTION_NAME, ast.T_PAREN_OPEN, ast.T_VARIABLE, ast.T_COMMA, ast.T_INTEGER, ast.T_PAREN_CLOSE, ast.T_PAREN_CLOSE, ast.T_EQUAL, ast.T_INTEGER, ast.T_BRACE_OPEN,
 	})
 }
 

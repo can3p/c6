@@ -4,9 +4,9 @@ import (
 	"github.com/c9s/c6/ast"
 )
 
-func lexCommentLine(l *Lexer) (stateFn, error) {
+func lexCommentLine(l *Lexer) stateFn {
 	if !l.match("//") {
-		return nil, nil
+		return nil
 	}
 	l.ignore()
 
@@ -22,12 +22,12 @@ func lexCommentLine(l *Lexer) (stateFn, error) {
 	}
 	l.backup()
 	l.ignore()
-	return lexStart, nil
+	return lexStart
 }
 
-func lexCommentBlock(l *Lexer, emit bool) (stateFn, error) {
+func lexCommentBlock(l *Lexer, emit bool) stateFn {
 	if !l.match("/*") {
-		return nil, nil
+		return nil
 	}
 	l.ignore()
 	var r = l.next()
@@ -41,20 +41,21 @@ func lexCommentBlock(l *Lexer, emit bool) (stateFn, error) {
 			}
 			l.match("*/")
 			l.ignore()
-			return lexStart, nil
+			return lexStart
 		}
 		r = l.next()
 	}
-	return nil, l.errorf("Expecting comment end mark '*/'. Got '%c'", r)
+	l.errorf("Expecting comment end mark '*/'. Got '%c'", r)
+	return lexStart
 }
 
-func lexComment(l *Lexer, emit bool) (stateFn, error) {
+func lexComment(l *Lexer, emit bool) stateFn {
 	var r = l.peek()
 	var r2 = l.peekBy(2)
 	if r == '/' && r2 == '*' {
-		return lexCommentBlock(l, emit)
+		lexCommentBlock(l, emit)
 	} else if r == '/' && r2 == '/' {
-		return lexCommentLine(l)
+		lexCommentLine(l)
 	}
-	return nil, nil
+	return nil
 }

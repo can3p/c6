@@ -2,8 +2,6 @@ package compiler
 
 import (
 	"bytes"
-	"fmt"
-
 	"github.com/c9s/c6/ast"
 	"github.com/c9s/c6/runtime"
 )
@@ -64,8 +62,10 @@ func (compiler *CompactCompiler) CompileComplexSelectorList(selectorList *ast.Co
 
 func (compiler *CompactCompiler) CompileDeclBlock(block *ast.DeclBlock) (out string) {
 	out += "{"
-	for _, stm := range block.Stmts.Stmts {
-		out += stm.String()
+	if block.Stmts != nil {
+		for _, stm := range *block.Stmts {
+			_ = stm
+		}
 	}
 	out += "}"
 	return out
@@ -79,45 +79,31 @@ func (compiler *CompactCompiler) CompileRuleSet(ruleset *ast.RuleSet) (out strin
 	return out
 }
 
-func (compiler *CompactCompiler) CompileStmt(anyStm ast.Stmt) (string, error) {
+func (compiler *CompactCompiler) CompileStmt(anyStm ast.Stmt) string {
 
 	switch stm := anyStm.(type) {
 	case *ast.RuleSet:
-		return compiler.CompileRuleSet(stm), nil
+		return compiler.CompileRuleSet(stm)
 	case *ast.ImportStmt:
 	case *ast.AssignStmt:
 	}
-
-	return "", fmt.Errorf("Unsupported compilation")
+	panic("Unsupported compilation")
 }
 
-func (compiler *CompactCompiler) CompileString(in interface{}) (string, error) {
-	s, err := compiler.Compile(in)
-	if err != nil {
-		return "", err
-	}
-
-	return s.String(), nil
+func (compiler *CompactCompiler) CompileString(any interface{}) string {
+	return compiler.Compile(any).String()
 }
 
-func (compiler *CompactCompiler) Compile(any interface{}) (*bytes.Buffer, error) {
+func (compiler *CompactCompiler) Compile(any interface{}) *bytes.Buffer {
 	switch v := any.(type) {
 	case ast.StmtList:
-		for _, stm := range v.Stmts {
-			s, err := compiler.CompileStmt(stm)
-			if err != nil {
-				return nil, err
-			}
-			compiler.Buffer.WriteString(s)
+		for _, stm := range v {
+			compiler.Buffer.WriteString(compiler.CompileStmt(stm))
 		}
 	case *ast.StmtList:
-		for _, stm := range v.Stmts {
-			s, err := compiler.CompileStmt(stm)
-			if err != nil {
-				return nil, err
-			}
-			compiler.Buffer.WriteString(s)
+		for _, stm := range *v {
+			compiler.Buffer.WriteString(compiler.CompileStmt(stm))
 		}
 	}
-	return &compiler.Buffer, nil
+	return &compiler.Buffer
 }

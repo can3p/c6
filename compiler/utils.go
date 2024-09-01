@@ -1,6 +1,8 @@
 package compiler
 
-//func indent(level int) string {
-//// two space
-//return strings.Repeat("  ", level)
-//}
+import "strings"
+
+func indent(level int) string {
+	// two space
+	return strings.Repeat("  ", level)
+}

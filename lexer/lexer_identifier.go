@@ -1,16 +1,12 @@
 package lexer
 
-import (
-	"fmt"
-	"unicode"
+import "unicode"
+import "github.com/c9s/c6/ast"
 
-	"github.com/c9s/c6/ast"
-)
-
-func lexIdentifier(l *Lexer) (stateFn, error) {
+func lexIdentifier(l *Lexer) stateFn {
 	var r = l.next()
 	if !unicode.IsLetter(r) && r != '-' {
-		return nil, fmt.Errorf("An identifier needs to start with a letter or dash")
+		panic("An identifier needs to start with a letter or dash")
 	}
 	r = l.next()
 
@@ -19,7 +15,7 @@ func lexIdentifier(l *Lexer) (stateFn, error) {
 			var r2 = l.peek()
 			if !unicode.IsLetter(r2) && r2 != '-' {
 				l.backup()
-				return lexExpr, nil
+				return lexExpr
 			}
 		}
 
@@ -31,16 +27,12 @@ func lexIdentifier(l *Lexer) (stateFn, error) {
 		var curTok = l.emit(ast.T_FUNCTION_NAME)
 
 		if curTok.Str == "url" || curTok.Str == "local" {
-			if err := lexUrlParam(l); err != nil {
-				return nil, err
-			}
+			lexUrlParam(l)
 		} else {
-			if _, err := lexFunctionParams(l); err != nil {
-				return nil, err
-			}
+			lexFunctionParams(l)
 		}
 	} else {
 		l.emit(ast.T_IDENT)
 	}
-	return lexExpr, nil
+	return lexExpr
 }

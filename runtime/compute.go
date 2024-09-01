@@ -1,10 +1,7 @@
 package runtime
 
-import (
-	"fmt"
-
-	"github.com/c9s/c6/ast"
-)
+import "github.com/c9s/c6/ast"
+import "fmt"
 
 /*
 Used for Incompatible unit, data type or unsupported operations
@@ -28,42 +25,41 @@ type ComputeFunction func(a ast.Value, b ast.Value) ast.Value
 
 const ValueTypeNum = 7
 
-//var computableMatrix [ValueTypeNum][ValueTypeNum]bool = [ValueTypeNum][ValueTypeNum]bool{
-//[> NumberValue <]
-//{false, false, false, false, false, false, false},
+var computableMatrix [ValueTypeNum][ValueTypeNum]bool = [ValueTypeNum][ValueTypeNum]bool{
+	/* NumberValue */
+	[ValueTypeNum]bool{false, false, false, false, false, false, false},
 
-//[> HexColorValue <]
-//{false, false, false, false, false, false, false},
+	/* HexColorValue */
+	[ValueTypeNum]bool{false, false, false, false, false, false, false},
 
-//[> RGBAColorValue <]
-//{false, false, false, false, false, false, false},
+	/* RGBAColorValue */
+	[ValueTypeNum]bool{false, false, false, false, false, false, false},
 
-//[> RGBColorValue <]
-//{false, false, false, false, false, false, false},
-//}
+	/* RGBColorValue */
+	[ValueTypeNum]bool{false, false, false, false, false, false, false},
+}
 
-//[>
-//*
-//Each row: [5]ComputeFunction{ NumberValue, HexColorValue, RGBAColorValue, RGBColorValue }
-//*/
-//var computeFunctionMatrix [5][5]ComputeFunction = [5][5]ComputeFunction{
+/**
+Each row: [5]ComputeFunction{ NumberValue, HexColorValue, RGBAColorValue, RGBColorValue }
+*/
+var computeFunctionMatrix [5][5]ComputeFunction = [5][5]ComputeFunction{
 
-//[> NumberValue <]
-//{nil, nil, nil, nil, nil},
+	/* NumberValue */
+	[5]ComputeFunction{nil, nil, nil, nil, nil},
 
-//[> HexColorValue <]
-//{nil, nil, nil, nil, nil},
+	/* HexColorValue */
+	[5]ComputeFunction{nil, nil, nil, nil, nil},
 
-//[> RGBAColorValue <]
-//{nil, nil, nil, nil, nil},
+	/* RGBAColorValue */
+	[5]ComputeFunction{nil, nil, nil, nil, nil},
 
-//[> RGBColorValue <]
-//{nil, nil, nil, nil, nil},
-//}
+	/* RGBColorValue */
+	[5]ComputeFunction{nil, nil, nil, nil, nil},
+}
 
-func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
+func Compute(op *ast.Op, a ast.Value, b ast.Value) ast.Value {
 	if op == nil {
-		return nil, fmt.Errorf("op can't be nil")
+		panic("op can't be nil")
 	}
 	switch op.Type {
 
@@ -73,15 +69,15 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 		case *ast.Boolean:
 			switch tb := b.(type) {
 			case *ast.Boolean:
-				return ast.NewBoolean(ta.Value == tb.Value), nil
+				return ast.NewBoolean(ta.Value == tb.Value)
 			}
 		case *ast.Number:
 			switch tb := b.(type) {
 			case *ast.Number:
 				if IsComparable(ta, tb) {
-					return ast.NewBoolean(ta.Value == tb.Value), nil
+					return ast.NewBoolean(ta.Value == tb.Value)
 				} else {
-					return nil, fmt.Errorf("Can't compare number (unit different)")
+					panic("Can't compare number (unit different)")
 				}
 			}
 		}
@@ -92,15 +88,15 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 		case *ast.Boolean:
 			switch tb := b.(type) {
 			case *ast.Boolean:
-				return ast.NewBoolean(ta.Value != tb.Value), nil
+				return ast.NewBoolean(ta.Value != tb.Value)
 			}
 		case *ast.Number:
 			switch tb := b.(type) {
 			case *ast.Number:
 				if IsComparable(ta, tb) {
-					return ast.NewBoolean(ta.Value != tb.Value), nil
+					return ast.NewBoolean(ta.Value != tb.Value)
 				} else {
-					return nil, fmt.Errorf("Can't compare number (unit different)")
+					panic("Can't compare number (unit different)")
 				}
 			}
 		}
@@ -112,9 +108,9 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 			switch tb := b.(type) {
 			case *ast.Number:
 				if IsComparable(ta, tb) {
-					return ast.NewBoolean(ta.Value > tb.Value), nil
+					return ast.NewBoolean(ta.Value > tb.Value)
 				} else {
-					return nil, fmt.Errorf("Can't compare number (unit different)")
+					panic("Can't compare number (unit different)")
 				}
 			}
 		}
@@ -126,9 +122,9 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 			switch tb := b.(type) {
 			case *ast.Number:
 				if IsComparable(ta, tb) {
-					return ast.NewBoolean(ta.Value >= tb.Value), nil
+					return ast.NewBoolean(ta.Value >= tb.Value)
 				} else {
-					return nil, fmt.Errorf("Can't compare number (unit different)")
+					panic("Can't compare number (unit different)")
 				}
 			}
 		}
@@ -140,9 +136,9 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 			switch tb := b.(type) {
 			case *ast.Number:
 				if IsComparable(ta, tb) {
-					return ast.NewBoolean(ta.Value < tb.Value), nil
+					return ast.NewBoolean(ta.Value < tb.Value)
 				} else {
-					return nil, fmt.Errorf("Can't compare number (unit different)")
+					panic("Can't compare number (unit different)")
 				}
 			}
 		}
@@ -154,9 +150,9 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 			switch tb := b.(type) {
 			case *ast.Number:
 				if IsComparable(ta, tb) {
-					return ast.NewBoolean(ta.Value <= tb.Value), nil
+					return ast.NewBoolean(ta.Value <= tb.Value)
 				} else {
-					return nil, fmt.Errorf("Can't compare number (unit different)")
+					panic("Can't compare number (unit different)")
 				}
 			}
 		}
@@ -168,12 +164,12 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 			switch tb := b.(type) {
 
 			case *ast.Boolean:
-				return ast.NewBoolean(ta.Value && tb.Value), nil
+				return ast.NewBoolean(ta.Value && tb.Value)
 
 			// For other data type, we cast to boolean
 			default:
 				if bv, ok := b.(ast.BooleanValue); ok {
-					return ast.NewBoolean(bv.Boolean()), nil
+					return ast.NewBoolean(bv.Boolean())
 				}
 			}
 		}
@@ -185,12 +181,12 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 			switch tb := b.(type) {
 
 			case *ast.Boolean:
-				return ast.NewBoolean(ta.Value || tb.Value), nil
+				return ast.NewBoolean(ta.Value || tb.Value)
 
 			// For other data type, we cast to boolean
 			default:
 				if bv, ok := b.(ast.BooleanValue); ok {
-					return ast.NewBoolean(bv.Boolean()), nil
+					return ast.NewBoolean(bv.Boolean())
 				}
 			}
 		}
@@ -205,22 +201,22 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 			case *ast.Number:
 				return NumberAddNumber(ta, tb)
 			case *ast.HexColor:
-				return HexColorAddNumber(tb, ta), nil
+				return HexColorAddNumber(tb, ta)
 			}
 		case *ast.HexColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return HexColorAddNumber(ta, tb), nil
+				return HexColorAddNumber(ta, tb)
 			}
 		case *ast.RGBColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return RGBColorAddNumber(ta, tb), nil
+				return RGBColorAddNumber(ta, tb)
 			}
 		case *ast.RGBAColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return RGBAColorAddNumber(ta, tb), nil
+				return RGBAColorAddNumber(ta, tb)
 			}
 		}
 	case ast.T_MINUS:
@@ -233,19 +229,19 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 		case *ast.HexColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return HexColorSubNumber(ta, tb), nil
+				return HexColorSubNumber(ta, tb)
 			}
 
 		case *ast.RGBColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return RGBColorSubNumber(ta, tb), nil
+				return RGBColorSubNumber(ta, tb)
 			}
 
 		case *ast.RGBAColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return RGBAColorSubNumber(ta, tb), nil
+				return RGBAColorSubNumber(ta, tb)
 			}
 		}
 
@@ -254,22 +250,22 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 		case *ast.Number:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return NumberDivNumber(ta, tb), nil
+				return NumberDivNumber(ta, tb)
 			}
 		case *ast.HexColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return HexColorDivNumber(ta, tb), nil
+				return HexColorDivNumber(ta, tb)
 			}
 		case *ast.RGBColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return RGBColorDivNumber(ta, tb), nil
+				return RGBColorDivNumber(ta, tb)
 			}
 		case *ast.RGBAColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return RGBAColorDivNumber(ta, tb), nil
+				return RGBAColorDivNumber(ta, tb)
 			}
 		}
 
@@ -278,29 +274,29 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 		case *ast.Number:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return NumberMulNumber(ta, tb), nil
+				return NumberMulNumber(ta, tb)
 			}
 
 		case *ast.HexColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return HexColorMulNumber(ta, tb), nil
+				return HexColorMulNumber(ta, tb)
 			}
 
 		case *ast.RGBColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return RGBColorMulNumber(ta, tb), nil
+				return RGBColorMulNumber(ta, tb)
 			}
 
 		case *ast.RGBAColor:
 			switch tb := b.(type) {
 			case *ast.Number:
-				return RGBAColorMulNumber(ta, tb), nil
+				return RGBAColorMulNumber(ta, tb)
 			}
 		}
 	}
-	return nil, nil
+	return nil
 }
 
 /*
@@ -331,7 +327,7 @@ func IsValue(val ast.Expr) bool {
 	return false
 }
 
-func EvaluateExprInBooleanContext(anyexpr ast.Expr, context *Context) (ast.Value, error) {
+func EvaluateExprInBooleanContext(anyexpr ast.Expr, context *Context) ast.Value {
 	switch expr := anyexpr.(type) {
 
 	case *ast.BinaryExpr:
@@ -342,30 +338,23 @@ func EvaluateExprInBooleanContext(anyexpr ast.Expr, context *Context) (ast.Value
 
 	default:
 		if bval, ok := expr.(ast.BooleanValue); ok {
-			return ast.NewBoolean(bval.Boolean()), nil
+			return ast.NewBoolean(bval.Boolean())
 		}
 	}
-	return nil, nil
+	return nil
 }
 
-func EvaluateBinaryExprInBooleanContext(expr *ast.BinaryExpr, context *Context) (ast.Value, error) {
+func EvaluateBinaryExprInBooleanContext(expr *ast.BinaryExpr, context *Context) ast.Value {
 
-	var lval ast.Value
-	var rval ast.Value
-	var err error
+	var lval ast.Value = nil
+	var rval ast.Value = nil
 
 	switch expr := expr.Left.(type) {
 	case *ast.UnaryExpr:
-		lval, err = EvaluateUnaryExprInBooleanContext(expr, context)
-		if err != nil {
-			return nil, err
-		}
+		lval = EvaluateUnaryExprInBooleanContext(expr, context)
 
 	case *ast.BinaryExpr:
-		lval, err = EvaluateBinaryExprInBooleanContext(expr, context)
-		if err != nil {
-			return nil, err
-		}
+		lval = EvaluateBinaryExprInBooleanContext(expr, context)
 
 	default:
 		lval = expr
@@ -373,16 +362,10 @@ func EvaluateBinaryExprInBooleanContext(expr *ast.BinaryExpr, context *Context) 
 
 	switch expr := expr.Right.(type) {
 	case *ast.UnaryExpr:
-		rval, err = EvaluateUnaryExprInBooleanContext(expr, context)
-		if err != nil {
-			return nil, err
-		}
+		rval = EvaluateUnaryExprInBooleanContext(expr, context)
 
 	case *ast.BinaryExpr:
-		rval, err = EvaluateBinaryExprInBooleanContext(expr, context)
-		if err != nil {
-			return nil, err
-		}
+		rval = EvaluateBinaryExprInBooleanContext(expr, context)
 
 	default:
 		rval = expr
@@ -391,24 +374,17 @@ func EvaluateBinaryExprInBooleanContext(expr *ast.BinaryExpr, context *Context) 
 	if lval != nil && rval != nil {
 		return Compute(expr.Op, lval, rval)
 	}
-	return nil, nil
+	return nil
 }
 
-func EvaluateUnaryExprInBooleanContext(expr *ast.UnaryExpr, context *Context) (ast.Value, error) {
-	var val ast.Value
-	var err error
+func EvaluateUnaryExprInBooleanContext(expr *ast.UnaryExpr, context *Context) ast.Value {
+	var val ast.Value = nil
 
 	switch t := expr.Expr.(type) {
 	case *ast.BinaryExpr:
-		val, err = EvaluateBinaryExpr(t, context)
-		if err != nil {
-			return nil, err
-		}
+		val = EvaluateBinaryExpr(t, context)
 	case *ast.UnaryExpr:
-		val, err = EvaluateUnaryExpr(t, context)
-		if err != nil {
-			return nil, err
-		}
+		val = EvaluateUnaryExpr(t, context)
 	default:
 		val = ast.Value(t)
 	}
@@ -416,12 +392,12 @@ func EvaluateUnaryExprInBooleanContext(expr *ast.UnaryExpr, context *Context) (a
 	switch expr.Op.Type {
 	case ast.T_LOGICAL_NOT:
 		if bval, ok := val.(ast.BooleanValue); ok {
-			return ast.NewBoolean(bval.Boolean()), nil
+			return ast.NewBoolean(bval.Boolean())
 		} else {
-			return nil, fmt.Errorf("BooleanValue interface is not support for %+v", val)
+			panic(fmt.Errorf("BooleanValue interface is not support for %+v", val))
 		}
 	}
-	return val, nil
+	return val
 }
 
 /*
@@ -429,7 +405,7 @@ EvaluateExpr calls EvaluateBinaryExpr. except EvaluateExpr
 prevents calculate css slash as division.  otherwise it's the same as
 EvaluateBinaryExpr.
 */
-func EvaluateExpr(expr ast.Expr, context *Context) (ast.Value, error) {
+func EvaluateExpr(expr ast.Expr, context *Context) ast.Value {
 
 	switch t := expr.(type) {
 
@@ -437,7 +413,7 @@ func EvaluateExpr(expr ast.Expr, context *Context) (ast.Value, error) {
 		// For binary expression that is a CSS slash, we evaluate the expression as a literal string (unquoted)
 		if t.IsCssSlash() {
 			// return string object without quote
-			return ast.NewString(0, t.Left.(*ast.Number).String()+"/"+t.Right.(*ast.Number).String(), nil), nil
+			return ast.NewString(0, t.Left.(*ast.Number).String()+"/"+t.Right.(*ast.Number).String(), nil)
 		}
 		return EvaluateBinaryExpr(t, context)
 
@@ -445,44 +421,37 @@ func EvaluateExpr(expr ast.Expr, context *Context) (ast.Value, error) {
 		return EvaluateUnaryExpr(t, context)
 
 	default:
-		return ast.Value(expr), nil
+		return ast.Value(expr)
 
 	}
 
 }
 
-func EvaluateFunctionCall(fcall ast.FunctionCall, context *Context) (ast.Value, error) {
+func EvaluateFunctionCall(fcall ast.FunctionCall, context *Context) ast.Value {
 	if fun, ok := context.Functions.Get(fcall.Ident.Str); ok {
 
 		_ = fun
 
 	} else {
-		return nil, fmt.Errorf("Function " + fcall.Ident.Str + " is undefined.")
+		panic("Function " + fcall.Ident.Str + " is undefined.")
 	}
-	return nil, nil
+	return nil
 }
 
 /*
 EvaluateBinaryExpr recursively.
 */
-func EvaluateBinaryExpr(expr *ast.BinaryExpr, context *Context) (ast.Value, error) {
+func EvaluateBinaryExpr(expr *ast.BinaryExpr, context *Context) ast.Value {
 	var lval ast.Value = nil
 	var rval ast.Value = nil
-	var err error
 
 	switch expr := expr.Left.(type) {
 
 	case *ast.BinaryExpr:
-		lval, err = EvaluateBinaryExpr(expr, context)
-		if err != nil {
-			return nil, err
-		}
+		lval = EvaluateBinaryExpr(expr, context)
 
 	case *ast.UnaryExpr:
-		lval, err = EvaluateUnaryExpr(expr, context)
-		if err != nil {
-			return nil, err
-		}
+		lval = EvaluateUnaryExpr(expr, context)
 
 	case *ast.Variable:
 		if varVal, ok := context.GetVariable(expr.Name); ok {
@@ -496,16 +465,10 @@ func EvaluateBinaryExpr(expr *ast.BinaryExpr, context *Context) (ast.Value, erro
 	switch expr := expr.Right.(type) {
 
 	case *ast.UnaryExpr:
-		rval, err = EvaluateUnaryExpr(expr, context)
-		if err != nil {
-			return nil, err
-		}
+		rval = EvaluateUnaryExpr(expr, context)
 
 	case *ast.BinaryExpr:
-		rval, err = EvaluateBinaryExpr(expr, context)
-		if err != nil {
-			return nil, err
-		}
+		rval = EvaluateBinaryExpr(expr, context)
 
 	case *ast.Variable:
 		if varVal, ok := context.GetVariable(expr.Name); ok {
@@ -519,25 +482,17 @@ func EvaluateBinaryExpr(expr *ast.BinaryExpr, context *Context) (ast.Value, erro
 	if lval != nil && rval != nil {
 		return Compute(expr.Op, lval, rval)
 	}
-	return nil, nil
+	return nil
 }
 
-func EvaluateUnaryExpr(expr *ast.UnaryExpr, context *Context) (ast.Value, error) {
+func EvaluateUnaryExpr(expr *ast.UnaryExpr, context *Context) ast.Value {
 	var val ast.Value = nil
-	var err error
 
 	switch t := expr.Expr.(type) {
 	case *ast.BinaryExpr:
-		val, err = EvaluateBinaryExpr(t, context)
-		if err != nil {
-			return nil, err
-		}
-
+		val = EvaluateBinaryExpr(t, context)
 	case *ast.UnaryExpr:
-		val, err = EvaluateUnaryExpr(t, context)
-		if err != nil {
-			return nil, err
-		}
+		val = EvaluateUnaryExpr(t, context)
 	case *ast.Variable:
 		if varVal, ok := context.GetVariable(t.Name); ok {
 			val = varVal.(ast.Expr)
@@ -559,5 +514,5 @@ func EvaluateUnaryExpr(expr *ast.UnaryExpr, context *Context) (ast.Value, error)
 			n.Value = -n.Value
 		}
 	}
-	return val, nil
+	return val
 }
