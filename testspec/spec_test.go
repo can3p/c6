@@ -105,6 +105,19 @@ func TestSpec(t *testing.T) {
 		failedSpecs[spec] = append(failedSpecs[spec], fname)
 	}
 
+	reportSuccess := func(fname, input string) {
+		blacklistedInputs := BlacklistedSpecs[fname]
+
+		if ignoreBlacklisted && blacklistedInputs != nil {
+			if _, ok := blacklistedInputs[input]; ok {
+				assert.True(t, false, "[example %s] Input: %s - test passes, but is listed in the blacklisted object", fname, input)
+				return
+			}
+		}
+
+		success++
+	}
+
 	testedCount := 0
 	for _, fname := range testFiles {
 		if testOnly != "" && testOnly != fname {
@@ -172,7 +185,7 @@ func TestSpec(t *testing.T) {
 						return
 					}
 
-					success++
+					reportSuccess(fname, input)
 				} else {
 					expected, err := fs.ReadFile(archive, outputFname)
 					if !assert.NoErrorf(t, err, "[example %s] Input: %s", fname, input) ||
@@ -181,7 +194,7 @@ func TestSpec(t *testing.T) {
 						return
 					}
 
-					success++
+					reportSuccess(fname, input)
 				}
 			}, "[example %s] Input: %s", fname, input) {
 				addFailure(fname, input)
