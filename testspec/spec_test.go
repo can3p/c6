@@ -23,7 +23,7 @@ func writeFailuresListP(names map[string][]string) {
 	var b bytes.Buffer
 
 	b.WriteString("package testspec\n\n")
-	b.WriteString("var failedSpecs = map[string]map[string]struct{}{\n")
+	b.WriteString("var BlacklistedSpecs = map[string]map[string]struct{}{\n")
 	for spec, n := range names {
 		b.WriteString("\t\"")
 		b.WriteString(spec)
@@ -80,24 +80,20 @@ func getInputFiles(fsys fs.FS) ([]string, error) {
 }
 
 func TestSpec(t *testing.T) {
-	type specStat struct {
-		fname    string
-		success  bool
-		fileStat map[string]bool
-	}
-
 	testFiles, err := getHrxFiles(hrxPath)
 	require.NoError(t, err)
 
 	assert.Positive(t, len(testFiles))
 
-	totalFiles := len(testFiles)
 	success := 0
-	stats := []*specStat{}
 	testOnly := os.Getenv("TEST_ONLY")
 	generateFailuresList := os.Getenv("GENERATE_FAILURES_LIST") != ""
-	if testOnly != "" && generateFailuresList {
-		panic("TEST_ONLY and GENERATE_FAILURES_LIST vars can't be set together")
+	ignoreBlacklisted := os.Getenv("IGNORE_BLACKLISTED") != ""
+	if testOnly != "" && (generateFailuresList || ignoreBlacklisted) {
+		panic("TEST_ONLY and GENERATE_FAILURES_LIST or IGNORE_BLACKLISTED vars can't be set together")
+	}
+	if ignoreBlacklisted && generateFailuresList {
+		panic("TEST_ONLY and GENERATE_FAILURES_LIST or IGNORE_BLACKLISTED vars can't be set together")
 	}
 
 	failedSpecs := map[string][]string{}
@@ -105,20 +101,17 @@ func TestSpec(t *testing.T) {
 	addFailure := func(spec, fname string) {
 		if _, ok := failedSpecs[spec]; !ok {
 			failedSpecs[spec] = []string{}
-			failedSpecs[spec] = append(failedSpecs[spec], fname)
 		}
+		failedSpecs[spec] = append(failedSpecs[spec], fname)
 	}
 
-	for idx, fname := range testFiles {
+	testedCount := 0
+	for _, fname := range testFiles {
 		if testOnly != "" && testOnly != fname {
 			continue
 		}
 
-		st := &specStat{
-			fname:    fname,
-			success:  true,
-			fileStat: map[string]bool{},
-		}
+		blacklistedInputs := BlacklistedSpecs[fname]
 
 		archive, err := hrx.OpenReader(path.Join(hrxPath, fname))
 		require.NoErrorf(t, err, "[example %s] open hrx file", fname)
@@ -127,20 +120,23 @@ func TestSpec(t *testing.T) {
 
 		require.NoErrorf(t, err, "[example %s] get input files", fname)
 
-		t.Logf("Processing file %s", fname)
-		t.Logf("Input files: %d - %v", idx, inputFiles)
-
 		for _, input := range inputFiles {
-			t.Logf("Processing Input file: %s", input)
-			assert.NotPanicsf(t, func() {
+			if ignoreBlacklisted && blacklistedInputs != nil {
+				if _, ok := blacklistedInputs[input]; ok {
+					continue
+				}
+			}
+
+			t.Logf("Processing Input file: %s - %s", fname, input)
+
+			testedCount++
+
+			if !assert.NotPanicsf(t, func() {
 				var context = runtime.NewContext()
 				var parser = parser.NewParser(context)
 
 				var stmts, err = parser.ParseFile(archive, input)
 				if !assert.NoErrorf(t, err, "[example %s] Input: %s, parse failed", fname, input) {
-					st.fileStat[input] = false
-					st.success = false
-					stats = append(stats, st)
 					addFailure(fname, input)
 					return
 				}
@@ -157,9 +153,6 @@ func TestSpec(t *testing.T) {
 
 				if _, err := fs.Stat(archive, warnFname); err == nil {
 					if !assert.True(t, false, "[example %s] Input: %s - warning is expected, but we don't handle that yet", fname, input) {
-						st.fileStat[input] = false
-						st.success = false
-						stats = append(stats, st)
 						addFailure(fname, input)
 						return
 					}
@@ -167,9 +160,7 @@ func TestSpec(t *testing.T) {
 
 				if _, err := fs.Stat(archive, errFname); err == nil {
 					if !assert.Errorf(t, compileErr, "[example %s] Input: %s", fname, input) {
-						st.fileStat[input] = false
-						st.success = false
-						stats = append(stats, st)
+						addFailure(fname, input)
 						return
 					}
 
@@ -177,32 +168,24 @@ func TestSpec(t *testing.T) {
 
 					if !assert.NoErrorf(t, err, "[example %s] Input: %s", fname, errFname) ||
 						!assert.Equalf(t, string(expected), compileErr.Error(), "[example %s] Input: %s", fname, errFname) {
-						st.fileStat[input] = false
-						st.success = false
-						stats = append(stats, st)
 						addFailure(fname, input)
 						return
 					}
 
-					st.fileStat[input] = true
 					success++
-					stats = append(stats, st)
-
 				} else {
 					expected, err := fs.ReadFile(archive, outputFname)
 					if !assert.NoErrorf(t, err, "[example %s] Input: %s", fname, input) ||
 						!assert.Equalf(t, expected, err.Error(), "[example %s] Input: %s", fname, input) {
-						st.fileStat[input] = false
-						stats = append(stats, st)
 						addFailure(fname, input)
 						return
 					}
 
-					st.fileStat[input] = true
 					success++
-					stats = append(stats, st)
 				}
-			}, "[example %s] Input: %s", fname, input)
+			}, "[example %s] Input: %s", fname, input) {
+				addFailure(fname, input)
+			}
 		}
 	}
 
@@ -210,7 +193,5 @@ func TestSpec(t *testing.T) {
 		writeFailuresListP(failedSpecs)
 	}
 
-	t.Logf("%d/%d spec files were successful", success, totalFiles)
-
-	require.True(t, false)
+	t.Logf("%d/%d spec files were successful", success, testedCount)
 }
