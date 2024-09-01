@@ -80,6 +80,10 @@ func getInputFiles(fsys fs.FS) ([]string, error) {
 }
 
 func TestSpec(t *testing.T) {
+	if os.Getenv("SKIP_SPEC") != "" {
+		return
+	}
+
 	testFiles, err := getHrxFiles(hrxPath)
 	require.NoError(t, err)
 
