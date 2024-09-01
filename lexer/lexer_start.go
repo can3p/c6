@@ -1,11 +1,13 @@
 package lexer
 
 import (
-	"github.com/c9s/c6/ast"
+	"fmt"
 	"unicode"
+
+	"github.com/c9s/c6/ast"
 )
 
-func lexStart(l *Lexer) stateFn {
+func lexStart(l *Lexer) (stateFn, error) {
 	// strip the leading spaces of a statement
 	l.ignoreSpaces()
 
@@ -15,69 +17,79 @@ func lexStart(l *Lexer) stateFn {
 	switch r {
 
 	case EOF:
-		return nil
+		return nil, nil
 
 	case '@':
-		return lexAtRule
+		return lexAtRule, nil
 	case '(':
 		l.next()
 		l.emit(ast.T_PAREN_OPEN)
-		return lexStart
+		return lexStart, nil
 	case ')':
 		l.next()
 		l.emit(ast.T_PAREN_CLOSE)
-		return lexStart
+		return lexStart, nil
 
 	case '{':
 		l.next()
 		l.emit(ast.T_BRACE_OPEN)
-		return lexStart
+		return lexStart, nil
 
 	case '}':
 		l.next()
 		l.emit(ast.T_BRACE_CLOSE)
-		return lexStart
+		return lexStart, nil
 
 	case '$':
-		return lexAssignStmt
+		return lexAssignStmt, nil
 
 	case ';':
 		l.next()
 		l.emit(ast.T_SEMICOLON)
-		return lexStart
+		return lexStart, nil
 
 	case '-':
+		// css/custom_properties/indentation.hrx
+		// lexProperty gets into endless loop while trying to parse
+		// a css variable.
+		// @TODO: remove and immplement css variables support properly
+		if r2 == '-' {
+			return nil, fmt.Errorf("CSS variables are not supported yet")
+		}
 		// Vendor prefix properties start with '-'
-		return lexProperty
+		return lexProperty, nil
 
 	case ',':
 		l.next()
 		l.emit(ast.T_COMMA)
-		return lexStart
+		return lexStart, nil
 
 	case '/':
 		if r2 == '*' {
 
-			lexCommentBlock(l, true)
-			return lexStart
+			if _, err := lexCommentBlock(l, true); err != nil {
+				return nil, err
+			}
+
+			return lexStart, nil
 
 		} else if r2 == '/' {
 
-			return lexCommentLine
+			return lexCommentLine, nil
 
 		}
 
-		panic("unexpected token. expecing '*' or '/'")
+		return nil, fmt.Errorf("unexpected token. expecing '*' or '/'")
 
 	case '#':
 		// make sure it's not an interpolation "#{" token
 		if r2 != '{' {
 			// looks like a selector
-			return lexSelectors
+			return lexSelectors, nil
 		}
 
 	case '[', '*', '>', '&', '.', '+', ':':
-		return lexSelectors
+		return lexSelectors, nil
 
 	}
 
@@ -85,14 +97,14 @@ func lexStart(l *Lexer) stateFn {
 
 		l.emit(ast.T_CDOPEN)
 
-		return lexStart
+		return lexStart, nil
 	}
 
 	if l.match("-->") {
 
 		l.emit(ast.T_CDCLOSE)
 
-		return lexStart
+		return lexStart, nil
 	}
 
 	// If a line starts with a letter or a sharp,
@@ -136,7 +148,7 @@ func lexStart(l *Lexer) stateFn {
 			} else if r == '{' {
 				break
 			} else if r == EOF {
-				panic("unexpected EOF")
+				return nil, fmt.Errorf("unexpected EOF")
 			}
 			r = l.next()
 		}
@@ -144,15 +156,10 @@ func lexStart(l *Lexer) stateFn {
 		l.rollback()
 
 		if isProperty {
-			return lexProperty
+			return lexProperty, nil
 		} else {
-			return lexSelectors
+			return lexSelectors, nil
 		}
-
-	} else {
-
-		l.errorf("Unexpected token: '%c'", r)
-
 	}
-	return nil
+	return nil, l.errorf("Unexpected token: '%c'", r)
 }

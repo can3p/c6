@@ -6,6 +6,7 @@ package parser
 
 import (
 	"fmt"
+	"io/fs"
 	"path/filepath"
 
 	"github.com/c9s/c6/ast"
@@ -41,13 +42,12 @@ type Parser struct {
 	GlobalContext *runtime.Context
 	ContextStack  []runtime.Context
 
+	fsys fs.FS
+
 	File *ast.File
 
 	// file content
 	Content string
-
-	// The token input channel, feeded by github.com/c9s/c6/lexer
-	Input chan *ast.Token
 
 	// Integer for counting token
 	Pos int
@@ -64,36 +64,39 @@ type Parser struct {
 func NewParser(context *runtime.Context) *Parser {
 	return &Parser{
 		GlobalContext: context,
-		Input:         nil,
 		Pos:           0,
 		RollbackPos:   0,
 	}
 }
 
-func (parser *Parser) ParseFile(path string) error {
+func (parser *Parser) ParseFile(fsys fs.FS, path string) (*ast.StmtList, error) {
 	ext := filepath.Ext(path)
 	filetype := getFileTypeByExtension(ext)
 
-	f, err := ast.NewFile(path)
+	f, err := ast.NewFile(fsys, path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	data, err := f.ReadFile()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	parser.Content = string(data)
 	parser.File = f
 
+	var stmts *ast.StmtList
+
 	switch filetype {
 	case ScssFileType:
-		parser.ParseScss(parser.Content)
-		break
+		stmts, err = parser.ParseScss(parser.Content)
+		if err != nil {
+			return nil, err
+		}
 	default:
-		return fmt.Errorf("Unsupported file format: %s", path)
+		return nil, fmt.Errorf("Unsupported file format: %s", path)
 	}
-	return nil
+	return stmts, nil
 }
 
 func (parser *Parser) backup() {
@@ -104,14 +107,14 @@ func (parser *Parser) restore(pos int) {
 	parser.Pos = pos
 }
 
-func (parser *Parser) remember() {
-	parser.RollbackPos = parser.Pos
-}
+//func (parser *Parser) remember() {
+//parser.RollbackPos = parser.Pos
+//}
 
 // rollback to the save position
-func (parser *Parser) rollback() {
-	parser.Pos = parser.RollbackPos
-}
+//func (parser *Parser) rollback() {
+//parser.Pos = parser.RollbackPos
+//}
 
 // accept() accepts one token type one time.
 // rolls back if the token type mismatch
@@ -126,16 +129,16 @@ func (parser *Parser) accept(tokenType ast.TokenType) *ast.Token {
 
 // acceptAny accepts some token types, or it rolls back when the token mismatch
 // the token types.
-func (parser *Parser) acceptAny(tokenTypes ...ast.TokenType) *ast.Token {
-	var tok = parser.next()
-	for _, tokType := range tokenTypes {
-		if tok.Type == tokType {
-			return tok
-		}
-	}
-	parser.backup()
-	return nil
-}
+//func (parser *Parser) acceptAny(tokenTypes ...ast.TokenType) *ast.Token {
+//var tok = parser.next()
+//for _, tokType := range tokenTypes {
+//if tok.Type == tokType {
+//return tok
+//}
+//}
+//parser.backup()
+//return nil
+//}
 
 func (parser *Parser) acceptAnyOf2(tokType1, tokType2 ast.TokenType) *ast.Token {
 	var tok = parser.next()
@@ -155,17 +158,17 @@ func (parser *Parser) acceptAnyOf3(tokType1, tokType2, tokType3 ast.TokenType) *
 	return nil
 }
 
-func (parser *Parser) expect(tokenType ast.TokenType) *ast.Token {
+func (parser *Parser) expect(tokenType ast.TokenType) (*ast.Token, error) {
 	var tok = parser.next()
 	if tok != nil && tok.Type != tokenType {
 		parser.backup()
-		panic(SyntaxError{
-			Reason:      tokenType.String(),
+		return nil, SyntaxError{
+			Reason:      fmt.Sprintf("expected: %s", tokenType.String()),
 			ActualToken: tok,
 			File:        parser.File,
-		})
+		}
 	}
-	return tok
+	return tok, nil
 }
 
 func (parser *Parser) next() *ast.Token {
@@ -198,9 +201,9 @@ func (parser *Parser) advance() {
 	parser.Pos++
 }
 
-func (parser *Parser) current() *ast.Token {
-	return parser.Tokens[parser.Pos]
-}
+//func (parser *Parser) current() *ast.Token {
+//return parser.Tokens[parser.Pos]
+//}
 
 func (parser *Parser) peek() *ast.Token {
 	if parser.Pos < len(parser.Tokens) {

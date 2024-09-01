@@ -53,12 +53,13 @@ func (self BinaryExpr) IsSimpleExpr() bool {
 	return ok1 || ok2
 }
 
-/**
+/*
+*
 The the divide expression will only be evaluated in the following 3 conditions:
 
-	1. If the value, or any part of it, is stored in a variable or returned by a function.
-	2. If the value is surrounded by parentheses.
-	3. If the value is used as part of another arithmetic expression.
+ 1. If the value, or any part of it, is stored in a variable or returned by a function.
+ 2. If the value is surrounded by parentheses.
+ 3. If the value is used as part of another arithmetic expression.
 
 This method needs to be called on the top caller to prevent unexpected result.
 
@@ -70,7 +71,7 @@ func (self *BinaryExpr) IsCssSlash() bool {
 		_, bok := self.Right.(*Number)
 
 		// it's not grouped, we should inflate it as string
-		if aok && bok && self.Grouped == false {
+		if aok && bok && !self.Grouped {
 			return true
 		}
 	}

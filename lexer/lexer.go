@@ -4,12 +4,15 @@ package lexer
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import "io/ioutil"
-import "unicode/utf8"
-import "strings"
-import "fmt"
-import "unicode"
-import "github.com/c9s/c6/ast"
+import (
+	"fmt"
+	"io/fs"
+	"strings"
+	"unicode"
+	"unicode/utf8"
+
+	"github.com/c9s/c6/ast"
+)
 
 const TOKEN_CHANNEL_BUFFER = 1024
 
@@ -49,20 +52,18 @@ type Lexer struct {
 	// character offset from the begining of line
 	LineOffset int
 
-	// the token output channel
-	Output chan *ast.Token
-
-	Tokens []ast.Token
+	Tokens []*ast.Token
 }
 
 func (l *Lexer) lastToken() *ast.Token {
 	if len(l.Tokens) > 0 {
-		return &l.Tokens[len(l.Tokens)-1]
+		return l.Tokens[len(l.Tokens)-1]
 	}
 	return nil
 }
 
-/**
+/*
+*
 Create a lexer object with bytes
 */
 func NewLexerWithBytes(data []byte) *Lexer {
@@ -76,7 +77,8 @@ func NewLexerWithBytes(data []byte) *Lexer {
 	return l
 }
 
-/**
+/*
+*
 Create a lexer object with string
 */
 func NewLexerWithString(body string) *Lexer {
@@ -89,13 +91,14 @@ func NewLexerWithString(body string) *Lexer {
 	}
 }
 
-/**
+/*
+*
 Create a lexer object with file path
 
 TODO: detect encoding here
 */
-func NewLexerWithFile(file string) (*Lexer, error) {
-	data, err := ioutil.ReadFile(file)
+func NewLexerWithFile(fsys fs.FS, file string) (*Lexer, error) {
+	data, err := fs.ReadFile(fsys, file)
 	if err != nil {
 		return nil, err
 	}
@@ -106,14 +109,6 @@ func NewLexerWithFile(file string) (*Lexer, error) {
 		LineOffset: 0,
 		Input:      string(data),
 	}, nil
-}
-
-func (l *Lexer) TokenStream() ast.TokenStream {
-	if l.Output != nil {
-		return l.Output
-	}
-	l.Output = make(chan *ast.Token, TOKEN_CHANNEL_BUFFER)
-	return l.Output
 }
 
 // remember the current offset, can be rolled back by using the `rollback`
@@ -129,18 +124,20 @@ func (l *Lexer) rollback() {
 	l.Offset = l.RollbackOffset
 }
 
-func (l *Lexer) acceptAndEmit(valid string, tokenType ast.TokenType) bool {
-	if l.accept(valid) {
-		l.emit(tokenType)
-		return true
-	}
-	return false
-}
+//func (l *Lexer) acceptAndEmit(valid string, tokenType ast.TokenType) bool {
+//if l.accept(valid) {
+//l.emit(tokenType)
+//return true
+//}
+//return false
+//}
 
-func (l *Lexer) expect(valid string) {
+func (l *Lexer) expect(valid string) error {
 	if !l.accept(valid) {
-		panic(fmt.Errorf("Expecting %s at %d", valid, l.Offset))
+		return fmt.Errorf("Expecting %s at %d", valid, l.Offset)
 	}
+
+	return nil
 }
 
 // test the next character, if it's not matched, go back to the original
@@ -148,7 +145,7 @@ func (l *Lexer) expect(valid string) {
 // Note, this method only match the first character
 func (l *Lexer) accept(valid string) bool {
 	var r rune = l.next()
-	if strings.IndexRune(valid, r) >= 0 {
+	if strings.ContainsRune(valid, r) {
 		return true
 	}
 	l.backup()
@@ -158,26 +155,26 @@ func (l *Lexer) accept(valid string) bool {
 // Accept letter runes continuously
 // Return true if there are some letters.
 // Return false if there is no letter.
-func (l *Lexer) acceptLetters() bool {
-	var r rune = l.next()
-	for unicode.IsLetter(r) {
-		r = l.next()
-	}
-	l.backup()
-	return l.Offset > l.Start
-}
+//func (l *Lexer) acceptLetters() bool {
+//var r rune = l.next()
+//for unicode.IsLetter(r) {
+//r = l.next()
+//}
+//l.backup()
+//return l.Offset > l.Start
+//}
 
 // Accept letter|digits runes continuously
 // Return true if there are some letters.
 // Return false if there is no letter.
-func (l *Lexer) acceptLettersAndDigits() bool {
-	var r rune = l.next()
-	for unicode.IsLetter(r) || unicode.IsDigit(r) {
-		r = l.next()
-	}
-	l.backup()
-	return l.Offset > l.Start
-}
+//func (l *Lexer) acceptLettersAndDigits() bool {
+//var r rune = l.next()
+//for unicode.IsLetter(r) || unicode.IsDigit(r) {
+//r = l.next()
+//}
+//l.backup()
+//return l.Offset > l.Start
+//}
 
 // Return the current token string but not consume it
 func (l *Lexer) current() string {
@@ -193,9 +190,9 @@ func (l *Lexer) length() int {
 }
 
 // If there are remaining tokens
-func (l *Lexer) remaining() bool {
-	return l.Offset+1 < len(l.Input)
-}
+//func (l *Lexer) remaining() bool {
+//return l.Offset+1 < len(l.Input)
+//}
 
 // next returns the next rune in the input.
 func (l *Lexer) next() (r rune) {
@@ -239,10 +236,10 @@ func (l *Lexer) peek2() (r1, r2 rune) {
 }
 
 // advance offset by specific width
-func (l *Lexer) advance(w int) {
-	l.Offset += w
-	l.LineOffset++
-}
+//func (l *Lexer) advance(w int) {
+//l.Offset += w
+//l.LineOffset++
+//}
 
 // peek more characters
 // peekBy(1) == peek()
@@ -257,28 +254,27 @@ func (l *Lexer) peekBy(p int) (r rune) {
 	return r
 }
 
-func (l *Lexer) take() string {
-	return l.Input[l.Start:l.Offset]
-}
+//func (l *Lexer) take() string {
+//return l.Input[l.Start:l.Offset]
+//}
 
 func (l *Lexer) emitToken(token *ast.Token) {
 	// TODO: debug emit flag
 	// fmt.Printf("emit: %+v\n", token)
-	l.Tokens = append(l.Tokens, *token)
-	l.Output <- token
+	l.Tokens = append(l.Tokens, token)
 	l.Start = l.Offset
 }
 
-func (l *Lexer) createTokenWith0Offset(tokenType ast.TokenType) *ast.Token {
-	var token = ast.Token{
-		Type:       tokenType,
-		Str:        "",
-		Pos:        l.Start,
-		Line:       l.Line,
-		LineOffset: l.LineOffset,
-	}
-	return &token
-}
+//func (l *Lexer) createTokenWith0Offset(tokenType ast.TokenType) *ast.Token {
+//var token = ast.Token{
+//Type:       tokenType,
+//Str:        "",
+//Pos:        l.Start,
+//Line:       l.Line,
+//LineOffset: l.LineOffset,
+//}
+//return &token
+//}
 
 func (l *Lexer) createToken(tokenType ast.TokenType) *ast.Token {
 	/*
@@ -293,6 +289,7 @@ func (l *Lexer) createToken(tokenType ast.TokenType) *ast.Token {
 		Line:       l.Line,
 		LineOffset: l.LineOffset,
 	}
+
 	return &token
 }
 
@@ -315,7 +312,7 @@ func (l *Lexer) emit(tokenType ast.TokenType, params ...bool) *ast.Token {
 func (l *Lexer) til(str string) {
 	var r = l.next()
 	for r != EOF {
-		if strings.IndexRune(str, r) >= 0 {
+		if strings.ContainsRune(str, r) {
 			break
 		}
 		r = l.next()
@@ -347,20 +344,20 @@ func (l *Lexer) match(str string) bool {
 	return true
 }
 
-func (l *Lexer) matchKeyword(str string, tokType ast.TokenType) bool {
-	l.remember()
-	if l.match(str) {
-		var r = l.peek()
-		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '-' {
-			// try next one
-			l.rollback()
-			return false
-		}
-		l.emit(tokType)
-		return true
-	}
-	return false
-}
+//func (l *Lexer) matchKeyword(str string, tokType ast.TokenType) bool {
+//l.remember()
+//if l.match(str) {
+//var r = l.peek()
+//if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '-' {
+//// try next one
+//l.rollback()
+//return false
+//}
+//l.emit(tokType)
+//return true
+//}
+//return false
+//}
 
 func (l *Lexer) matchKeywordList(keywords ast.KeywordTokenList) *ast.Token {
 	for _, keyword := range keywords {
@@ -378,22 +375,22 @@ func (l *Lexer) matchKeywordList(keywords ast.KeywordTokenList) *ast.Token {
 	return nil
 }
 
-func (l *Lexer) matchKeywordMap(keywords ast.KeywordTokenMap) ast.TokenType {
-	for str, tokType := range keywords {
-		l.remember()
-		if l.match(str) {
-			var r = l.peek()
-			if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '-' {
-				// try next one
-				l.rollback()
-				continue
-			}
-			l.emit(tokType)
-			return tokType
-		}
-	}
-	return 0
-}
+//func (l *Lexer) matchKeywordMap(keywords ast.KeywordTokenMap) ast.TokenType {
+//for str, tokType := range keywords {
+//l.remember()
+//if l.match(str) {
+//var r = l.peek()
+//if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '-' {
+//// try next one
+//l.rollback()
+//continue
+//}
+//l.emit(tokType)
+//return tokType
+//}
+//}
+//return 0
+//}
 
 func (l *Lexer) precedeStartOffset() bool {
 	return l.Offset > l.Start
@@ -425,7 +422,7 @@ func (l *Lexer) ignoreSpaces() int {
 	return space
 }
 
-func (l *Lexer) ignoreComment() {
+func (l *Lexer) ignoreComment() error {
 	if l.match("/*") {
 		l.ignore()
 		r := l.next()
@@ -439,46 +436,56 @@ func (l *Lexer) ignoreComment() {
 			}
 		}
 		if r == EOF {
-			l.errorf("Expecting comment end mark '*/'. Got '%c'", r)
+			return l.errorf("Expecting comment end mark '*/'. Got '%c'", r)
+		}
+	} else if l.match("//") {
+		l.ignore()
+		r := l.next()
+		for ; r != EOF; r = l.next() {
+			if r == '\n' {
+				break
+			}
+
+			l.ignore()
+			l.next()
 		}
 	}
+
+	return nil
 }
 
-func (l *Lexer) DispatchFn(fn stateFn) stateFn {
+func (l *Lexer) DispatchFn(fn stateFn) (stateFn, error) {
 	for l.State = fn; l.State != nil; {
-		fn := l.State(l)
+		fn, err := l.State(l)
+		if err != nil {
+			return nil, err
+		}
+
 		if fn != nil {
 			l.State = fn
 		} else {
 			break
 		}
 	}
-	return l.State
+	return l.State, nil
 }
 
 func (l *Lexer) Dump() {
 	fmt.Printf("Lexer: %+v\n", l)
 }
 
-func (l *Lexer) RunFrom(fn stateFn) {
-	if l.Output == nil {
-		l.Output = make(ast.TokenStream, TOKEN_CHANNEL_BUFFER)
+func (l *Lexer) RunFrom(fn stateFn) ([]*ast.Token, error) {
+	if _, err := l.DispatchFn(fn); err != nil {
+		return nil, err
 	}
-	l.DispatchFn(fn)
-	l.Output <- nil
+
+	return l.Tokens, nil
 }
 
-func (l *Lexer) Run() {
-	if l.Output == nil {
-		l.Output = make(ast.TokenStream, TOKEN_CHANNEL_BUFFER)
+func (l *Lexer) Run() ([]*ast.Token, error) {
+	if _, err := l.DispatchFn(lexStart); err != nil {
+		return nil, err
 	}
-	l.DispatchFn(lexStart)
-	l.Output <- nil
-}
 
-func (l *Lexer) Close() {
-	if l.Output != nil {
-		close(l.Output)
-	}
-	l.Output = nil
+	return l.Tokens, nil
 }

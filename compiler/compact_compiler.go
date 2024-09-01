@@ -2,6 +2,8 @@ package compiler
 
 import (
 	"bytes"
+	"fmt"
+
 	"github.com/c9s/c6/ast"
 	"github.com/c9s/c6/runtime"
 )
@@ -62,10 +64,8 @@ func (compiler *CompactCompiler) CompileComplexSelectorList(selectorList *ast.Co
 
 func (compiler *CompactCompiler) CompileDeclBlock(block *ast.DeclBlock) (out string) {
 	out += "{"
-	if block.Stmts != nil {
-		for _, stm := range *block.Stmts {
-			_ = stm
-		}
+	for _, stm := range block.Stmts.Stmts {
+		out += stm.String()
 	}
 	out += "}"
 	return out
@@ -79,31 +79,45 @@ func (compiler *CompactCompiler) CompileRuleSet(ruleset *ast.RuleSet) (out strin
 	return out
 }
 
-func (compiler *CompactCompiler) CompileStmt(anyStm ast.Stmt) string {
+func (compiler *CompactCompiler) CompileStmt(anyStm ast.Stmt) (string, error) {
 
 	switch stm := anyStm.(type) {
 	case *ast.RuleSet:
-		return compiler.CompileRuleSet(stm)
+		return compiler.CompileRuleSet(stm), nil
 	case *ast.ImportStmt:
 	case *ast.AssignStmt:
 	}
-	panic("Unsupported compilation")
+
+	return "", fmt.Errorf("Unsupported compilation")
 }
 
-func (compiler *CompactCompiler) CompileString(any interface{}) string {
-	return compiler.Compile(any).String()
+func (compiler *CompactCompiler) CompileString(in interface{}) (string, error) {
+	s, err := compiler.Compile(in)
+	if err != nil {
+		return "", err
+	}
+
+	return s.String(), nil
 }
 
-func (compiler *CompactCompiler) Compile(any interface{}) *bytes.Buffer {
+func (compiler *CompactCompiler) Compile(any interface{}) (*bytes.Buffer, error) {
 	switch v := any.(type) {
 	case ast.StmtList:
-		for _, stm := range v {
-			compiler.Buffer.WriteString(compiler.CompileStmt(stm))
+		for _, stm := range v.Stmts {
+			s, err := compiler.CompileStmt(stm)
+			if err != nil {
+				return nil, err
+			}
+			compiler.Buffer.WriteString(s)
 		}
 	case *ast.StmtList:
-		for _, stm := range *v {
-			compiler.Buffer.WriteString(compiler.CompileStmt(stm))
+		for _, stm := range v.Stmts {
+			s, err := compiler.CompileStmt(stm)
+			if err != nil {
+				return nil, err
+			}
+			compiler.Buffer.WriteString(s)
 		}
 	}
-	return &compiler.Buffer
+	return &compiler.Buffer, nil
 }

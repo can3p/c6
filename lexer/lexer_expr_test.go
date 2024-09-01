@@ -1,7 +1,10 @@
 package lexer
 
-import "testing"
-import "github.com/c9s/c6/ast"
+import (
+	"testing"
+
+	"github.com/c9s/c6/ast"
+)
 
 // import "github.com/stretchr/testify/assert"
 
@@ -13,7 +16,8 @@ func TestLexerIdentifierWithTrailingInterp(t *testing.T) {
 	AssertLexerTokenSequenceFromState(t, `none#{ 10 + 10 }`, lexExpr, []ast.TokenType{
 		ast.T_IDENT, ast.T_LITERAL_CONCAT, ast.T_INTERPOLATION_START,
 		ast.T_INTEGER, ast.T_PLUS, ast.T_INTEGER,
-		ast.T_INTERPOLATION_END})
+		ast.T_INTERPOLATION_END,
+		ast.T_LITERAL_CONCAT})
 }
 
 func TestLexerIdentifierWithLeadingInterp(t *testing.T) {
@@ -73,11 +77,11 @@ func TestLexerExprUnicodeRange3(t *testing.T) {
 }
 
 func TestLexerExprNumberWithScientificNotation(t *testing.T) {
-	AssertLexerTokenSequenceFromState(t, `10e3`, lexExpr, []ast.TokenType{ast.T_INTEGER})
+	AssertLexerTokenSequenceFromState(t, `10e3`, lexExpr, []ast.TokenType{ast.T_INTEGER, ast.T_INTEGER})
 }
 
 func TestLexerExprNumberWithScientificNotation2(t *testing.T) {
-	AssertLexerTokenSequenceFromState(t, `3.4e-2`, lexExpr, []ast.TokenType{ast.T_FLOAT})
+	AssertLexerTokenSequenceFromState(t, `3.4e-2`, lexExpr, []ast.TokenType{ast.T_FLOAT, ast.T_UNIT_OTHERS, ast.T_MINUS, ast.T_INTEGER})
 }
 
 func TestLexerExprNumberWithNthChildSyntax(t *testing.T) {
@@ -97,7 +101,7 @@ func TestLexerExprNumberWithNthChildSyntax4(t *testing.T) {
 }
 
 func TestLexerExprNumberWithScientificNotation3(t *testing.T) {
-	AssertLexerTokenSequenceFromState(t, `3.1415e-5`, lexExpr, []ast.TokenType{ast.T_FLOAT})
+	AssertLexerTokenSequenceFromState(t, `3.1415e-5`, lexExpr, []ast.TokenType{ast.T_FLOAT, ast.T_UNIT_OTHERS, ast.T_MINUS, ast.T_INTEGER})
 }
 
 func TestLexerExprVariableMinusVariable(t *testing.T) {

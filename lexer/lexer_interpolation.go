@@ -1,18 +1,19 @@
 package lexer
 
-import "github.com/c9s/c6/ast"
+import (
+	"unicode"
 
-import "unicode"
+	"github.com/c9s/c6/ast"
+)
 
 /*
 There are 3 scope that users may use interpolation syntax:
 
- {selector interpolation}  {
-	 {property name inpterpolation}: {property value interpolation}
- }
-
+	 {selector interpolation}  {
+		 {property name inpterpolation}: {property value interpolation}
+	 }
 */
-func lexInterpolation(l *Lexer, emit bool) stateFn {
+func lexInterpolation(l *Lexer, emit bool) (stateFn, error) {
 	l.remember()
 	var r rune = l.next()
 	if r == '#' {
@@ -43,30 +44,40 @@ func lexInterpolation(l *Lexer, emit bool) stateFn {
 			if emit {
 				l.emit(ast.T_INTERPOLATION_END)
 			}
-			return nil
+			return nil, nil
 		}
 	}
 	l.rollback()
-	return nil
+	return nil, nil
 }
 
 // Lex the expression inside interpolation
-func lexInterpolation2(l *Lexer) stateFn {
+func lexInterpolation2(l *Lexer) (stateFn, error) {
 	var r rune = l.next()
 	if r != '#' {
-		l.errorf("Expecting interpolation token '#', Got %c", r)
+		return nil, l.errorf("Expecting interpolation token '#', Got %c", r)
 	}
 	r = l.next()
 	if r != '{' {
-		l.errorf("Expecting interpolation token '{', Got %c", r)
+		return nil, l.errorf("Expecting interpolation token '{', Got %c", r)
 	}
 	l.emit(ast.T_INTERPOLATION_START)
 
 	// skip the space after #{
-	for lexExpr(l) != nil {
+	for {
+		expr, err := lexExpr(l)
+		if err != nil {
+			return nil, err
+		}
+
+		if expr == nil {
+			break
+		}
 	}
 	l.ignoreSpaces()
-	l.expect("}")
+	if err := l.expect("}"); err != nil {
+		return nil, err
+	}
 	l.emit(ast.T_INTERPOLATION_END)
-	return nil
+	return nil, nil
 }

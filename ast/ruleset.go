@@ -1,5 +1,7 @@
 package ast
 
+import "fmt"
+
 type RuleSet struct {
 	Selectors *ComplexSelectorList
 	Block     *DeclBlock
@@ -21,5 +23,5 @@ func (self *RuleSet) GetSubRuleSets() []*RuleSet {
 func (self *RuleSet) CanBeStmt() {}
 
 func (self RuleSet) String() string {
-	return "String() not implemented yet."
+	return fmt.Sprintf("ruleset selector: %s, rules are %s", self.Selectors.String(), self.Block.String())
 }

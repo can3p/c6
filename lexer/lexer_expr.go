@@ -1,12 +1,15 @@
 package lexer
 
-import "unicode"
-import "github.com/c9s/c6/ast"
+import (
+	"unicode"
+
+	"github.com/c9s/c6/ast"
+)
 
 /*
 Lexing expression with interpolation support.
 */
-func lexExpr(l *Lexer) stateFn {
+func lexExpr(l *Lexer) (stateFn, error) {
 	var leadingSpaces = l.ignoreSpaces()
 
 	var r, r2 = l.peek2()
@@ -29,11 +32,16 @@ func lexExpr(l *Lexer) stateFn {
 
 	} else if r == 'U' && r2 == '+' {
 
-		lexUnicodeRange(l)
+		if _, err := lexUnicodeRange(l); err != nil {
+			return nil, err
+		}
 
 	} else if unicode.IsLetter(r) {
 
-		lexIdentifier(l)
+		_, err := lexIdentifier(l)
+		if err != nil {
+			return nil, err
+		}
 
 	} else if r == '.' && r2 == '.' {
 
@@ -44,14 +52,32 @@ func lexExpr(l *Lexer) stateFn {
 	} else if r == '.' && unicode.IsDigit(r2) {
 
 		// lexNumber may return lexNumber unit
-		if fn := lexNumber(l); fn != nil {
-			fn(l)
+		if fn, err := lexNumber(l); err != nil {
+			return nil, err
+		} else if fn != nil {
+			_, err := fn(l)
+
+			if err != nil {
+				return nil, err
+			}
 		}
 
 	} else if unicode.IsDigit(r) {
 
-		if fn := lexNumber(l); fn != nil {
-			fn(l)
+		if fn, err := lexNumber(l); err != nil {
+			if err == ErrLexNaN {
+				_, err := lexIdentifier(l)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				return nil, err
+			}
+		} else if fn != nil {
+			_, err := fn(l)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 	} else if r == '+' {
@@ -75,7 +101,9 @@ func lexExpr(l *Lexer) stateFn {
 			//         background-image: -moz-linear-gradient(top, #81a8cb, #4477a1);
 
 			l.next()
-			lexIdentifier(l)
+			if _, err := lexIdentifier(l); err != nil {
+				return nil, err
+			}
 
 		} else {
 
@@ -105,7 +133,10 @@ func lexExpr(l *Lexer) stateFn {
 
 		if r2 == '*' {
 			// don't emit the comment inside the expression
-			lexComment(l, false)
+			_, err := lexComment(l, false)
+			if err != nil {
+				return nil, err
+			}
 		} else {
 			l.next()
 			l.emit(ast.T_DIV)
@@ -179,28 +210,40 @@ func lexExpr(l *Lexer) stateFn {
 		// solution here..
 		if l.peekBy(2) == '{' {
 
-			lexInterpolation2(l)
+			_, err := lexInterpolation2(l)
+			if err != nil {
+				return nil, err
+			}
 
 		} else {
-			lexHexColor(l)
+			_, err := lexHexColor(l)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 	} else if r == '"' || r == '\'' {
 
-		lexString(l)
+		_, err := lexString(l)
+
+		if err != nil {
+			return nil, err
+		}
 
 	} else if r == '$' {
 
-		lexVariableName(l)
+		if _, err := lexVariableName(l); err != nil {
+			return nil, err
+		}
 
 	} else if r == EOF || r == '}' || r == '{' || r == ';' { // let expression lexer stop before the start or end of block.
 
-		return nil
+		return nil, nil
 
 	} else {
 
 		// anything else expression lexer don't know
-		return nil
+		return nil, nil
 
 	}
 
@@ -208,9 +251,12 @@ func lexExpr(l *Lexer) stateFn {
 	r, r2 = l.peek2()
 	if r == '#' && r2 == '{' {
 		l.emit(ast.T_LITERAL_CONCAT)
-		lexInterpolation2(l)
+		_, err := lexInterpolation2(l)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// the default return stats
-	return lexExpr
+	return lexExpr, nil
 }

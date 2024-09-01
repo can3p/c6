@@ -1,16 +1,46 @@
 package main
 
-import "github.com/c9s/c6/runtime"
-import "github.com/spf13/cobra"
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"os"
+	"path"
+
+	"github.com/c9s/c6/compiler"
+	"github.com/c9s/c6/parser"
+	"github.com/c9s/c6/runtime"
+	"github.com/spf13/cobra"
+)
 
 func main() {
 	var rootCmd = &cobra.Command{
 		Use:   "c6",
 		Short: "C6 is a very fast SASS compatible compiler",
 		Long:  `C6 is a SASS compatible implementation written in Go. But wait! this is not only to implement SASS, but also to improve the language for better consistency, syntax and performance.`,
-		Run: func(cmd *cobra.Command, args []string) {
-			// Do Stuff Here
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			fname := args[0]
+			var context = runtime.NewContext()
+			d := os.DirFS(path.Dir(fname))
+			var parser = parser.NewParser(context)
+			var stmts, err = parser.ParseFile(d, fname)
+
+			if err != nil {
+				return err
+			}
+
+			var b bytes.Buffer
+			var compiler = compiler.NewPrettyCompiler(context, &b)
+
+			err = compiler.Compile(stmts)
+
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(b.String())
+			return nil
 		},
 	}
 
@@ -18,6 +48,7 @@ func main() {
 		Use:   "version",
 		Short: "Print the version number of C6",
 		Long:  `All software has versions. This is C6's`,
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("C6 SASS Compiler v0.1 -- HEAD")
 		},
@@ -26,14 +57,37 @@ func main() {
 
 	var compileCmd = &cobra.Command{
 		Use:   "compile",
-		Short: "Compile some scss files",
+		Short: "Compile some scss from stdin",
 		// Long:  "",
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Run compile!")
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var context = runtime.NewContext()
+			var parser = parser.NewParser(context)
+			content, _ := io.ReadAll(os.Stdin)
 
-			_ = runtime.NewContext()
+			stmts, err := parser.ParseScss(string(content))
+			if err != nil {
+				return err
+			}
+
+			var b bytes.Buffer
+			var compiler = compiler.NewPrettyCompiler(context, &b)
+
+			err = compiler.Compile(stmts)
+
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(b.String())
+			return nil
 		},
 	}
+
+	compileCmd.Flags().Int("precision", 0, "I don't know the meaning of this flag")
+	rootCmd.Flags().Int("precision", 0, "I don't know the meaning of this flag")
+
 	rootCmd.AddCommand(compileCmd)
-	rootCmd.Execute()
+	if err := rootCmd.Execute(); err != nil {
+		panic(err)
+	}
 }
