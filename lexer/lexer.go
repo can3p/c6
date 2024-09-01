@@ -438,6 +438,17 @@ func (l *Lexer) ignoreComment() error {
 		if r == EOF {
 			return l.errorf("Expecting comment end mark '*/'. Got '%c'", r)
 		}
+	} else if l.match("//") {
+		l.ignore()
+		r := l.next()
+		for ; r != EOF; r = l.next() {
+			if r == '\n' {
+				break
+			}
+
+			l.ignore()
+			l.next()
+		}
 	}
 
 	return nil

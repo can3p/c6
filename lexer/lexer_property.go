@@ -35,31 +35,50 @@ func lexMicrosoftProgIdFunction(l *Lexer) (stateFn, error) {
 	l.emit(ast.T_PAREN_OPEN)
 
 	l.ignoreSpaces()
+	if err := l.ignoreComment(); err != nil {
+		return nil, err
+	}
+
+	r = l.peek()
+	l.ignoreSpaces()
 
 	// here comes the sProperty
 	//     progid:DXImageTransform.Microsoft.filtername(sProperties)
 	// @see https://msdn.microsoft.com/en-us/library/ms532847(v=vs.85).aspx
 	for r != ')' {
 		// lex function parameter name
+		if unicode.IsSpace(r) {
+			l.ignoreSpaces()
+		}
+
+		if err := l.ignoreComment(); err != nil {
+			return nil, err
+		}
+
 		r = l.next()
 		for unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
 			r = l.next()
 		}
 		l.backup()
 		l.emit(ast.T_MS_PARAM_NAME)
-		l.accept("=")
-		l.emit(ast.T_ATTR_EQUAL)
+		if l.accept("=") {
+			l.emit(ast.T_ATTR_EQUAL)
 
-		if _, err := lexExpr(l); err != nil {
-			return nil, err
-		}
+			if _, err := lexExpr(l); err != nil {
+				return nil, err
+			}
 
-		l.ignoreSpaces()
-		r = l.peek()
-		if r == ',' {
-			l.next()
-			l.emit(ast.T_COMMA)
 			l.ignoreSpaces()
+			r = l.peek()
+			if r == ',' {
+				l.next()
+				l.emit(ast.T_COMMA)
+				l.ignoreSpaces()
+			} else if r == ')' {
+				l.next()
+				l.emit(ast.T_PAREN_CLOSE)
+				break
+			}
 		} else if r == ')' {
 			l.next()
 			l.emit(ast.T_PAREN_CLOSE)
@@ -82,6 +101,10 @@ func lexProperty(l *Lexer) (stateFn, error) {
 	var r = l.peek()
 
 	for r != ':' && r != '/' && !unicode.IsSpace(r) {
+		if r == '.' {
+			return nil, l.errorf("dot notation in properties is not supported. Got %c", r)
+		}
+
 		if l.peek() == '#' && l.peekBy(2) == '{' {
 			if _, err := lexInterpolation2(l); err != nil {
 				return nil, err
