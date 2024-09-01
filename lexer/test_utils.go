@@ -43,6 +43,14 @@ func AssertTokenSequence(t *testing.T, l *Lexer, tokenList []ast.TokenType) []as
 	var failure = false
 	for idx, expectingToken := range tokenList {
 
+		if idx == len(l.Tokens) {
+			for _, token := range tokenList[idx:] {
+				OutputRed(t, "not ok ---- input longer than expected  %s", token.String())
+				failure = true
+			}
+			break
+		}
+
 		var token = l.Tokens[idx]
 
 		if token == nil {
@@ -54,7 +62,7 @@ func AssertTokenSequence(t *testing.T, l *Lexer, tokenList []ast.TokenType) []as
 		tokens = append(tokens, *token)
 
 		if expectingToken == token.Type {
-			OutputGreen(t, "ok %s '%s'", token.Type.String(), token.Str)
+			//OutputGreen(t, "ok %s '%s'", token.Type.String(), token.Str)
 		} else {
 			failure = true
 			OutputRed(t, "not ok ---- %d token => got %s '%s' expecting %s", idx, token.Type.String(), token.Str, expectingToken.String())
@@ -65,6 +73,7 @@ func AssertTokenSequence(t *testing.T, l *Lexer, tokenList []ast.TokenType) []as
 	if len(tokenList) < len(l.Tokens) {
 		for _, token := range l.Tokens[len(tokenList):] {
 			OutputRed(t, "not ok ---- Remaining expecting %s '%s'", token.Type.String(), token.Str)
+			failure = true
 		}
 	}
 	if failure {
