@@ -6,6 +6,7 @@ import (
 
 	"github.com/c9s/c6/ast"
 	"github.com/c9s/c6/runtime"
+	"github.com/pkg/errors"
 )
 
 const indentSpace = "  "
@@ -96,7 +97,7 @@ func (c *PrettyCompiler) CompileStmt(anyStm ast.Stmt) error {
 		return nil
 	}
 
-	return ErrUnknownAstNode
+	return errors.Wrapf(ErrUnknownAstNode, "node: %v", anyStm)
 }
 
 func (c *PrettyCompiler) Compile(list *ast.StmtList) error {
