@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path"
+	"sort"
 	"strings"
 	"testing"
 
@@ -25,7 +26,12 @@ func writeFailuresListP(names map[string][][]string) {
 
 	b.WriteString("package testspec\n\n")
 	b.WriteString("var BlacklistedSpecs = map[string]map[string]string{\n")
-	for spec, n := range names {
+	for _, spec := range sortedKeys(names) {
+		n := names[spec]
+		sort.SliceStable(n, func(i, j int) bool {
+			return n[i][0] < n[j][0]
+		})
+
 		b.WriteString("\t\"")
 		b.WriteString(spec)
 		b.WriteString("\": {\n")
@@ -42,6 +48,16 @@ func writeFailuresListP(names map[string][][]string) {
 	if err := os.WriteFile(failuresList, b.Bytes(), fs.ModePerm); err != nil {
 		panic(err)
 	}
+}
+
+func sortedKeys[A any](m map[string]A) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	return keys
 }
 
 func getHrxFiles(path string) ([]string, error) {
