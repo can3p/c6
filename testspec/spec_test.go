@@ -2,6 +2,7 @@ package testspec
 
 import (
 	"bytes"
+	"fmt"
 	"io/fs"
 	"os"
 	"path"
@@ -19,19 +20,19 @@ import (
 const hrxPath = "../sass-spec/spec"
 const failuresList = "failures_list.go"
 
-func writeFailuresListP(names map[string][]string) {
+func writeFailuresListP(names map[string][][]string) {
 	var b bytes.Buffer
 
 	b.WriteString("package testspec\n\n")
-	b.WriteString("var BlacklistedSpecs = map[string]map[string]struct{}{\n")
+	b.WriteString("var BlacklistedSpecs = map[string]map[string]string{\n")
 	for spec, n := range names {
 		b.WriteString("\t\"")
 		b.WriteString(spec)
 		b.WriteString("\": {\n")
 		for _, n := range n {
 			b.WriteString("\t\t\"")
-			b.WriteString(n)
-			b.WriteString("\": {},\n")
+			b.WriteString(n[0])
+			b.WriteString(fmt.Sprintf("\": \"%s\",\n", n[1]))
 		}
 		b.WriteString("\t},\n")
 	}
@@ -100,13 +101,13 @@ func TestSpec(t *testing.T) {
 		panic("TEST_ONLY and GENERATE_FAILURES_LIST or IGNORE_BLACKLISTED vars can't be set together")
 	}
 
-	failedSpecs := map[string][]string{}
+	failedSpecs := map[string][][]string{}
 
-	addFailure := func(spec, fname string) {
+	addFailure := func(spec, fname string, reason string) {
 		if _, ok := failedSpecs[spec]; !ok {
-			failedSpecs[spec] = []string{}
+			failedSpecs[spec] = [][]string{}
 		}
-		failedSpecs[spec] = append(failedSpecs[spec], fname)
+		failedSpecs[spec] = append(failedSpecs[spec], []string{fname, reason})
 	}
 
 	reportSuccess := func(fname, input string) {
@@ -154,7 +155,7 @@ func TestSpec(t *testing.T) {
 
 				var stmts, err = parser.ParseFile(archive, input)
 				if !assert.NoErrorf(t, err, "[example %s] Input: %s, parse failed", fname, input) {
-					addFailure(fname, input)
+					addFailure(fname, input, "parse_failure")
 					return
 				}
 
@@ -170,14 +171,14 @@ func TestSpec(t *testing.T) {
 
 				if _, err := fs.Stat(archive, warnFname); err == nil {
 					if !assert.True(t, false, "[example %s] Input: %s - warning is expected, but we don't handle that yet", fname, input) {
-						addFailure(fname, input)
+						addFailure(fname, input, "unhandled_warning")
 						return
 					}
 				}
 
 				if _, err := fs.Stat(archive, errFname); err == nil {
 					if !assert.Errorf(t, compileErr, "[example %s] Input: %s", fname, input) {
-						addFailure(fname, input)
+						addFailure(fname, input, "compiler_should_have_errored")
 						return
 					}
 
@@ -185,7 +186,7 @@ func TestSpec(t *testing.T) {
 
 					if !assert.NoErrorf(t, err, "[example %s] Input: %s", fname, errFname) ||
 						!assert.Equalf(t, string(expected), compileErr.Error(), "[example %s] Input: %s", fname, errFname) {
-						addFailure(fname, input)
+						addFailure(fname, input, "compiler_error_does_not_match")
 						return
 					}
 
@@ -194,14 +195,14 @@ func TestSpec(t *testing.T) {
 					expected, err := fs.ReadFile(archive, outputFname)
 					if !assert.NoErrorf(t, err, "[example %s] Input: %s", fname, input) ||
 						!assert.Equalf(t, expected, err.Error(), "[example %s] Input: %s", fname, input) {
-						addFailure(fname, input)
+						addFailure(fname, input, "compiler_output_does_not_match")
 						return
 					}
 
 					reportSuccess(fname, input)
 				}
 			}, "[example %s] Input: %s", fname, input) {
-				addFailure(fname, input)
+				addFailure(fname, input, "compiler_panic")
 			}
 		}
 	}
