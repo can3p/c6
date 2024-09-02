@@ -210,7 +210,7 @@ func TestSpec(t *testing.T) {
 				} else {
 					expected, err := fs.ReadFile(archive, outputFname)
 					if !assert.NoErrorf(t, err, "[example %s] Input: %s", fname, input) ||
-						!assert.Equalf(t, expected, err.Error(), "[example %s] Input: %s", fname, input) {
+						!assert.Equalf(t, string(expected), b.String(), "[example %s] Input: %s", fname, input) {
 						addFailure(fname, input, "compiler_output_does_not_match")
 						return
 					}
