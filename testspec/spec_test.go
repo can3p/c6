@@ -208,6 +208,11 @@ func TestSpec(t *testing.T) {
 
 					reportSuccess(fname, input)
 				} else {
+					if !assert.NoErrorf(t, compileErr, "[example %s] Input: %s", fname, input) {
+						addFailure(fname, input, fmt.Sprintf("compiler_unexpected_compile_error - %s", compileErr.Error()))
+						return
+					}
+
 					expected, err := fs.ReadFile(archive, outputFname)
 					if !assert.NoErrorf(t, err, "[example %s] Input: %s", fname, input) ||
 						!assert.Equalf(t, string(expected), b.String(), "[example %s] Input: %s", fname, input) {
