@@ -39,17 +39,17 @@ func (c *PrettyCompiler) printLine(l string, printLeadingNewLine bool) {
 		if err != nil {
 			panic(err)
 		}
-	}
 
-	i := 0
+		i := 0
 
-	for i < c.Indent {
-		_, err := c.Buffer.WriteString(indentSpace)
+		for i < c.Indent {
+			_, err := c.Buffer.WriteString(indentSpace)
 
-		if err != nil {
-			panic(err)
+			if err != nil {
+				panic(err)
+			}
+			i++
 		}
-		i++
 	}
 
 	c.Buffer.WriteString(l)
@@ -68,10 +68,18 @@ func (c *PrettyCompiler) CompileComplexSelectorList(selectorList *ast.ComplexSel
 }
 
 func (c *PrettyCompiler) CompileDeclBlock(block *ast.DeclBlock) {
-	for _, stm := range block.Stmts.Stmts {
-		c.printLine(stm.String(), true)
-		c.printByte(';')
+	if block.Stmts != nil {
+		if err := c.Compile(block.Stmts); err != nil {
+			panic(err)
+		}
 	}
+
+	if len(block.SubRuleSets) > 0 {
+		for _, r := range block.SubRuleSets {
+			c.CompileRuleSet(r)
+		}
+	}
+
 }
 
 func (c *PrettyCompiler) CompileRuleSet(ruleset *ast.RuleSet) {
@@ -86,6 +94,40 @@ func (c *PrettyCompiler) CompileRuleSet(ruleset *ast.RuleSet) {
 	c.printLine("}", len(ruleset.Block.Stmts.Stmts) > 0)
 }
 
+func (c *PrettyCompiler) CompileMediaQuery(mq *ast.MediaQuery) {
+	c.printLine(mq.String(), false)
+}
+
+func (c *PrettyCompiler) CompileMediaQueryStmt(mq *ast.MediaQueryStmt) {
+	c.printLine("@media ", true)
+	for idx, mediaQuery := range mq.MediaQueryList.List {
+		if idx > 0 {
+			c.printLine(", ", false)
+			c.CompileMediaQuery(mediaQuery)
+		}
+	}
+	c.printLine(mq.String(), false)
+	c.printLine(" {", false)
+	c.changeIndent(1)
+	c.CompileDeclBlock(mq.Block)
+	c.changeIndent(-1)
+	c.printLine("}", true)
+}
+
+func (c *PrettyCompiler) CompileProperty(mq *ast.Property) {
+	c.printLine(mq.Name.Name, true)
+	c.printLine(": ", false)
+	for idx, expr := range mq.Values {
+		if idx > 0 {
+			c.printByte(' ')
+		}
+
+		c.printLine(expr.String(), false)
+	}
+
+	c.printByte(';')
+}
+
 func (c *PrettyCompiler) CompileStmt(anyStm ast.Stmt) error {
 	switch stm := anyStm.(type) {
 	case *ast.RuleSet:
@@ -94,6 +136,12 @@ func (c *PrettyCompiler) CompileStmt(anyStm ast.Stmt) error {
 	case *ast.ImportStmt:
 		return nil
 	case *ast.AssignStmt:
+		return nil
+	case *ast.MediaQueryStmt:
+		c.CompileMediaQueryStmt(stm)
+		return nil
+	case *ast.Property:
+		c.CompileProperty(stm)
 		return nil
 	}
 

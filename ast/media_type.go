@@ -8,7 +8,11 @@ func NewMediaType(expr Expr) *MediaType {
 	return &MediaType{expr}
 }
 
-func (self MediaType) String() string {
+func (self *MediaType) String() string {
+	if self == nil {
+		return "<not set>"
+	}
+
 	return self.Expr.String()
 }
 
@@ -33,8 +37,8 @@ func (self MediaFeature) String() (out string) {
 }
 
 /*
-  media_type: all | aural | braille | handheld | print |
-  projection | screen | tty | tv | embossed
+media_type: all | aural | braille | handheld | print |
+projection | screen | tty | tv | embossed
 */
 const (
 	MediaTypeAll = iota

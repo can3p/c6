@@ -14,7 +14,7 @@ type DeclBlock struct {
 
 	// The symbol table for storing constant values
 	// Only constants can be stored here...
-	Stmts StmtList
+	Stmts *StmtList
 
 	// Nested rulesets
 	SubRuleSets []*RuleSet
@@ -23,7 +23,7 @@ type DeclBlock struct {
 func NewDeclBlock(parentRuleSet *RuleSet) *DeclBlock {
 	return &DeclBlock{
 		ParentRuleSet: parentRuleSet,
-		Stmts:         StmtList{},
+		Stmts:         &StmtList{},
 	}
 }
 
