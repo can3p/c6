@@ -3,17 +3,24 @@ C6
 Hate waiting for SASS compiling your stylesheets with Compass over 10 seconds
 everytime?  C6 helps you write style sheets with efficiency.
 
-C6 is a SASS 3.2 compatible implementation written in Go. But wait! this is not
-only to implement SASS, but also to create a new language for better
-consistency, syntax and performance. And yes, this means we're free to accept
-new language feature requests.
+C6 is a SASS 3.2 compatible implementation written in Go.
 
-[![Build Status](https://travis-ci.org/c9s/c6.svg)](https://travis-ci.org/c9s/c6)
-[![Coverage Status](https://coveralls.io/repos/c9s/c6/badge.svg)](https://coveralls.io/r/c9s/c6)
-[![GoDoc](https://godoc.org/github.com/c9s/c6?status.svg)](https://godoc.org/github.com/c9s/c6)
+This is a for of the original project with no intention for backwards compatibility.
+Current goal is to have at least some success against running the official spec.
 
-[![wercker status](https://app.wercker.com/status/13aa03443c40dedeeabda923e1a95180/m "wercker status")](https://app.wercker.com/project/bykey/13aa03443c40dedeeabda923e1a95180)
+If you want to help, the process is the following:
 
+- Decide which spec you want to work on in the `sass-spec`
+- Remove the corresponding entries from [blacklist](testspec/failures_list.go)
+- run the spec and see it fail with:
+  ```
+  IGNORE_BLACKLISTED=true go test testspec/*
+  ```
+- Fix the code and create a pull request
+
+Game rules are simple:
+- If a spec was successfully removed from the blacklist with the previous changes it cannot be added back
+- That's it
 
 ## Installation
 
@@ -228,7 +235,7 @@ go get github.com/c9s/c6/cmd/c6
 - [ ] import css as sass: https://github.com/sass/sass/issues/556
 - [ ] import once: https://github.com/sass/sass/issues/139
 - [ ] namespace and alias: https://github.com/sass/sass/issues/353
-- [ ] `@use` directive: https://github.com/nex3/sass/issues/353#issuecomment-5146513 
+- [ ] `@use` directive: https://github.com/nex3/sass/issues/353#issuecomment-5146513
 - [ ] conditional import: https://github.com/sass/sass/issues/451
 - [ ] `@sprite` syntax sugar
 -->
@@ -284,7 +291,7 @@ type will be resolved at the runtime.
 ### Why do you want to implement another SASS compiler?
 
 The original SASS is written in Ruby and it's really slow, we take 11 seconds
-to compile the stylesheets of our application, libsass is fast but it does not 
+to compile the stylesheets of our application, libsass is fast but it does not
 catch up the ruby sass implementation , and you can't compile them with Compass.
 Since Go is simple, easy & fast, thus we implement SASS in Go to move faster.
 
@@ -347,4 +354,3 @@ to either dynamic/static link this library without permissions)
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/c9s/c6/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
