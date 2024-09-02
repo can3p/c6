@@ -457,7 +457,7 @@ func EvaluateFunctionCall(fcall ast.FunctionCall, context *Context) (ast.Value, 
 		_ = fun
 
 	} else {
-		return nil, fmt.Errorf("Function " + fcall.Ident.Str + " is undefined.")
+		return nil, fmt.Errorf("Function %s is undefined.", fcall.Ident.Str)
 	}
 	return nil, nil
 }
