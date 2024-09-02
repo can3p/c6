@@ -4433,10 +4433,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"selector/percentage/scientific/positive_exponent/input.scss": "compiler_output_does_not_match",
 		"selector/to/input.scss": "compiler_output_does_not_match",
 	},
-	"css/media/bubbling.hrx": {
-		"preserve_merge_after_bubble/input.scss": "compiler_output_does_not_match",
-		"unmergeable_and_merged/input.scss": "compiler_output_does_not_match",
-	},
 	"css/media/comment.hrx": {
 		"after_query/loud/input.scss": "compiler_output_does_not_match",
 		"after_query/silent/input.scss": "parse_failure",
