@@ -5,7 +5,7 @@ everytime?  C6 helps you write style sheets with efficiency.
 
 C6 is a SASS 3.2 compatible implementation written in Go.
 
-This is a for of the original project with no intention for backwards compatibility.
+This is a fork of the original project with no intention for backwards compatibility.
 Current goal is to have at least some success against running the official spec.
 
 If you want to help, the process is the following:
