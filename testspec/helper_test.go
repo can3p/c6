@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func RunSpecs(t *testing.T, testFiles []string, testOnly string, ignoreInput func(string, string) bool) map[string][][]string {
+func RunSpecs(t *testing.T, hrxPath string, testFiles []string, testOnly string, ignoreInput func(string, string) bool) map[string][][]string {
 	success := 0
 
 	failedSpecs := map[string][][]string{}

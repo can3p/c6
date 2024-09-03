@@ -110,5 +110,9 @@ func (c *PrettyCompiler) Compile(list *ast.StmtList) error {
 		}
 	}
 
+	if c.Buffer.Len() > 0 {
+		c.printByte('\n')
+	}
+
 	return nil
 }

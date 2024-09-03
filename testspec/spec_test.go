@@ -13,6 +13,7 @@ import (
 )
 
 const hrxPath = "../sass-spec/spec"
+const ownHrxPath = "../own-spec"
 const failuresList = "failures_list.go"
 
 func writeFailuresListP(names map[string][][]string) {
@@ -74,7 +75,7 @@ func TestSpec(t *testing.T) {
 		panic("TEST_ONLY and GENERATE_FAILURES_LIST or IGNORE_BLACKLISTED vars can't be set together")
 	}
 
-	failedSpecs := RunSpecs(t, testFiles, testOnly, func(fname, input string) bool {
+	failedSpecs := RunSpecs(t, hrxPath, testFiles, testOnly, func(fname, input string) bool {
 		blacklistedInputs := BlacklistedSpecs[fname]
 
 		if ignoreBlacklisted && blacklistedInputs != nil {
@@ -89,4 +90,15 @@ func TestSpec(t *testing.T) {
 	if generateFailuresList {
 		writeFailuresListP(failedSpecs)
 	}
+}
+
+func TestOwnSpec(t *testing.T) {
+	testFiles, err := getHrxFiles(ownHrxPath)
+	require.NoError(t, err)
+
+	assert.Positive(t, len(testFiles))
+
+	testOnly := os.Getenv("TEST_ONLY")
+
+	RunSpecs(t, ownHrxPath, testFiles, testOnly, nil)
 }

@@ -1,0 +1,11 @@
+<===> basic/input.scss
+.foo {
+  a: b;
+}
+
+<===> basic/output.css
+.foo {
+  a: b;
+}
+
+<===>
