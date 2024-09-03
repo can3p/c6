@@ -1,7 +1,5 @@
 C6
 ===========================
-Hate waiting for SASS compiling your stylesheets with Compass over 10 seconds
-everytime?  C6 helps you write style sheets with efficiency.
 
 C6 is a SASS 3.2 compatible implementation written in Go.
 
@@ -21,12 +19,6 @@ If you want to help, the process is the following:
 Game rules are simple:
 - If a spec was successfully removed from the blacklist with the previous changes it cannot be added back
 - That's it
-
-## Installation
-
-```
-go get github.com/c9s/c6/cmd/c6
-```
 
 ## Working in progress
 
@@ -273,31 +265,6 @@ In the above code, `#{$name}:before a` is treated as `T_SELECTOR_TEMPLATE` token
 type will be resolved at the runtime.
 
 
-
-
-
-
-
-
-
-
-
-## Self Benchmarking
-
-[![BenchViz](https://raw.githubusercontent.com/c9s/c6/master/benchmarks/summary.svg)](https://raw.githubusercontent.com/c9s/c6/master/benchmarks/summary.svg)
-
-## FAQ
-
-### Why do you want to implement another SASS compiler?
-
-The original SASS is written in Ruby and it's really slow, we take 11 seconds
-to compile the stylesheets of our application, libsass is fast but it does not
-catch up the ruby sass implementation , and you can't compile them with Compass.
-Since Go is simple, easy & fast, thus we implement SASS in Go to move faster.
-
-Further, we want to design a new language (ECSS temporarily named) that is compatible with SASS 3.4 or
-even SASS 4.0 with more powerful features.
-
 ## Reference
 
 SASS Reference <http://sass-lang.com/documentation/file.SASS_REFERENCE.html>
@@ -331,19 +298,9 @@ Articles:
 
 - Logic in media queries - <https://css-tricks.com/logic-in-media-queries/>
 
+## Credits
 
-## Contribution
-
-Please open up an issue on GitHub before you put a lot efforts on pull request.
-
-The code submitting to PR must be filtered with `gofmt`
-
-## Community
-
-- Slack: we are on Slack channel `#c6`, go invite yourself here:
-<https://docs.google.com/forms/d/11KpalZc6AUuQYf7vz531ys0pLEC9csjkC6QyC_hJQEg/viewform>
-
-- Our Official Twitter Channel: <https://twitter.com/C6SASS>
+Original source code is available at https://github.com/c9s/c6
 
 ## License
 
@@ -351,6 +308,3 @@ MPL License <https://www.mozilla.org/MPL/2.0/>
 
 (MPL is like LGPL but with static/dynamic linking exception, which allows you
 to either dynamic/static link this library without permissions)
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/c9s/c6/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
