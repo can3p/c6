@@ -41,4 +41,16 @@ $var: abc;
   a: abc;
 }
 
+<===> easy_calc/input.scss
+$var: abc;
+.foo {
+  $var: 1px;
+  a: $var + 1px;
+}
+
+<===> easy_calc/output.css
+.foo {
+  a: 2px;
+}
+
 <===>
