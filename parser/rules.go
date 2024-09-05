@@ -1454,8 +1454,7 @@ func (parser *Parser) ParseDeclBlock() (*ast.DeclBlock, error) {
 		} else if stm, err := parser.ParseStmt(); err != nil {
 			return nil, err
 		} else if stm != nil {
-			// TODO: why do we have this branch at all if it breaks tests?
-			//return nil, fmt.Errorf("parse declaration empty branch  at token %s", tok)
+			declBlock.Append(stm)
 		} else {
 			return nil, fmt.Errorf("Parse failed at token %s", tok)
 		}

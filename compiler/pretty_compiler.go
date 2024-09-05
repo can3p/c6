@@ -97,6 +97,7 @@ func (c *PrettyCompiler) CompileStmtList(list *ast.StmtList) error {
 	for idx, stm := range list.Stmts {
 		if idx > 0 {
 			c.printNewline()
+			c.printNewline()
 		}
 
 		if err := c.CompileStmt(stm); err != nil {

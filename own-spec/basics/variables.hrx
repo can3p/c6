@@ -9,4 +9,36 @@ $var: abc;
   a: abc;
 }
 
+<===> override/input.scss
+$var: abc;
+.foo {
+  $var: def;
+  a: $var;
+}
+
+<===> override/output.css
+.foo {
+  a: def;
+}
+
+<===> override_cancelled/input.scss
+$var: abc;
+.foo {
+  $var: def;
+  a: $var;
+}
+
+.bar {
+  a: $var;
+}
+
+<===> override_cancelled/output.css
+.foo {
+  a: def;
+}
+
+.bar {
+  a: abc;
+}
+
 <===>
