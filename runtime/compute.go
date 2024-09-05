@@ -429,8 +429,7 @@ EvaluateExpr calls EvaluateBinaryExpr. except EvaluateExpr
 prevents calculate css slash as division.  otherwise it's the same as
 EvaluateBinaryExpr.
 */
-func EvaluateExpr(expr ast.Expr, context *Context) (ast.Value, error) {
-
+func EvaluateExpr(expr ast.Expr, scope *Scope) (ast.Value, error) {
 	switch t := expr.(type) {
 
 	case *ast.BinaryExpr:
@@ -439,11 +438,17 @@ func EvaluateExpr(expr ast.Expr, context *Context) (ast.Value, error) {
 			// return string object without quote
 			return ast.NewString(0, t.Left.(*ast.Number).String()+"/"+t.Right.(*ast.Number).String(), nil), nil
 		}
-		return EvaluateBinaryExpr(t, context)
+		return EvaluateBinaryExpr(t, nil)
 
 	case *ast.UnaryExpr:
-		return EvaluateUnaryExpr(t, context)
+		return EvaluateUnaryExpr(t, nil)
 
+	case *ast.Variable:
+		if val, err := scope.Lookup(t.NormalizedName()); err != nil {
+			return nil, err
+		} else {
+			return val, nil
+		}
 	default:
 		return ast.Value(expr), nil
 

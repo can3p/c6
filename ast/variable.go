@@ -1,25 +1,26 @@
 package ast
 
+import "strings"
+
 type Variable struct {
 	Name  string
-	Value Expr
 	Token *Token
 }
 
-func (self Variable) CanBeNode() {}
-
-func (self *Variable) SetValue(val Expr) {
-	self.Value = val
+// sass spec assumes that $var_name and $var-name mean the same
+func (self Variable) NormalizedName() string {
+	return strings.ReplaceAll(self.Name, "-", "_")
 }
+
+func (self Variable) CanBeNode() {}
 
 func (self Variable) String() string {
 	return self.Name
 }
 
-func NewVariable(name string) *Variable {
-	return &Variable{name, nil, nil}
-}
-
 func NewVariableWithToken(token *Token) *Variable {
-	return &Variable{token.Str, nil, token}
+	return &Variable{
+		Name:  token.Str,
+		Token: token,
+	}
 }

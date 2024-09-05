@@ -13,17 +13,14 @@ const indentSpace = "  "
 var ErrUnknownAstNode = fmt.Errorf("Unknown ast node to compile")
 
 type PrettyCompiler struct {
-	Context      *runtime.Context
-	ContextStack []runtime.Context
-	Buffer       *bytes.Buffer
-	Indent       int
+	Buffer *bytes.Buffer
+	Indent int
 }
 
-func NewPrettyCompiler(context *runtime.Context, buf *bytes.Buffer) *PrettyCompiler {
+func NewPrettyCompiler(buf *bytes.Buffer) *PrettyCompiler {
 	return &PrettyCompiler{
-		Context: context,
-		Buffer:  buf,
-		Indent:  0,
+		Buffer: buf,
+		Indent: 0,
 	}
 }
 
@@ -74,9 +71,6 @@ func (c *PrettyCompiler) CompileDeclBlock(block *ast.DeclBlock) {
 }
 
 func (c *PrettyCompiler) CompileRuleSet(ruleset *ast.RuleSet) {
-	c.Context.PushRuleSet(ruleset)
-	defer c.Context.PopRuleSet()
-
 	c.CompileComplexSelectorList(ruleset.Selectors)
 	c.printLine(" {", false)
 	c.changeIndent(1)
@@ -99,7 +93,7 @@ func (c *PrettyCompiler) CompileStmt(anyStm ast.Stmt) error {
 	return ErrUnknownAstNode
 }
 
-func (c *PrettyCompiler) Compile(list *ast.StmtList) error {
+func (c *PrettyCompiler) CompileStmtList(list *ast.StmtList) error {
 	for idx, stm := range list.Stmts {
 		if idx > 0 {
 			c.printNewline()
@@ -115,4 +109,15 @@ func (c *PrettyCompiler) Compile(list *ast.StmtList) error {
 	}
 
 	return nil
+}
+
+func (c *PrettyCompiler) Compile(list *ast.StmtList) error {
+	scope := runtime.NewScope(nil)
+	executed, err := runtime.ExecuteList(scope, list)
+
+	if err != nil {
+		return err
+	}
+
+	return c.CompileStmtList(executed)
 }

@@ -1063,7 +1063,8 @@ func (parser *Parser) ParseLiteralExpr() (ast.Expr, error) {
 		} else {
 			// Return expression as css slash syntax string
 			// TODO: re-visit here later
-			return runtime.EvaluateExpr(expr, parser.GlobalContext)
+			//return runtime.EvaluateExpr(expr, nil)
+			return nil, fmt.Errorf("evaluation should not happen at parse time")
 		}
 
 		// if we can't evaluate the value, just return the expression tree

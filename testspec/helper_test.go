@@ -71,7 +71,7 @@ func RunSpecs(t *testing.T, hrxPath string, testFiles []string, testOnly string,
 				}
 
 				var b bytes.Buffer
-				var compiler = compiler.NewPrettyCompiler(context, &b)
+				var compiler = compiler.NewPrettyCompiler(&b)
 
 				compileErr := compiler.Compile(stmts)
 

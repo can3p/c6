@@ -1,0 +1,12 @@
+<===> basic/input.scss
+$var: abc;
+.foo {
+  a: $var;
+}
+
+<===> basic/output.css
+.foo {
+  a: abc;
+}
+
+<===>
