@@ -189,7 +189,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"filter/multi_args/input.scss": "parse_failure",
 		"filter/one_arg/input.scss": "parse_failure",
 		"filter/space_before_equals/input.scss": "unhandled_warning",
-		"opacity/filter/input.scss": "compiler_output_does_not_match",
 		"opacity/named/input.scss": "compiler_output_does_not_match",
 		"opacity/positional/input.scss": "compiler_output_does_not_match",
 		"opacity/with_calc/input.scss": "parse_failure",
@@ -504,9 +503,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"clamped/lightness/below/input.scss": "parse_failure",
 		"clamped/saturation/above/input.scss": "compiler_output_does_not_match",
 		"clamped/saturation/below/input.scss": "parse_failure",
-		"in_gamut/blue/input.scss": "compiler_output_does_not_match",
-		"in_gamut/grayish/yellow/input.scss": "compiler_output_does_not_match",
-		"in_gamut/red/input.scss": "compiler_output_does_not_match",
 		"named/input.scss": "parse_failure",
 		"units/hue/deg/input.scss": "compiler_output_does_not_match",
 		"units/lightness/unitless/input.scss": "unhandled_warning",
@@ -626,43 +622,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"core_functions/color/hsl/three_args/units.hrx": {
 		"hue/angle/input.scss": "compiler_output_does_not_match",
 		"hue/deg/input.scss": "compiler_output_does_not_match",
-		"hue/unitless/input.scss": "compiler_output_does_not_match",
 		"hue/unknown/input.scss": "unhandled_warning",
 		"lightness/unitless/input.scss": "unhandled_warning",
 		"lightness/unknown/input.scss": "unhandled_warning",
 		"saturation/unitless/input.scss": "unhandled_warning",
 		"saturation/unknown/input.scss": "unhandled_warning",
 	},
-	"core_functions/color/hsl/three_args/w3c/black_to_white_through.hrx": {
-		"blue/input.scss": "compiler_output_does_not_match",
-		"cyan/input.scss": "compiler_output_does_not_match",
-		"green/input.scss": "compiler_output_does_not_match",
-		"purple/input.scss": "compiler_output_does_not_match",
-		"red/input.scss": "compiler_output_does_not_match",
-		"yellow/input.scss": "compiler_output_does_not_match",
-	},
 	"core_functions/color/hsl/three_args/w3c/blue_to_red.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"core_functions/color/hsl/three_args/w3c/gray_to.hrx": {
-		"blue/input.scss": "compiler_output_does_not_match",
-		"cyan/input.scss": "compiler_output_does_not_match",
-		"green/input.scss": "compiler_output_does_not_match",
-		"purple/input.scss": "compiler_output_does_not_match",
-		"red/input.scss": "compiler_output_does_not_match",
-		"yellow/input.scss": "compiler_output_does_not_match",
-	},
-	"core_functions/color/hsl/three_args/w3c/green_to_blue.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"core_functions/color/hsl/three_args/w3c/hue.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"core_functions/color/hsl/three_args/w3c/red_to_green.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"core_functions/color/hsla.hrx": {
-		"four_args/input.scss": "compiler_output_does_not_match",
 		"one_arg/alpha/input.scss": "parse_failure",
 		"one_arg/no_alpha/input.scss": "compiler_output_does_not_match",
 		"three_args/input.scss": "compiler_output_does_not_match",
@@ -1020,13 +992,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"percents/clamped/red/input.scss": "compiler_output_does_not_match",
 		"percents/percent/green/input.scss": "compiler_output_does_not_match",
 		"percents/unitless/green/input.scss": "compiler_output_does_not_match",
-		"unitless/beaded/input.scss": "compiler_output_does_not_match",
 		"unitless/clamped/blue/input.scss": "compiler_output_does_not_match",
 		"unitless/clamped/green/input.scss": "parse_failure",
 		"unitless/clamped/red/input.scss": "compiler_output_does_not_match",
 		"unitless/named/input.scss": "parse_failure",
-		"unitless/numbers/input.scss": "compiler_output_does_not_match",
-		"unitless/springgreen/input.scss": "compiler_output_does_not_match",
 	},
 	"core_functions/color/rgb/one_arg/relative_color.hrx": {
 		"calc/alpha/input.scss": "parse_failure",
@@ -1137,13 +1106,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"var/arg_3/input.scss": "parse_failure",
 	},
 	"core_functions/color/rgb/three_args/unitless.hrx": {
-		"beaded/input.scss": "compiler_output_does_not_match",
 		"clamped/blue/input.scss": "compiler_output_does_not_match",
 		"clamped/green/input.scss": "parse_failure",
 		"clamped/red/input.scss": "compiler_output_does_not_match",
 		"named/input.scss": "parse_failure",
-		"numbers/input.scss": "compiler_output_does_not_match",
-		"springgreen/input.scss": "compiler_output_does_not_match",
 	},
 	"core_functions/color/rgb/two_args.hrx": {
 		"clamped/opaque/input.scss": "compiler_output_does_not_match",
@@ -1164,15 +1130,12 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"transparent_to/transparent/input.scss": "compiler_output_does_not_match",
 	},
 	"core_functions/color/rgba.hrx": {
-		"four_args/input.scss": "compiler_output_does_not_match",
 		"one_arg/alpha/input.scss": "parse_failure",
 		"one_arg/no_alpha/input.scss": "compiler_output_does_not_match",
 		"three_args/input.scss": "compiler_output_does_not_match",
 	},
 	"core_functions/color/saturate.hrx": {
 		"css_overload/named/input.scss": "parse_failure",
-		"css_overload/unit/input.scss": "compiler_output_does_not_match",
-		"css_overload/unitless/input.scss": "compiler_output_does_not_match",
 		"css_overload/with_calc/input.scss": "parse_failure",
 		"css_overload/with_css_var/input.scss": "parse_failure",
 		"css_overload/with_sass_var/input.scss": "compiler_output_does_not_match",
@@ -1353,7 +1316,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"grayscale/with_calc/input.scss": "parse_failure",
 		"grayscale/with_color/input.scss": "compiler_output_does_not_match",
 		"grayscale/with_css_var/input.scss": "parse_failure",
-		"grayscale/with_number/input.scss": "compiler_output_does_not_match",
 		"grayscale/with_unquoted_calc/input.scss": "compiler_output_does_not_match",
 		"green/input.scss": "compiler_output_does_not_match",
 		"hue/input.scss": "compiler_output_does_not_match",
@@ -1361,7 +1323,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"invert/with_calc/input.scss": "parse_failure",
 		"invert/with_color/input.scss": "compiler_output_does_not_match",
 		"invert/with_css_var/input.scss": "parse_failure",
-		"invert/with_number/input.scss": "compiler_output_does_not_match",
 		"invert/with_unquoted_calc/input.scss": "compiler_output_does_not_match",
 		"lighten/input.scss": "compiler_output_does_not_match",
 		"lightness/input.scss": "compiler_output_does_not_match",
@@ -1408,7 +1369,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"core_functions/global/meta.hrx": {
 		"call/input.scss": "compiler_output_does_not_match",
-		"content_exists/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"content_exists/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 		"feature_exists/input.scss": "compiler_output_does_not_match",
 		"function_exists/input.scss": "compiler_output_does_not_match",
 		"get_function/input.scss": "compiler_output_does_not_match",
@@ -4264,14 +4225,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"error/loud/unterminated/sass/input.sass": "parse_failure",
 		"error/loud/unterminated/scss/input.scss": "parse_failure",
 		"inline/loud/sass/input.sass": "parse_failure",
-		"inline/loud/scss/input.scss": "compiler_output_does_not_match",
 		"inline/silent/sass/input.sass": "parse_failure",
 		"inline/silent/scss/input.scss": "parse_failure",
 		"multiple/input.scss": "parse_failure",
 		"multiple_stars/input.scss": "compiler_output_does_not_match",
 		"sourcemap/between_loads/input.scss": "compiler_output_does_not_match",
-		"sourcemap/sourcemappingurl/input.scss": "compiler_output_does_not_match",
-		"sourcemap/sourceurl/input.scss": "compiler_output_does_not_match",
 		"weird_indentation/input.scss": "parse_failure",
 	},
 	"css/custom_properties/error.hrx": {
@@ -4344,13 +4302,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"css/font-face.hrx": {
 		"bubble/deeply-nested/input.scss": "unhandled_warning",
 		"bubble/empty/input.scss": "parse_failure",
-		"bubble/in-mixin/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"bubble/in-mixin/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 		"bubble/loaded/import/input.scss": "parse_failure",
 		"bubble/loaded/meta-load-css/input.scss": "unhandled_warning",
-		"bubble/rules/input.scss": "compiler_output_does_not_match",
-	},
-	"css/function_name_identifiers.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"bubble/rules/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement",
 	},
 	"css/functions/error.hrx": {
 		"single_equals/no_lhs/input.scss": "parse_failure",
@@ -4375,12 +4330,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"comment/progid/before_close_paren/loud/input.scss": "parse_failure",
 		"comment/progid/before_close_paren/silent/input.scss": "parse_failure",
 		"prefixed/calc/interpolation/input.scss": "parse_failure",
-		"prefixed/calc/number/input.scss": "compiler_output_does_not_match",
 		"prefixed/calc/punctuation/input.scss": "compiler_panic",
-	},
-	"css/functions/url.hrx": {
-		"exclam/middle/input.scss": "compiler_output_does_not_match",
-		"exclam/only/input.scss": "compiler_output_does_not_match",
 	},
 	"css/functions/var.hrx": {
 		"css_function/single_argument/expression/input.scss": "parse_failure",
@@ -4394,7 +4344,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"css_function/two_argument/empty/whitespace_before/input.scss": "parse_failure",
 		"css_function/two_argument/expressions/input.scss": "parse_failure",
 		"css_function/two_argument/rest/input.scss": "parse_failure",
-		"css_function/zero_argument/empty/input.scss": "compiler_output_does_not_match",
 		"error/empty_after_keyword/input.scss": "parse_failure",
 		"error/empty_second_before_third/input.scss": "parse_failure",
 		"error/invalid_second_arg_syntax/input.scss": "parse_failure",
@@ -4415,7 +4364,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"css/keyframes.hrx": {
 		"bubble/empty/input.scss": "compiler_output_does_not_match",
-		"bubble/in-mixin/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"bubble/in-mixin/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 		"bubble/rules/input.scss": "compiler_output_does_not_match",
 		"error/in_keyframe_block/style_rule/input.scss": "compiler_should_have_errored",
 		"in_keyframe_block/known_at_rule/input.scss": "compiler_output_does_not_match",
@@ -4434,30 +4383,30 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"selector/to/input.scss": "compiler_output_does_not_match",
 	},
 	"css/media/bubbling.hrx": {
-		"preserve_merge_after_bubble/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-		"unmergeable_and_merged/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"preserve_merge_after_bubble/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"unmergeable_and_merged/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement not'a' (T_IDENT) at line 4, offset 281",
 	},
 	"css/media/comment.hrx": {
-		"after_query/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"after_query/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
 		"after_query/silent/input.scss": "parse_failure",
-		"before_query/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"before_query/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
 		"before_query/silent/input.scss": "parse_failure",
 	},
 	"css/media/indentation.hrx": {
-		"media_nested_in_selector/input.scss": "compiler_output_does_not_match",
-		"nested_selector/different_lines_parent/different_lines/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-		"nested_selector/different_lines_parent/same_line/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-		"nested_selector/same_lines_parent/different_lines/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-		"nested_selector/same_lines_parent/same_line/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-		"simple_selector_on_different_lines/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"media_nested_in_selector/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement c",
+		"nested_selector/different_lines_parent/different_lines/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement a",
+		"nested_selector/different_lines_parent/same_line/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement a",
+		"nested_selector/same_lines_parent/different_lines/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement a",
+		"nested_selector/same_lines_parent/same_line/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement a",
+		"simple_selector_on_different_lines/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement a",
 	},
 	"css/media/logic/and.hrx": {
-		"comment_after/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment_after/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 		"interpolation/input.scss": "parse_failure",
 		"mixed_case/input.scss": "parse_failure",
-		"multiple/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-		"no_whitespace_before/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-		"one/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"multiple/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"no_whitespace_before/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"one/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 	},
 	"css/media/logic/and_not.hrx": {
 		"after_interpolation/input.scss": "parse_failure",
@@ -4502,14 +4451,14 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"raw/and/mixed_case/input.scss": "parse_failure",
 		"raw/different_than_top_level/input.scss": "parse_failure",
 		"raw/not/lowercase/input.scss": "parse_failure",
-		"raw/not/mixed_case/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"raw/not/mixed_case/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 		"raw/or/lowercase/input.scss": "parse_failure",
 		"raw/or/mixed_case/input.scss": "parse_failure",
 	},
 	"css/media/logic/not.hrx": {
 		"not/comment_after/input.scss": "parse_failure",
 		"not/interpolation/input.scss": "parse_failure",
-		"not/mixed_case/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"not/mixed_case/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement NoT(a)",
 		"not/parens/input.scss": "parse_failure",
 	},
 	"css/media/logic/or.hrx": {
@@ -4546,7 +4495,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"css/media/type.hrx": {
-		"not/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"not/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement not'a' (T_IDENT) at line 0, offset 11",
 	},
 	"css/moz_document/comment.hrx": {
 		"after_arg/loud/input.scss": "unhandled_warning",
@@ -4717,11 +4666,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"error/wrong_order/supports_after_comma/input.scss": "parse_failure",
 		"error/wrong_order/unknown_function_after_comma/input.scss": "parse_failure",
 		"error/wrong_order/url_after_comma/input.scss": "parse_failure",
-		"media/complex/input.scss": "compiler_output_does_not_match",
+		"media/complex/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 		"media/list/after_feature/input.scss": "parse_failure",
 		"media/list/after_ident/input.scss": "parse_failure",
 		"media/list/and_without_space/input.scss": "parse_failure",
-		"media/simple/input.scss": "compiler_output_does_not_match",
+		"media/simple/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 		"multiple/many/input.scss": "parse_failure",
 		"multiple/supports_then/media/input.scss": "parse_failure",
 		"multiple/supports_then/supports/input.scss": "parse_failure",
@@ -4735,10 +4684,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"multiple/unknown_ident_then/supports/input.scss": "parse_failure",
 		"multiple/unknown_ident_then/unknown_function/input.scss": "parse_failure",
 		"multiple/unknown_ident_then/unknown_ident/input.scss": "parse_failure",
-		"supports/calc/input.scss": "compiler_output_does_not_match",
+		"supports/calc/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 		"supports/condition/input.scss": "parse_failure",
 		"supports/condition_and/input.scss": "parse_failure",
-		"supports/condition_function/input.scss": "compiler_output_does_not_match",
+		"supports/condition_function/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 		"supports/condition_negation/input.scss": "parse_failure",
 		"supports/declaration/custom_prop/punctuation/input.scss": "parse_failure",
 		"supports/declaration/custom_prop/value/input.scss": "parse_failure",
@@ -4867,9 +4816,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"css/selector/combinator/middle.hrx": {
 		"multiple/no_whitespace/input.scss": "parse_failure",
 		"multiple/whitespace/input.scss": "parse_failure",
-		"single/child/input.scss": "compiler_output_does_not_match",
-		"single/next_sibling/input.scss": "compiler_output_does_not_match",
-		"single/sibling/input.scss": "compiler_output_does_not_match",
 	},
 	"css/selector/combinator/only_one_bogus.hrx": {
 		"input.scss": "parse_failure",
@@ -4932,14 +4878,8 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"css/style_rule.hrx": {
-		"comment/after_selector/loud/input.scss": "compiler_output_does_not_match",
-		"comment/after_selector/silent/input.scss": "compiler_output_does_not_match",
-		"declaration/comment/after_colon/loud/input.scss": "compiler_output_does_not_match",
 		"declaration/comment/after_colon/silent/input.scss": "parse_failure",
-		"declaration/comment/after_value/loud/input.scss": "compiler_output_does_not_match",
 		"declaration/comment/after_value/silent/input.scss": "parse_failure",
-		"declaration/comment/before_colon/loud/input.scss": "compiler_output_does_not_match",
-		"declaration/comment/before_colon/silent/input.scss": "compiler_output_does_not_match",
 		"declaration/interleaved/after_nested_rule/input.scss": "unhandled_warning",
 		"declaration/interleaved/around_nested_rule/input.scss": "unhandled_warning",
 		"declaration/interleaved/before_nested_rule/input.scss": "compiler_output_does_not_match",
@@ -5004,8 +4944,8 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"css/supports/nesting.hrx": {
 		"loud_comment/input.scss": "compiler_output_does_not_match",
-		"media/in_style_rule/input.scss": "compiler_output_does_not_match",
-		"media/top/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"media/in_style_rule/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
+		"media/top/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
 		"style_rule/input.scss": "compiler_output_does_not_match",
 		"supports/input.scss": "compiler_output_does_not_match",
 	},
@@ -5127,7 +5067,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"css/url.hrx": {
 		"escape/ascii/input.scss": "compiler_output_does_not_match",
 		"escape/close_paren/input.scss": "parse_failure",
-		"escape/interpolation/input.scss": "compiler_output_does_not_match",
 		"escape/non_ascii/input.scss": "compiler_output_does_not_match",
 	},
 	"directives/at_root.hrx": {
@@ -5136,7 +5075,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"nested_import/with_builtin_use/input.scss": "parse_failure",
 		"nested_import/with_no_use/input.scss": "parse_failure",
 		"nested_import/with_user_use/input.scss": "parse_failure",
-		"property_only/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"property_only/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement print",
 	},
 	"directives/extend/after_target.hrx": {
 		"multiple_recursive/input.scss": "parse_failure",
@@ -5158,8 +5097,8 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"before_arg/silent/input.scss": "parse_failure",
 	},
 	"directives/extend/error.hrx": {
-		"complex/input.scss": "compiler_should_have_errored",
-		"compound/input.scss": "compiler_should_have_errored",
+		"complex/input.scss": "compiler_error_does_not_match",
+		"compound/input.scss": "compiler_error_does_not_match",
 	},
 	"directives/extend/pseudo.hrx": {
 		"into_pseudo/extends_after/input.scss": "parse_failure",
@@ -5168,38 +5107,38 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"directives/for.hrx": {
-		"comment/after_from/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/after_from/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 10 {  }",
 		"comment/after_from/silent/input.scss": "parse_failure",
-		"comment/after_through/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/after_through/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 10 {  }",
 		"comment/after_through/silent/input.scss": "parse_failure",
-		"comment/before_block/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/before_block/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 10 {  }",
 		"comment/before_block/silent/input.scss": "parse_failure",
-		"comment/before_from/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/before_from/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 10 {  }",
 		"comment/before_from/silent/input.scss": "parse_failure",
-		"comment/before_through/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/before_through/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 10 {  }",
 		"comment/before_through/silent/input.scss": "parse_failure",
 		"comment/before_var/loud/input.scss": "parse_failure",
 		"comment/before_var/silent/input.scss": "parse_failure",
-		"empty/input.scss": "compiler_output_does_not_match",
+		"empty/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: runtime error: invalid memory address or nil pointer dereference)",
 		"error/from_float/input.scss": "compiler_error_does_not_match",
 		"error/from_type/input.scss": "compiler_error_does_not_match",
 		"error/incompatible_units/input.scss": "compiler_error_does_not_match",
 		"error/to_float/input.scss": "compiler_error_does_not_match",
 		"error/to_type/input.scss": "compiler_error_does_not_match",
 		"error/unit_coersion_to_float/input.scss": "compiler_error_does_not_match",
-		"exclusive_backward/input.scss": "compiler_output_does_not_match",
-		"exclusive_forward/input.scss": "compiler_output_does_not_match",
+		"exclusive_backward/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: runtime error: invalid memory address or nil pointer dereference)",
+		"exclusive_forward/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: runtime error: invalid memory address or nil pointer dereference)",
 		"in_declaration/input.scss": "compiler_output_does_not_match",
-		"inclusive_backward/input.scss": "compiler_output_does_not_match",
-		"inclusive_forward/input.scss": "compiler_output_does_not_match",
-		"negative_to_negative/input.scss": "compiler_output_does_not_match",
-		"negative_to_positive/input.scss": "compiler_output_does_not_match",
-		"positive_to_negative/input.scss": "compiler_output_does_not_match",
-		"to_scope/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-		"unit/compatible/input.scss": "compiler_output_does_not_match",
-		"unit/from_unitless/input.scss": "compiler_output_does_not_match",
-		"unit/same/input.scss": "compiler_output_does_not_match",
-		"unit/to_unitless/input.scss": "compiler_output_does_not_match",
+		"inclusive_backward/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 5 through 1 {  }",
+		"inclusive_forward/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 5 {  }",
+		"negative_to_negative/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from -5 through -1 {  }",
+		"negative_to_positive/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from -1 through 3 {  }",
+		"positive_to_negative/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 2 through -1 {  }",
+		"to_scope/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through $limit {  }",
+		"unit/compatible/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 5mm through 1cm {  }",
+		"unit/from_unitless/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 5px {  }",
+		"unit/same/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1px through 5px {  }",
+		"unit/to_unitless/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1px through 5 {  }",
 	},
 	"directives/forward/css.hrx": {
 		"forward_into_import/input.scss": "compiler_output_does_not_match",
@@ -5461,9 +5400,9 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"directives/function.hrx": {
-		"comment/function/after_args/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/function/after_args/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 		"comment/function/after_args/silent/input.scss": "parse_failure",
-		"comment/function/before_name/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/function/before_name/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 		"comment/function/before_name/silent/input.scss": "parse_failure",
 		"comment/return/after_value/loud/input.scss": "parse_failure",
 		"comment/return/after_value/silent/input.scss": "parse_failure",
@@ -5478,16 +5417,16 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"directives/if/comment.hrx": {
 		"comment/else/before_block/loud/input.scss": "parse_failure",
-		"comment/else/before_block/silent/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-		"comment/else_if/after_condition/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/else/before_block/silent/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
+		"comment/else_if/after_condition/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 		"comment/else_if/after_condition/silent/input.scss": "parse_failure",
-		"comment/else_if/before_condition/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/else_if/before_condition/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 		"comment/else_if/before_condition/silent/input.scss": "parse_failure",
 		"comment/else_if/before_if/loud/input.scss": "parse_failure",
 		"comment/else_if/before_if/silent/input.scss": "parse_failure",
-		"comment/if/after_condition/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/if/after_condition/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 		"comment/if/after_condition/silent/input.scss": "parse_failure",
-		"comment/if/before_condition/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/if/before_condition/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 		"comment/if/before_condition/silent/input.scss": "parse_failure",
 	},
 	"directives/if/error/syntax.hrx": {
@@ -5495,7 +5434,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"directives/if/escaped.hrx": {
 		"if_only/input.scss": "compiler_output_does_not_match",
-		"with_else/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"with_else/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"directives/import/comment.hrx": {
 		"after_comma/loud/input.scss": "parse_failure",
@@ -5541,7 +5480,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"all/input.scss": "parse_failure",
 		"extension/input.scss": "parse_failure",
 		"import_only/no_extension/input.scss": "parse_failure",
-		"import_only/with_extension/input.scss": "compiler_should_have_errored",
+		"import_only/with_extension/input.scss": "compiler_error_does_not_match",
 		"index/input.scss": "parse_failure",
 		"partial/input.scss": "parse_failure",
 	},
@@ -5572,7 +5511,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"explicit_extension/sass/input.scss": "parse_failure",
 		"explicit_extension/scss/input.scss": "compiler_panic",
 		"index/dir_dot_foo/input.scss": "parse_failure",
-		"index/dir_dot_scss/input.scss": "compiler_should_have_errored",
+		"index/dir_dot_scss/input.scss": "compiler_error_does_not_match",
 		"index/partial/input.scss": "parse_failure",
 		"index/sass/input.scss": "parse_failure",
 		"index/scss/input.scss": "parse_failure",
@@ -5616,9 +5555,9 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"comment/include/before_name/silent/input.scss": "parse_failure",
 		"comment/include/before_using/loud/input.scss": "parse_failure",
 		"comment/include/before_using/silent/input.scss": "parse_failure",
-		"comment/mixin/after_args/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/mixin/after_args/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 		"comment/mixin/after_args/silent/input.scss": "parse_failure",
-		"comment/mixin/before_name/loud/input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"comment/mixin/before_name/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 		"comment/mixin/before_name/silent/input.scss": "parse_failure",
 		"custom_ident_include/input.scss": "parse_failure",
 		"custom_ident_name/input.scss": "parse_failure",
@@ -5978,14 +5917,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_1016.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"libsass-closed-issues/issue_1021.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_1025.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1030.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_1036.hrx": {
 		"input.scss": "parse_failure",
@@ -6021,13 +5957,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1082.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement",
 	},
 	"libsass-closed-issues/issue_1087.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1091.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"libsass-closed-issues/issue_1092.hrx": {
 		"input.scss": "parse_failure",
@@ -6098,14 +6034,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_1153.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"libsass-closed-issues/issue_1162.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_1163.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1167.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_unexpected_compile_error - Incompatible unit s != ms.  3s + 101ms",
 	},
 	"libsass-closed-issues/issue_1168.hrx": {
 		"input.scss": "parse_failure",
@@ -6180,22 +6113,16 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1210/with_without.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 	},
 	"libsass-closed-issues/issue_1215.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass-closed-issues/issue_1216.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_1218.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen and (min-width:#{$foo})",
 	},
 	"libsass-closed-issues/issue_1224.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-	},
-	"libsass-closed-issues/issue_1230.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all and (max-width:768px)",
 	},
 	"libsass-closed-issues/issue_1231.hrx": {
 		"input.scss": "parse_failure",
@@ -6228,7 +6155,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1248.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"libsass-closed-issues/issue_1251.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -6315,7 +6242,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1323.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"libsass-closed-issues/issue_1328.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -6336,7 +6263,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_137.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"libsass-closed-issues/issue_1370.hrx": {
 		"input.scss": "parse_failure",
@@ -6354,10 +6281,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1398.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen and (hux:3/4)",
 	},
 	"libsass-closed-issues/issue_1399.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_1404.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -6450,7 +6377,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass-closed-issues/issue_1486.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"libsass-closed-issues/issue_1487.hrx": {
 		"input.scss": "parse_failure",
@@ -6468,7 +6395,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1527/extend.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1527/selector/first.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -6519,16 +6446,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1569.hrx": {
-		"input.scss": "compiler_should_have_errored",
-	},
-	"libsass-closed-issues/issue_1570.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1574.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"libsass-closed-issues/issue_1577.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1578.hrx": {
 		"input.sass": "parse_failure",
@@ -6540,7 +6464,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1584.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_1585.hrx": {
 		"input.scss": "compiler_error_does_not_match",
@@ -6573,10 +6497,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "unhandled_warning",
 	},
 	"libsass-closed-issues/issue_1624.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-	},
-	"libsass-closed-issues/issue_1629.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"libsass-closed-issues/issue_1632.hrx": {
 		"input.scss": "parse_failure",
@@ -6585,7 +6506,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "unhandled_warning",
 	},
 	"libsass-closed-issues/issue_1640.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_1644/complex.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -6627,9 +6548,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass-closed-issues/issue_1667.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_1669.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_167.hrx": {
@@ -6689,9 +6607,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_1723.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"libsass-closed-issues/issue_1726.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_1729.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -6699,7 +6614,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1732/valid/directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all",
 	},
 	"libsass-closed-issues/issue_1732/valid/keyframe.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -6708,12 +6623,9 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1732/valid/mixin-def.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_1732/valid/propset.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_1732/valid/ruleset.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1733.hrx": {
@@ -6743,9 +6655,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_1757/for.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"libsass-closed-issues/issue_1765.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_1766.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -6753,7 +6662,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "unhandled_warning",
 	},
 	"libsass-closed-issues/issue_1770.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"libsass-closed-issues/issue_1776.hrx": {
 		"input.scss": "parse_failure",
@@ -6768,19 +6677,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1794.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 	},
 	"libsass-closed-issues/issue_1796.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1797.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"libsass-closed-issues/issue_1798/1.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_1798/2.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1801/import-cycle.hrx": {
 		"input.scss": "parse_failure",
@@ -6801,7 +6704,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1813.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"libsass-closed-issues/issue_1819.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -6816,34 +6719,31 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_185/hoisting.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement only'screen' (T_IDENT) at line 0, offset 12",
 	},
 	"libsass-closed-issues/issue_185/media_level_4.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 	},
 	"libsass-closed-issues/issue_185/media_wrapper_selector.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all",
 	},
 	"libsass-closed-issues/issue_185/merge_no_repeat.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement only'screen' (T_IDENT) at line 3, offset 38 and (min-width:1337px)",
 	},
 	"libsass-closed-issues/issue_185/mixin.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_185/selector_wrapper_media.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all",
 	},
 	"libsass-closed-issues/issue_1873.hrx": {
 		"input.scss": "compiler_should_have_errored",
-	},
-	"libsass-closed-issues/issue_1886.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1889.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1890.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 	},
 	"libsass-closed-issues/issue_1898.hrx": {
 		"input.scss": "parse_failure",
@@ -6855,7 +6755,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1907.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_1915.hrx": {
 		"input.scss": "parse_failure",
@@ -6894,7 +6794,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1944.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"libsass-closed-issues/issue_1945.hrx": {
 		"input.scss": "parse_failure",
@@ -6927,16 +6827,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2006.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_2007.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2009.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"libsass-closed-issues/issue_201.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_2017.hrx": {
 		"input.scss": "parse_failure",
@@ -6969,7 +6866,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2053.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"libsass-closed-issues/issue_2054.hrx": {
 		"input.scss": "parse_failure",
@@ -6990,7 +6887,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2095.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all",
 	},
 	"libsass-closed-issues/issue_2106/test.hrx": {
 		"input.scss": "parse_failure",
@@ -7029,7 +6926,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2149.hrx": {
-		"input.scss": "compiler_panic",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_2150.hrx": {
 		"input.scss": "parse_failure",
@@ -7038,7 +6935,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2154.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 	},
 	"libsass-closed-issues/issue_2155.hrx": {
 		"input.scss": "parse_failure",
@@ -7053,7 +6950,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "unhandled_warning",
 	},
 	"libsass-closed-issues/issue_2169.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"libsass-closed-issues/issue_2175.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -7068,7 +6965,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2198.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_2200.hrx": {
 		"input.scss": "parse_failure",
@@ -7101,34 +6998,34 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_2260/inner-parent-no-compound.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_2260/inner-parent-with-compound.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_2260/no-parent-no-compound.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_2260/no-parent-with-compound.hrx": {
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_2260/outer-parent-no-compound.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_2260/outer-parent-with-compound.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_2261.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2289.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"libsass-closed-issues/issue_2291.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2295/basic.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"libsass-closed-issues/issue_2295/original.hrx": {
 		"input.scss": "parse_failure",
@@ -7211,9 +7108,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_2399.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass-closed-issues/issue_2429.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_2444.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
@@ -7227,7 +7121,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2465.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_unexpected_compile_error - Incompatible unit e != px.  5e - 2px",
 	},
 	"libsass-closed-issues/issue_2467.hrx": {
 		"input.scss": "parse_failure",
@@ -7263,7 +7157,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2582.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"libsass-closed-issues/issue_2625.hrx": {
 		"input.scss": "parse_failure",
@@ -7281,7 +7175,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass-closed-issues/issue_279.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"libsass-closed-issues/issue_2808.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -7293,7 +7187,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_289.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"libsass-closed-issues/issue_2959.hrx": {
 		"input.scss": "parse_failure",
@@ -7320,7 +7214,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_344.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_346.hrx": {
 		"input.scss": "parse_failure",
@@ -7352,9 +7246,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_453.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass-closed-issues/issue_456.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_469.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
@@ -7365,7 +7256,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_487.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_492.hrx": {
 		"input.scss": "parse_failure",
@@ -7388,9 +7279,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_534.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"libsass-closed-issues/issue_535.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_54.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
@@ -7400,25 +7288,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_549.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass-closed-issues/issue_550/literal/dimension.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_550/literal/number.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_550/literal/percent.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_550/operator.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_550/variable/dimension.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_550/variable/number.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_550/variable/percent.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_552.hrx": {
@@ -7440,7 +7310,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_56.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 	},
 	"libsass-closed-issues/issue_574.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -7455,13 +7325,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_579.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-	},
-	"libsass-closed-issues/issue_58.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_59.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_590.hrx": {
 		"input.scss": "parse_failure",
@@ -7470,9 +7337,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_593.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_595.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_6.hrx": {
@@ -7485,13 +7349,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_613.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_615.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_622.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
 	},
 	"libsass-closed-issues/issue_623.hrx": {
 		"input.scss": "parse_failure",
@@ -7504,9 +7368,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"libsass-closed-issues/issue_639.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"libsass-closed-issues/issue_64.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_641.hrx": {
 		"input.scss": "parse_failure",
@@ -7536,13 +7397,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_666/angle.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_unexpected_compile_error - Incompatible unit <nil> != deg.  42 + 11deg",
 	},
 	"libsass-closed-issues/issue_666/length.hrx": {
-		"input.scss": "parse_failure",
-	},
-	"libsass-closed-issues/issue_67.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Incompatible unit <nil> != in.  42 + 11in",
 	},
 	"libsass-closed-issues/issue_672.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -7566,7 +7424,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_698.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_699.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -7602,10 +7460,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_73.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_733.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"libsass-closed-issues/issue_736.hrx": {
 		"input.scss": "parse_failure",
@@ -7629,16 +7487,16 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_77.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_783.hrx": {
-		"input.scss": "unhandled_warning",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_784.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_803.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement $query-string",
 	},
 	"libsass-closed-issues/issue_813.hrx": {
 		"input.scss": "parse_failure",
@@ -7656,10 +7514,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_828.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_829.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 	},
 	"libsass-closed-issues/issue_83.hrx": {
 		"input.scss": "parse_failure",
@@ -7671,7 +7529,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_859.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
 	},
 	"libsass-closed-issues/issue_86.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -7686,7 +7544,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_871.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_873.hrx": {
 		"input.scss": "parse_failure",
@@ -7794,7 +7652,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-todo-issues/issue_2096.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-todo-issues/issue_221260.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -7809,16 +7667,16 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-todo-issues/issue_2235/empty.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all and (min-width:100px)",
 	},
 	"libsass-todo-issues/issue_2235/not-empty.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all and (min-width:100px)",
 	},
 	"libsass-todo-issues/issue_2295/error/basic.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-todo-issues/issue_2295/error/wrapped.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-todo-issues/issue_238764.hrx": {
 		"input.scss": "compiler_error_does_not_match",
@@ -7848,13 +7706,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/at-root/137_test_at_root_in_mixin.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass/at-root/138_test_at_root_in_media.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
 	},
 	"libsass/at-root/139_test_at_root_in_bubbled_media.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
 	},
 	"libsass/at-root/140_test_at_root_in_unknown_directive.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -7887,46 +7745,46 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/at-root/with_without.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 	},
 	"libsass/at-stuff.hrx": {
 		"input.scss": "unhandled_warning",
 	},
 	"libsass/base-level-parent/imported/at-root-alone-itpl.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/at-root-alone.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/at-root-postfix-itpl.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"libsass/base-level-parent/imported/at-root-postfix.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/at-root-prefix-itpl.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"libsass/base-level-parent/imported/at-root-prefix.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/basic-alone-itpl.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/basic-alone.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/basic-postfix-itpl.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"libsass/base-level-parent/imported/basic-postfix.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/basic-prefix-itpl.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"libsass/base-level-parent/imported/basic-prefix.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/nested/at-root-alone-itpl.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -8061,7 +7919,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/conversions.hrx": {
-		"input.scss": "unhandled_warning",
+		"input.scss": "compiler_panic",
 	},
 	"libsass/css-import.hrx": {
 		"input.scss": "parse_failure",
@@ -8103,7 +7961,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass/http_import.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"libsass/image-url.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -8112,7 +7970,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass/inh.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"libsass/interpolated-function-call.hrx": {
 		"input.scss": "parse_failure",
@@ -8130,7 +7988,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "unhandled_warning",
 	},
 	"libsass/media-hoisting.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
 	},
 	"libsass/media.hrx": {
 		"input.scss": "parse_failure",
@@ -8235,19 +8093,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/units/conversion/angle.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"libsass/units/conversion/frequency.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"libsass/units/conversion/resolution.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"libsass/units/conversion/size.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"libsass/units/conversion/time.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"libsass/units/feature-test.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -8333,13 +8191,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass/wrapped-selector-whitespace.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"non_conformant/basic/01_simple_css.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/basic/02_simple_nesting.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/basic/03_simple_variable.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/basic/04_basic_variables.hrx": {
@@ -8418,13 +8270,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/basic/30_if_in_function.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/basic/31_if_in_mixin.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/basic/32_percentages.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"non_conformant/basic/33_ambiguous_imports.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -8441,9 +8293,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/basic/38_expressions_in_at_directives.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/basic/39_dash_match_attribute_selector.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/basic/40_pseudo_class_identifier_starting_with_n.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
@@ -8451,13 +8300,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/basic/42_css_imports.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/basic/44_bem_selectors.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/basic/49_interpolants_in_css_imports.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/basic/50_wrapped_pseudo_selectors.hrx": {
 		"input.scss": "parse_failure",
@@ -8472,7 +8321,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/basic/54_adjacent_identifiers_with_hyphens.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/basic/55_variable_exists.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -8505,13 +8354,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/extend/selector/missing.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/extend/selector/optional.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/extend/selector/simple.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"non_conformant/errors/fn-change-color-1.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -8544,7 +8393,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/fn-varargs/with-optional.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/errors/import/file/control-else.hrx": {
 		"input.scss": "parse_failure",
@@ -8619,19 +8468,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/control-else.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/errors/import/url/control-if.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/errors/import/url/loop/each.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/loop/for.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 2 {  }",
 	},
 	"non_conformant/errors/import/url/loop/while.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/errors/import/url/mixin/control-else/outside.hrx": {
 		"input.scss": "parse_failure",
@@ -8667,13 +8516,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/invalid-operation/plus.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/errors/invalid-operation/sub.hrx": {
 		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/errors/invalid-operation/times.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/errors/invalid-parent/function-in-each.hrx": {
 		"input.scss": "parse_failure",
@@ -8718,7 +8567,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/invalid-parent/return-in-ruleset.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/unicode/report/after.hrx": {
 		"input.scss": "parse_failure",
@@ -8736,7 +8585,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/extend-tests/004_test_basic.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"non_conformant/extend-tests/005_test_multiple_targets.hrx": {
 		"input.scss": "parse_failure",
@@ -9264,7 +9113,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/extend-tests/184_test_control_flow_if.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/extend-tests/185_test_control_flow_for.hrx": {
 		"input.scss": "parse_failure",
@@ -9300,7 +9149,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/extend-tests/196_test_extend_within_nested_directives.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
 	},
 	"non_conformant/extend-tests/197_test_extend_within_disparate_media.hrx": {
 		"input.scss": "parse_failure",
@@ -9309,7 +9158,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/extend-tests/199_test_extend_within_disparate_nested_directives.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
 	},
 	"non_conformant/extend-tests/206_test_extend_succeeds_when_one_extension_fails_but_others_dont.hrx": {
 		"input.scss": "parse_failure",
@@ -9357,7 +9206,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/extend-tests/221_test_partially_failed_extend.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"non_conformant/extend-tests/222_test_newline_near_combinator.hrx": {
 		"input.scss": "parse_failure",
@@ -9480,13 +9329,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/misc/media_interpolation.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement bar$baz",
 	},
 	"non_conformant/misc/mixin_content.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/misc/namespace_properties_with_script_value.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/misc/negative_numbers.hrx": {
 		"input.scss": "parse_failure",
@@ -9499,9 +9348,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"non_conformant/misc/trailing_comma_in_selector.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"non_conformant/misc/unicode_variables.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/mixin/content/arguments/error/args.hrx": {
 		"named/input.scss": "parse_failure",
@@ -9539,7 +9385,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/mixin/environment_locality.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/mixin/error/no_content.hrx": {
 		"input.scss": "compiler_error_does_not_match",
@@ -9551,11 +9397,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/operations/division.hrx": {
-		"slash/with_string/slash_minus_string/input.scss": "unhandled_warning",
-		"slash/with_string/slash_plus_string/input.scss": "unhandled_warning",
-		"slash/with_string/slash_slash_string/input.scss": "compiler_output_does_not_match",
-		"slash/with_string/string_minus_slash/input.scss": "unhandled_warning",
-		"slash/with_string/string_plus_slash/input.scss": "unhandled_warning",
+		"slash/with_string/slash_minus_string/input.scss": "compiler_panic",
+		"slash/with_string/slash_plus_string/input.scss": "compiler_panic",
+		"slash/with_string/slash_slash_string/input.scss": "compiler_panic",
+		"slash/with_string/string_minus_slash/input.scss": "compiler_panic",
+		"slash/with_string/string_plus_slash/input.scss": "compiler_panic",
 	},
 	"non_conformant/parser/and_and.hrx": {
 		"input.scss": "parse_failure",
@@ -10340,7 +10186,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/sass_4_0/color_arithmetic/addition/color_color.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/sass_4_0/color_arithmetic/addition/color_number.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -10370,7 +10216,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/sass_4_0/color_arithmetic/subtraction/color_color.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/sass_4_0/color_arithmetic/subtraction/color_number.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -10385,67 +10231,52 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scope/clash.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/scope/each.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scope/for.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: runtime error: invalid memory address or nil pointer dereference)",
 	},
 	"non_conformant/scope/function.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/scope/if.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/scope/mixin.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scope/nested.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"non_conformant/scope/root.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scope/ruleset.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scope/while.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-	},
-	"non_conformant/scss-tests/001_test_one_line_comments.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/scss-tests/002_test_one_line_comments.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss-tests/003_test_variables.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss-tests/004_test_variables.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss-tests/005_test_unicode_variables.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Undefined variable.",
 	},
 	"non_conformant/scss-tests/006_test_guard_assign.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss-tests/007_test_guard_assign.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/008_test_sass_script.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/011_test_if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/scss-tests/012_test_if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/scss-tests/013_test_if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/scss-tests/014_test_comment_after_if_directive.hrx": {
 		"input.scss": "parse_failure",
@@ -10457,19 +10288,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/019_test_css_import_directive.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/scss-tests/020_test_css_import_directive.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/scss-tests/021_test_css_import_directive.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/scss-tests/022_test_css_import_directive.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/scss-tests/023_test_css_import_directive.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/scss-tests/024_test_media_import.hrx": {
 		"input.scss": "parse_failure",
@@ -10484,10 +10315,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/029_test_url_import.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/scss-tests/030_test_block_comment_in_script.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/scss-tests/031_test_line_comment_in_script.hrx": {
 		"input.scss": "parse_failure",
@@ -10550,28 +10381,28 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/052_test_namespace_properties_with_script_value.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/scss-tests/053_test_no_namespace_properties_without_space.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/054_test_basic_mixins.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss-tests/055_test_basic_mixins.hrx": {
 		"input.scss": "unhandled_warning",
 	},
 	"non_conformant/scss-tests/056_test_basic_mixins.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss-tests/057_test_mixins_with_empty_args.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss-tests/058_test_mixins_with_empty_args.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss-tests/059_test_mixins_with_empty_args.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss-tests/060_test_mixins_with_args.hrx": {
 		"input.scss": "parse_failure",
@@ -10580,10 +10411,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/062_test_basic_function.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/scss-tests/063_test_function_args.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/scss-tests/064_test_mixin_var_args.hrx": {
 		"input.scss": "parse_failure",
@@ -10616,7 +10447,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/083_test_function_var_args.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/scss-tests/084_test_function_empty_var_args.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10703,7 +10534,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/131_test_nested_mixin_def.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss-tests/132_test_nested_mixin_shadow.hrx": {
 		"input.scss": "parse_failure",
@@ -10720,14 +10551,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss-tests/172_test_parsing_decimals_followed_by_comments_doesnt_take_forever.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss-tests/173_test_parsing_many_numbers_doesnt_take_forever.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss-tests/174_test_import_comments_in_imports.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/176_test_newline_selector_rendered_multiple_times.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 2 {  }",
 	},
 	"non_conformant/scss-tests/177_test_prop_name_interpolation_after_hyphen.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10748,10 +10576,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/183_test_passing_required_args_as_a_keyword_arg.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss-tests/184_test_passing_all_as_keyword_args_in_opposite_order.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss-tests/185_test_keyword_args_in_functions.hrx": {
 		"input.scss": "parse_failure",
@@ -10790,10 +10618,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss/basic_function.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/scss/basic_mixins.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss/basic_prop_name_interpolation.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10801,20 +10629,14 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss/basic_selector_interpolation.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss/blimp.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss/block_comment_in_script.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss/cfunc.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/scss/classes-and-ids.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss/color_output.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Undefined variable.",
 	},
 	"non_conformant/scss/comment_after_if_directive.hrx": {
 		"input.scss": "parse_failure",
@@ -10823,31 +10645,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss/concat.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/scss/cons-up.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss/css_basic_scss.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/css_block_directive_with_semicolon.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss/css_cdo_and_cdc_ignored_at_toplevel.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss/css_crazy_comments.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss/css_empty_declarations.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss/css_import_directive.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss/css_invisible_comments.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/scss/css_property_comments.hrx": {
 		"input.scss": "parse_failure",
@@ -10860,9 +10670,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"non_conformant/scss/css_selector_hacks.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"non_conformant/scss/css_spaceless_combo_selectors.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/css_unary_ops.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10889,28 +10696,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/for_in_functions.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/scss/function-names.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/scss/function_args.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/scss/functions-and-mixins.hrx": {
 		"input.scss": "unhandled_warning",
 	},
 	"non_conformant/scss/functions.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"non_conformant/scss/guard_assign.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss/hey1.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss/hey2.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/huge.hrx": {
 		"input.scss": "parse_failure",
@@ -10925,19 +10723,16 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/if-in-mixin.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss/if-in-propset.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/if.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/scss/if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
-	},
-	"non_conformant/scss/imp.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/scss/important-in-arglist.hrx": {
 		"input.scss": "parse_failure",
@@ -10949,7 +10744,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/interpolated-strings.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/scss/interpolation-operators-precedence.hrx": {
 		"input.scss": "parse_failure",
@@ -10979,13 +10774,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss/media/nesting/merged_and_retained.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
 	},
 	"non_conformant/scss/media/nesting/removed.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss/media/nesting/retained.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement not'screen' (T_IDENT) at line 8, offset 488",
 	},
 	"non_conformant/scss/media/script_features.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -11006,7 +10801,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss/mixins_with_empty_args.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss/multiline-var.hrx": {
 		"input.scss": "parse_failure",
@@ -11027,7 +10822,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "unhandled_warning",
 	},
 	"non_conformant/scss/nested-extend.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"non_conformant/scss/nested_namespace_properties.hrx": {
 		"input.scss": "parse_failure",
@@ -11060,13 +10855,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/passing_all_as_keyword_args_in_opposite_order.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss/passing_required_args_as_a_keyword_arg.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Unknown ast node to compile",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss/percentages.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"non_conformant/scss/placeholder-with-media.hrx": {
 		"input.scss": "parse_failure",
@@ -11123,13 +10918,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/strings.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/scss/url_import.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/scss/variables.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Undefined variable.",
 	},
 	"non_conformant/scss/vars.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -11141,10 +10936,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss/while.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/scss/while_directive.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 	"non_conformant/scss/while_in_functions.hrx": {
 		"input.scss": "parse_failure",
@@ -11160,13 +10955,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"global/first_declaration/top_level/input.scss": "unhandled_warning",
 	},
 	"operators/minus.hrx": {
-		"syntax/comment/both/input.scss": "compiler_output_does_not_match",
-		"syntax/comment/left/input.scss": "compiler_output_does_not_match",
+		"syntax/comment/both/input.scss": "compiler_panic",
+		"syntax/comment/left/input.scss": "compiler_panic",
 		"syntax/comment/right/input.scss": "compiler_output_does_not_match",
-		"syntax/whitespace/both/input.scss": "compiler_output_does_not_match",
-		"syntax/whitespace/left/newline/input.scss": "unhandled_warning",
-		"syntax/whitespace/left/space/input.scss": "unhandled_warning",
-		"syntax/whitespace/left/tab/input.scss": "unhandled_warning",
+		"syntax/whitespace/both/input.scss": "compiler_panic",
+		"syntax/whitespace/left/newline/input.scss": "compiler_panic",
+		"syntax/whitespace/left/space/input.scss": "compiler_panic",
+		"syntax/whitespace/left/tab/input.scss": "compiler_panic",
 		"syntax/whitespace/neither/input.scss": "compiler_output_does_not_match",
 		"syntax/whitespace/right/input.scss": "compiler_output_does_not_match",
 	},
@@ -11177,24 +10972,24 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"degenerate/modulus/infinity/positive_and_positive/input.scss": "parse_failure",
 	},
 	"operators/plus.hrx": {
-		"syntax/comment/both/input.scss": "compiler_output_does_not_match",
-		"syntax/comment/left/input.scss": "compiler_output_does_not_match",
-		"syntax/comment/right/input.scss": "compiler_output_does_not_match",
-		"syntax/whitespace/both/input.scss": "compiler_output_does_not_match",
-		"syntax/whitespace/left/newline/input.scss": "unhandled_warning",
-		"syntax/whitespace/left/space/input.scss": "unhandled_warning",
-		"syntax/whitespace/left/tab/input.scss": "unhandled_warning",
-		"syntax/whitespace/neither/input.scss": "compiler_output_does_not_match",
-		"syntax/whitespace/right/input.scss": "compiler_output_does_not_match",
+		"syntax/comment/both/input.scss": "compiler_panic",
+		"syntax/comment/left/input.scss": "compiler_panic",
+		"syntax/comment/right/input.scss": "compiler_panic",
+		"syntax/whitespace/both/input.scss": "compiler_panic",
+		"syntax/whitespace/left/newline/input.scss": "compiler_panic",
+		"syntax/whitespace/left/space/input.scss": "compiler_panic",
+		"syntax/whitespace/left/tab/input.scss": "compiler_panic",
+		"syntax/whitespace/neither/input.scss": "compiler_panic",
+		"syntax/whitespace/right/input.scss": "compiler_panic",
 	},
 	"operators/slash.hrx": {
 		"namespaced_variables/input.scss": "unhandled_warning",
 		"separator/calculation/preserved/both/input.scss": "parse_failure",
 		"separator/calculation/preserved/left/input.scss": "parse_failure",
 		"separator/calculation/preserved/right/input.scss": "parse_failure",
-		"separator/calculation/simplified/both/input.scss": "compiler_output_does_not_match",
-		"separator/calculation/simplified/left/input.scss": "compiler_output_does_not_match",
-		"separator/calculation/simplified/right/input.scss": "compiler_output_does_not_match",
+		"separator/calculation/simplified/both/input.scss": "compiler_panic",
+		"separator/calculation/simplified/left/input.scss": "compiler_panic",
+		"separator/calculation/simplified/right/input.scss": "compiler_panic",
 		"without_intermediate/whitespace/input.scss": "parse_failure",
 	},
 	"parser/indentation.hrx": {
@@ -11214,7 +11009,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"error/too_few_args/input.scss": "compiler_should_have_errored",
 		"error/too_many_args/input.scss": "compiler_should_have_errored",
 		"error/type/input.scss": "compiler_should_have_errored",
-		"math/slash_as_division/input.scss": "unhandled_warning",
+		"math/slash_as_division/input.scss": "compiler_panic",
 		"negative/input.scss": "parse_failure",
 		"overridden/input.scss": "parse_failure",
 		"percentage_warning/input.scss": "parse_failure",
@@ -11291,12 +11086,8 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"overridden/input.scss": "parse_failure",
 		"simplification/input.scss": "parse_failure",
 		"units/compatible/input.scss": "parse_failure",
-		"units/fake/input.scss": "compiler_output_does_not_match",
 		"units/none/input.scss": "parse_failure",
-		"units/real_and_fake/input.scss": "compiler_output_does_not_match",
-		"units/real_and_unknown/input.scss": "compiler_output_does_not_match",
 		"units/same_fake/input.scss": "compiler_output_does_not_match",
-		"units/unknown/input.scss": "compiler_output_does_not_match",
 	},
 	"values/calculation/calc/constant.hrx": {
 		"e/alone/input.scss": "compiler_output_does_not_match",
@@ -11304,21 +11095,18 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"e/equals_max_precision/input.scss": "parse_failure",
 		"e/math/simplified/input.scss": "parse_failure",
 		"e/math/unsimplified/input.scss": "parse_failure",
-		"infinity/alone/input.scss": "compiler_output_does_not_match",
 		"infinity/case_insensitive/input.scss": "compiler_output_does_not_match",
 		"infinity/math/simplified/input.scss": "parse_failure",
 		"infinity/math/unsimplified/computed/input.scss": "parse_failure",
 		"infinity/math/unsimplified/from_variable/input.scss": "compiler_output_does_not_match",
 		"infinity/math/unsimplified/literal/input.scss": "parse_failure",
 		"infinity/type/input.scss": "compiler_output_does_not_match",
-		"minus_infinity/alone/input.scss": "compiler_output_does_not_match",
 		"minus_infinity/case_insensitive/input.scss": "compiler_output_does_not_match",
 		"minus_infinity/math/simplified/input.scss": "parse_failure",
 		"minus_infinity/math/unsimplified/computed/input.scss": "parse_failure",
 		"minus_infinity/math/unsimplified/from_variable/input.scss": "compiler_output_does_not_match",
 		"minus_infinity/math/unsimplified/literal/input.scss": "parse_failure",
 		"minus_infinity/type/input.scss": "compiler_output_does_not_match",
-		"nan/alone/input.scss": "compiler_output_does_not_match",
 		"nan/case_insensitive/input.scss": "compiler_output_does_not_match",
 		"nan/math/simplified/input.scss": "parse_failure",
 		"nan/math/unsimplified/computed/input.scss": "parse_failure",
@@ -11335,7 +11123,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"precedence/after_minus/input.scss": "parse_failure",
 		"precedence/after_plus/input.scss": "parse_failure",
 		"precedence/after_times/input.scss": "parse_failure",
-		"undefined/alone/input.scss": "compiler_output_does_not_match",
 		"undefined/math/input.scss": "parse_failure",
 	},
 	"values/calculation/calc/error/complex_units.hrx": {
@@ -11689,7 +11476,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"calculation/min/simplified/input.scss": "compiler_output_does_not_match",
 		"case_insensitive/input.scss": "compiler_output_does_not_match",
 		"extra_whitespace/input.scss": "compiler_output_does_not_match",
-		"function/css/input.scss": "compiler_output_does_not_match",
 		"function/if/input.scss": "compiler_output_does_not_match",
 		"function/max/input.scss": "parse_failure",
 		"function/min/input.scss": "parse_failure",
@@ -11776,7 +11562,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"identifier/input.scss": "compiler_output_does_not_match",
 		"interpolation/input.scss": "parse_failure",
 		"number/input.scss": "compiler_output_does_not_match",
-		"operation/input.scss": "parse_failure",
+		"operation/input.scss": "compiler_output_does_not_match",
 		"var/direct/input.scss": "parse_failure",
 		"var/variable/input.scss": "parse_failure",
 		"variable/input.scss": "compiler_output_does_not_match",
@@ -11823,9 +11609,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"preserved/single_arg/interpolation/input.scss": "parse_failure",
 		"preserved/single_arg/unquoted_string/input.scss": "compiler_output_does_not_match",
 		"preserved/single_arg/var/input.scss": "parse_failure",
-		"preserved/unit/first/input.scss": "compiler_output_does_not_match",
-		"preserved/unit/second/input.scss": "compiler_output_does_not_match",
-		"preserved/unit/third/input.scss": "compiler_output_does_not_match",
 		"simplified/between/input.scss": "compiler_output_does_not_match",
 		"simplified/compatible_units/input.scss": "compiler_output_does_not_match",
 		"simplified/lower_bound/far_below/input.scss": "compiler_output_does_not_match",
@@ -11886,12 +11669,8 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"overridden/input.scss": "parse_failure",
 		"simplification/input.scss": "parse_failure",
 		"units/compatible/input.scss": "compiler_output_does_not_match",
-		"units/fake/input.scss": "compiler_output_does_not_match",
 		"units/none/input.scss": "compiler_output_does_not_match",
-		"units/real_and_fake/input.scss": "compiler_output_does_not_match",
-		"units/real_and_unknown/input.scss": "compiler_output_does_not_match",
 		"units/same_fake/input.scss": "compiler_output_does_not_match",
-		"units/unknown/input.scss": "compiler_output_does_not_match",
 	},
 	"values/calculation/log.hrx": {
 		"base/between_zero_and_one/input.scss": "compiler_output_does_not_match",
@@ -11930,7 +11709,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"error/unitless_and_real/in_calc/input.scss": "parse_failure",
 		"extra_whitespace/min_in_max/input.scss": "compiler_output_does_not_match",
 		"extra_whitespace/number/input.scss": "compiler_output_does_not_match",
-		"math/slash_as_division/input.scss": "unhandled_warning",
+		"math/slash_as_division/input.scss": "compiler_panic",
 		"overridden/input.scss": "parse_failure",
 		"preserved/math/first/input.scss": "parse_failure",
 		"preserved/math/second/input.scss": "parse_failure",
@@ -11938,9 +11717,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"preserved/operation/unitless_and_real/in_calc/input.scss": "parse_failure",
 		"preserved/operation/unitless_and_real/minus/input.scss": "parse_failure",
 		"preserved/operation/unitless_and_real/plus/input.scss": "parse_failure",
-		"preserved/unit/first/input.scss": "compiler_output_does_not_match",
-		"preserved/unit/second/input.scss": "compiler_output_does_not_match",
-		"preserved/unit/third/input.scss": "compiler_output_does_not_match",
 		"preserved/variable/input.scss": "compiler_output_does_not_match",
 		"simplified/compatible_units/input.scss": "compiler_output_does_not_match",
 		"simplified/first/input.scss": "compiler_output_does_not_match",
@@ -11963,7 +11739,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"error/unitless_and_real/in_calc/input.scss": "parse_failure",
 		"extra_whitespace/max_in_min/input.scss": "compiler_output_does_not_match",
 		"extra_whitespace/number/input.scss": "compiler_output_does_not_match",
-		"math/slash_as_division/input.scss": "unhandled_warning",
+		"math/slash_as_division/input.scss": "compiler_panic",
 		"overridden/input.scss": "parse_failure",
 		"preserved/math/first/input.scss": "parse_failure",
 		"preserved/math/second/input.scss": "parse_failure",
@@ -11971,9 +11747,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"preserved/operation/unitless_and_real/in_calc/input.scss": "parse_failure",
 		"preserved/operation/unitless_and_real/minus/input.scss": "parse_failure",
 		"preserved/operation/unitless_and_real/plus/input.scss": "parse_failure",
-		"preserved/unit/first/input.scss": "compiler_output_does_not_match",
-		"preserved/unit/second/input.scss": "compiler_output_does_not_match",
-		"preserved/unit/third/input.scss": "compiler_output_does_not_match",
 		"preserved/variable/input.scss": "compiler_output_does_not_match",
 		"simplified/compatible_units/input.scss": "compiler_output_does_not_match",
 		"simplified/first/input.scss": "compiler_output_does_not_match",
@@ -12008,10 +11781,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"positive_zero/input.scss": "compiler_output_does_not_match",
 		"simplification/input.scss": "parse_failure",
 		"units/compatible/input.scss": "compiler_output_does_not_match",
-		"units/fake/input.scss": "compiler_output_does_not_match",
 		"units/none/input.scss": "compiler_output_does_not_match",
-		"units/real_and_fake/input.scss": "compiler_output_does_not_match",
-		"units/real_and_unknown/input.scss": "compiler_output_does_not_match",
 		"units/same_fake/input.scss": "compiler_output_does_not_match",
 		"units/unknown/input.scss": "compiler_output_does_not_match",
 		"x_infinity/negative/input.scss": "compiler_output_does_not_match",
@@ -12064,10 +11834,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"positive_zero/input.scss": "compiler_output_does_not_match",
 		"simplification/input.scss": "parse_failure",
 		"units/compatible/input.scss": "compiler_output_does_not_match",
-		"units/fake/input.scss": "compiler_output_does_not_match",
 		"units/none/input.scss": "compiler_output_does_not_match",
-		"units/real_and_fake/input.scss": "compiler_output_does_not_match",
-		"units/real_and_unknown/input.scss": "compiler_output_does_not_match",
 		"units/same_fake/input.scss": "compiler_output_does_not_match",
 		"units/unknown/input.scss": "compiler_output_does_not_match",
 		"x_infinity/negative/input.scss": "compiler_output_does_not_match",
@@ -12099,7 +11866,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"values/calculation/round/one_argument.hrx": {
 		"case_insensitive/input.scss": "compiler_output_does_not_match",
-		"math/slash_as_division/input.scss": "unhandled_warning",
+		"math/slash_as_division/input.scss": "compiler_panic",
 		"negative/input.scss": "parse_failure",
 		"overridden/input.scss": "parse_failure",
 		"positive/input.scss": "compiler_output_does_not_match",
@@ -12191,7 +11958,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"step/unknown_variable/input.scss": "parse_failure",
 		"strategy/interpolation/input.scss": "parse_failure",
 		"strategy/unknown_variable/input.scss": "parse_failure",
-		"units/real_and_unknown/input.scss": "compiler_output_does_not_match",
 		"units/unknown/input.scss": "compiler_output_does_not_match",
 	},
 	"values/calculation/round/two_arguments.hrx": {
@@ -12216,10 +11982,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"simplification/input.scss": "parse_failure",
 		"step_is_zero/input.scss": "compiler_output_does_not_match",
 		"units/compatible/input.scss": "compiler_output_does_not_match",
-		"units/fake/input.scss": "compiler_output_does_not_match",
 		"units/none/input.scss": "compiler_output_does_not_match",
-		"units/real_and_fake/input.scss": "compiler_output_does_not_match",
-		"units/real_and_unknown/input.scss": "compiler_output_does_not_match",
 		"units/same_fake/input.scss": "compiler_output_does_not_match",
 		"units/unknown/input.scss": "compiler_output_does_not_match",
 		"unknown_variable/input.scss": "parse_failure",
@@ -12312,9 +12075,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"values/identifiers/escape/script.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"values/identifiers/if.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"values/ids.hrx": {
@@ -12443,12 +12203,8 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"list/argument/function/user_defined/input.scss": "parse_failure",
 		"list/argument/mixin/input.scss": "parse_failure",
 		"list/bracketed/input.scss": "parse_failure",
-		"list/comma/input.scss": "compiler_output_does_not_match",
-		"list/declaration/input.scss": "compiler_output_does_not_match",
 		"list/interpolation/input.scss": "parse_failure",
-		"list/parenthesized/input.scss": "compiler_output_does_not_match",
 		"list/return/input.scss": "parse_failure",
-		"value/declaration/input.scss": "compiler_output_does_not_match",
 		"value/interpolation/input.scss": "parse_failure",
 		"value/multiple/input.scss": "compiler_output_does_not_match",
 	},
@@ -12591,6 +12347,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"comment/before_colon/silent/input.scss": "parse_failure",
 		"double_flag/default/input.scss": "unhandled_warning",
 		"double_flag/global/input.scss": "unhandled_warning",
-		"semi_global/in_local/double_nested/input.scss": "compiler_output_does_not_match",
+		"semi_global/in_local/double_nested/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 	},
 }
