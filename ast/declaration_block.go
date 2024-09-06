@@ -35,6 +35,10 @@ func (self *DeclBlock) Append(decl Stmt) {
 	self.Stmts.Append(decl)
 }
 
+func (self *DeclBlock) AppendList(stm *StmtList) {
+	self.Stmts.AppendList(stm)
+}
+
 func (self *DeclBlock) AppendSubRuleSet(ruleset *RuleSet) {
 	newRuleSets := append(self.SubRuleSets, ruleset)
 	self.SubRuleSets = newRuleSets

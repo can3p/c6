@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/c9s/c6/parser"
@@ -18,11 +19,11 @@ func AssertPrettyCompile(t *testing.T, code string, expected string) {
 
 	var buf bytes.Buffer
 
-	var compiler = NewPrettyCompiler(context, &buf)
+	var compiler = NewPrettyCompiler(&buf)
 
 	err = compiler.Compile(stmts)
 	require.NoError(t, err)
-	assert.Equal(t, expected, buf.String())
+	assert.Equal(t, expected, strings.TrimSpace(buf.String()))
 }
 
 func TestPrettyCompileUniversalSelector(t *testing.T) {

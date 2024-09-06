@@ -14,7 +14,6 @@ import (
 
 	"github.com/c9s/c6/ast"
 	"github.com/c9s/c6/lexer"
-	"github.com/c9s/c6/runtime"
 )
 
 var HttpUrlPattern = regexp.MustCompile("^https?://")
@@ -859,16 +858,6 @@ func (parser *Parser) ParseExpr(inParenthesis bool) (ast.Expr, error) {
 			return nil, err
 		} else if term != nil {
 			expr = ast.NewUnaryExpr(ast.NewOpWithToken(tok), term)
-
-			if uexpr, ok := expr.(*ast.UnaryExpr); ok {
-
-				// if it's evaluatable just return the evaluated value.
-				if val, ok, err := runtime.ReduceExpr(uexpr, parser.GlobalContext); err != nil {
-					return nil, err
-				} else if ok {
-					expr = ast.Expr(val)
-				}
-			}
 		} else {
 			parser.restore(pos)
 			return nil, nil
@@ -895,18 +884,7 @@ func (parser *Parser) ParseExpr(inParenthesis bool) (ast.Expr, error) {
 			return nil, err
 		} else if rightTerm != nil {
 			// XXX: check parenthesis
-			var bexpr = ast.NewBinaryExpr(ast.NewOpWithToken(rightTok), expr, rightTerm, inParenthesis)
-
-			if val, ok, err := runtime.ReduceExpr(bexpr, parser.GlobalContext); err != nil {
-				return nil, err
-			} else if ok {
-
-				expr = ast.Expr(val)
-
-			} else {
-				// wrap the existing expression with the new binary expression object
-				expr = ast.Expr(bexpr)
-			}
+			expr = ast.NewBinaryExpr(ast.NewOpWithToken(rightTok), expr, rightTerm, inParenthesis)
 		} else {
 			return nil, SyntaxError{
 				Reason:      "Expecting term on the right side",
@@ -1027,7 +1005,6 @@ func (parser *Parser) ParseValueStrict() (ast.Expr, error) {
 		}
 		parser.restore(pos)
 	}
-	// Reduce the expression
 	return parser.ParseExpr(false)
 }
 
@@ -1052,21 +1029,6 @@ func (parser *Parser) ParseLiteralExpr() (ast.Expr, error) {
 			expr = ast.NewLiteralConcat(expr, rightExpr)
 		}
 
-		// Check if the expression is reduce-able
-		// For now, division looks like CSS slash at the first level, should be string.
-		if runtime.CanReduceExpr(expr) {
-			if reducedExpr, ok, err := runtime.ReduceExpr(expr, parser.GlobalContext); err != nil {
-				return nil, err
-			} else if ok {
-				return reducedExpr, nil
-			}
-		} else {
-			// Return expression as css slash syntax string
-			// TODO: re-visit here later
-			return runtime.EvaluateExpr(expr, parser.GlobalContext)
-		}
-
-		// if we can't evaluate the value, just return the expression tree
 		return expr, nil
 	}
 	return nil, nil
@@ -1216,33 +1178,6 @@ func (parser *Parser) ParseAssignStmt() (ast.Stmt, error) {
 			File:        parser.File,
 		}
 	}
-
-	// Optimize the expression only when it's an expression
-	// TODO: for expression inside a map or list we should also optmise them too
-	if bexpr, ok := valExpr.(ast.BinaryExpr); ok {
-		if reducedExpr, ok, err := runtime.ReduceExpr(bexpr, parser.GlobalContext); err != nil {
-			return nil, err
-		} else if ok {
-			valExpr = reducedExpr
-		}
-	} else if uexpr, ok := valExpr.(ast.UnaryExpr); ok {
-		if reducedExpr, ok, err := runtime.ReduceExpr(uexpr, parser.GlobalContext); err != nil {
-			return nil, err
-		} else if ok {
-			valExpr = reducedExpr
-		}
-	}
-
-	// FIXME
-	// Even we can visit the variable assignment in the AST visitors but if we
-	// could save the information, we can reduce the effort for the visitors.
-	/*
-		if currentBlock := parser.GlobalContext.CurrentBlock(); currentBlock != nil {
-			currentBlock.GetSymTable().Set(variable.Name, valExpr)
-		} else {
-			panic("nil block")
-		}
-	*/
 
 	var stm = ast.NewAssignStmt(variable, valExpr)
 	parser.ParseFlags(stm)
@@ -1453,8 +1388,7 @@ func (parser *Parser) ParseDeclBlock() (*ast.DeclBlock, error) {
 		} else if stm, err := parser.ParseStmt(); err != nil {
 			return nil, err
 		} else if stm != nil {
-			// TODO: why do we have this branch at all if it breaks tests?
-			//return nil, fmt.Errorf("parse declaration empty branch  at token %s", tok)
+			declBlock.Append(stm)
 		} else {
 			return nil, fmt.Errorf("Parse failed at token %s", tok)
 		}
@@ -1686,11 +1620,6 @@ func (parser *Parser) ParseForStmt() (ast.Stmt, error) {
 			return nil, err
 		}
 
-		if reducedExpr, ok, err := runtime.ReduceExpr(fromExpr, parser.GlobalContext); err != nil {
-			return nil, err
-		} else if ok {
-			fromExpr = reducedExpr
-		}
 		stm.From = fromExpr
 
 		// "through" or "to"
@@ -1707,11 +1636,6 @@ func (parser *Parser) ParseForStmt() (ast.Stmt, error) {
 		endExpr, err := parser.ParseExpr(true)
 		if err != nil {
 			return nil, err
-		}
-		if reducedExpr, ok, err := runtime.ReduceExpr(endExpr, parser.GlobalContext); err != nil {
-			return nil, err
-		} else if ok {
-			endExpr = reducedExpr
 		}
 
 		if tok.Type == ast.T_FOR_THROUGH {
@@ -1730,11 +1654,6 @@ func (parser *Parser) ParseForStmt() (ast.Stmt, error) {
 		if err != nil {
 			return nil, err
 		}
-		if reducedExpr, ok, err := runtime.ReduceExpr(fromExpr, parser.GlobalContext); err != nil {
-			return nil, err
-		} else if ok {
-			fromExpr = reducedExpr
-		}
 		stm.From = fromExpr
 
 		if _, err := parser.expect(ast.T_RANGE); err != nil {
@@ -1745,12 +1664,6 @@ func (parser *Parser) ParseForStmt() (ast.Stmt, error) {
 		if err != nil {
 			return nil, err
 		}
-		if reducedExpr, ok, err := runtime.ReduceExpr(endExpr, parser.GlobalContext); err != nil {
-			return nil, err
-		} else if ok {
-			endExpr = reducedExpr
-		}
-
 		stm.To = endExpr
 	}
 

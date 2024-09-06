@@ -331,14 +331,14 @@ func IsValue(val ast.Expr) bool {
 	return false
 }
 
-func EvaluateExprInBooleanContext(anyexpr ast.Expr, context *Context) (ast.Value, error) {
+func EvaluateExprInBooleanContext(anyexpr ast.Expr, scope *Scope) (ast.Value, error) {
 	switch expr := anyexpr.(type) {
 
 	case *ast.BinaryExpr:
-		return EvaluateBinaryExprInBooleanContext(expr, context)
+		return EvaluateBinaryExprInBooleanContext(expr, scope)
 
 	case *ast.UnaryExpr:
-		return EvaluateUnaryExprInBooleanContext(expr, context)
+		return EvaluateUnaryExprInBooleanContext(expr, scope)
 
 	default:
 		if bval, ok := expr.(ast.BooleanValue); ok {
@@ -348,7 +348,7 @@ func EvaluateExprInBooleanContext(anyexpr ast.Expr, context *Context) (ast.Value
 	return nil, nil
 }
 
-func EvaluateBinaryExprInBooleanContext(expr *ast.BinaryExpr, context *Context) (ast.Value, error) {
+func EvaluateBinaryExprInBooleanContext(expr *ast.BinaryExpr, scope *Scope) (ast.Value, error) {
 
 	var lval ast.Value
 	var rval ast.Value
@@ -356,13 +356,13 @@ func EvaluateBinaryExprInBooleanContext(expr *ast.BinaryExpr, context *Context) 
 
 	switch expr := expr.Left.(type) {
 	case *ast.UnaryExpr:
-		lval, err = EvaluateUnaryExprInBooleanContext(expr, context)
+		lval, err = EvaluateUnaryExprInBooleanContext(expr, scope)
 		if err != nil {
 			return nil, err
 		}
 
 	case *ast.BinaryExpr:
-		lval, err = EvaluateBinaryExprInBooleanContext(expr, context)
+		lval, err = EvaluateBinaryExprInBooleanContext(expr, scope)
 		if err != nil {
 			return nil, err
 		}
@@ -373,13 +373,13 @@ func EvaluateBinaryExprInBooleanContext(expr *ast.BinaryExpr, context *Context) 
 
 	switch expr := expr.Right.(type) {
 	case *ast.UnaryExpr:
-		rval, err = EvaluateUnaryExprInBooleanContext(expr, context)
+		rval, err = EvaluateUnaryExprInBooleanContext(expr, scope)
 		if err != nil {
 			return nil, err
 		}
 
 	case *ast.BinaryExpr:
-		rval, err = EvaluateBinaryExprInBooleanContext(expr, context)
+		rval, err = EvaluateBinaryExprInBooleanContext(expr, scope)
 		if err != nil {
 			return nil, err
 		}
@@ -394,18 +394,18 @@ func EvaluateBinaryExprInBooleanContext(expr *ast.BinaryExpr, context *Context) 
 	return nil, nil
 }
 
-func EvaluateUnaryExprInBooleanContext(expr *ast.UnaryExpr, context *Context) (ast.Value, error) {
+func EvaluateUnaryExprInBooleanContext(expr *ast.UnaryExpr, scope *Scope) (ast.Value, error) {
 	var val ast.Value
 	var err error
 
 	switch t := expr.Expr.(type) {
 	case *ast.BinaryExpr:
-		val, err = EvaluateBinaryExpr(t, context)
+		val, err = EvaluateBinaryExpr(t, scope)
 		if err != nil {
 			return nil, err
 		}
 	case *ast.UnaryExpr:
-		val, err = EvaluateUnaryExpr(t, context)
+		val, err = EvaluateUnaryExpr(t, scope)
 		if err != nil {
 			return nil, err
 		}
@@ -429,8 +429,7 @@ EvaluateExpr calls EvaluateBinaryExpr. except EvaluateExpr
 prevents calculate css slash as division.  otherwise it's the same as
 EvaluateBinaryExpr.
 */
-func EvaluateExpr(expr ast.Expr, context *Context) (ast.Value, error) {
-
+func EvaluateExpr(expr ast.Expr, scope *Scope) (ast.Value, error) {
 	switch t := expr.(type) {
 
 	case *ast.BinaryExpr:
@@ -439,11 +438,17 @@ func EvaluateExpr(expr ast.Expr, context *Context) (ast.Value, error) {
 			// return string object without quote
 			return ast.NewString(0, t.Left.(*ast.Number).String()+"/"+t.Right.(*ast.Number).String(), nil), nil
 		}
-		return EvaluateBinaryExpr(t, context)
+		return EvaluateBinaryExpr(t, scope)
 
 	case *ast.UnaryExpr:
-		return EvaluateUnaryExpr(t, context)
+		return EvaluateUnaryExpr(t, scope)
 
+	case *ast.Variable:
+		if val, err := scope.Lookup(t.NormalizedName()); err != nil {
+			return nil, err
+		} else {
+			return val, nil
+		}
 	default:
 		return ast.Value(expr), nil
 
@@ -465,27 +470,29 @@ func EvaluateFunctionCall(fcall ast.FunctionCall, context *Context) (ast.Value, 
 /*
 EvaluateBinaryExpr recursively.
 */
-func EvaluateBinaryExpr(expr *ast.BinaryExpr, context *Context) (ast.Value, error) {
-	var lval ast.Value = nil
-	var rval ast.Value = nil
+func EvaluateBinaryExpr(expr *ast.BinaryExpr, scope *Scope) (ast.Value, error) {
+	var lval ast.Value
+	var rval ast.Value
 	var err error
 
 	switch expr := expr.Left.(type) {
 
 	case *ast.BinaryExpr:
-		lval, err = EvaluateBinaryExpr(expr, context)
+		lval, err = EvaluateBinaryExpr(expr, scope)
 		if err != nil {
 			return nil, err
 		}
 
 	case *ast.UnaryExpr:
-		lval, err = EvaluateUnaryExpr(expr, context)
+		lval, err = EvaluateUnaryExpr(expr, scope)
 		if err != nil {
 			return nil, err
 		}
 
 	case *ast.Variable:
-		if varVal, ok := context.GetVariable(expr.Name); ok {
+		if varVal, err := scope.Lookup(expr.NormalizedName()); err != nil {
+			return nil, err
+		} else {
 			lval = varVal.(ast.Expr)
 		}
 
@@ -496,19 +503,21 @@ func EvaluateBinaryExpr(expr *ast.BinaryExpr, context *Context) (ast.Value, erro
 	switch expr := expr.Right.(type) {
 
 	case *ast.UnaryExpr:
-		rval, err = EvaluateUnaryExpr(expr, context)
+		rval, err = EvaluateUnaryExpr(expr, scope)
 		if err != nil {
 			return nil, err
 		}
 
 	case *ast.BinaryExpr:
-		rval, err = EvaluateBinaryExpr(expr, context)
+		rval, err = EvaluateBinaryExpr(expr, scope)
 		if err != nil {
 			return nil, err
 		}
 
 	case *ast.Variable:
-		if varVal, ok := context.GetVariable(expr.Name); ok {
+		if varVal, err := scope.Lookup(expr.NormalizedName()); err != nil {
+			return nil, err
+		} else {
 			rval = varVal.(ast.Expr)
 		}
 
@@ -522,24 +531,26 @@ func EvaluateBinaryExpr(expr *ast.BinaryExpr, context *Context) (ast.Value, erro
 	return nil, nil
 }
 
-func EvaluateUnaryExpr(expr *ast.UnaryExpr, context *Context) (ast.Value, error) {
-	var val ast.Value = nil
+func EvaluateUnaryExpr(expr *ast.UnaryExpr, scope *Scope) (ast.Value, error) {
+	var val ast.Value
 	var err error
 
 	switch t := expr.Expr.(type) {
 	case *ast.BinaryExpr:
-		val, err = EvaluateBinaryExpr(t, context)
+		val, err = EvaluateBinaryExpr(t, scope)
 		if err != nil {
 			return nil, err
 		}
 
 	case *ast.UnaryExpr:
-		val, err = EvaluateUnaryExpr(t, context)
+		val, err = EvaluateUnaryExpr(t, scope)
 		if err != nil {
 			return nil, err
 		}
 	case *ast.Variable:
-		if varVal, ok := context.GetVariable(t.Name); ok {
+		if varVal, err := scope.Lookup(t.NormalizedName()); err != nil {
+			return nil, err
+		} else {
 			val = varVal.(ast.Expr)
 		}
 	default:

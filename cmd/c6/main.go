@@ -31,7 +31,7 @@ func main() {
 			}
 
 			var b bytes.Buffer
-			var compiler = compiler.NewPrettyCompiler(context, &b)
+			var compiler = compiler.NewPrettyCompiler(&b)
 
 			err = compiler.Compile(stmts)
 
@@ -70,7 +70,7 @@ func main() {
 			}
 
 			var b bytes.Buffer
-			var compiler = compiler.NewPrettyCompiler(context, &b)
+			var compiler = compiler.NewPrettyCompiler(&b)
 
 			err = compiler.Compile(stmts)
 

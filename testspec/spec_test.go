@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,7 +34,7 @@ func writeFailuresListP(names map[string][][]string) {
 		for _, n := range n {
 			b.WriteString("\t\t\"")
 			b.WriteString(n[0])
-			b.WriteString(fmt.Sprintf("\": \"%s\",\n", n[1]))
+			b.WriteString(fmt.Sprintf("\": \"%s\",\n", strings.TrimSpace(n[1])))
 		}
 		b.WriteString("\t},\n")
 	}
