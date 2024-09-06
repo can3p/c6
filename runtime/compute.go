@@ -471,8 +471,8 @@ func EvaluateFunctionCall(fcall ast.FunctionCall, context *Context) (ast.Value, 
 EvaluateBinaryExpr recursively.
 */
 func EvaluateBinaryExpr(expr *ast.BinaryExpr, scope *Scope) (ast.Value, error) {
-	var lval ast.Value = nil
-	var rval ast.Value = nil
+	var lval ast.Value
+	var rval ast.Value
 	var err error
 
 	switch expr := expr.Left.(type) {
@@ -532,7 +532,7 @@ func EvaluateBinaryExpr(expr *ast.BinaryExpr, scope *Scope) (ast.Value, error) {
 }
 
 func EvaluateUnaryExpr(expr *ast.UnaryExpr, scope *Scope) (ast.Value, error) {
-	var val ast.Value = nil
+	var val ast.Value
 	var err error
 
 	switch t := expr.Expr.(type) {
