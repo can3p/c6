@@ -8,31 +8,43 @@
   a: b;
 }
 
-<===> basic/replace/input.scss
-a {
-  & {
-    h: x;
+<===> basic/multiple_sels/input.scss
+.foo, .bar {
+  a: b;
+}
+
+<===> basic/multiple_sels/output.css
+.foo, .bar {
+  a: b;
+}
+
+<===> basic/multiple_levels/input.scss
+.foo {
+  .bar {
+    a: b;
   }
 }
 
-<===> basic/replace/output.css
-a {
-  h: x;
+<===> basic/multiple_levels/output.css
+.foo .bar {
+  a: b;
 }
 
-<===> basic/catesian/input.scss
-a,b {
-  o: b;
-
-  c,d {
-    j: k;
-    e,f {
-      h: x;
+<===> basic/multiple_selectors/input.scss
+.foo, .bar {
+  .baz,  div {
+    span,  a {
+      a: b;
     }
   }
 }
 
-<===> basic/catesian/output.css
+<===> basic/multiple_selectors/output.css
+.foo .baz span, .foo .baz a, .foo div span, .foo div a, .bar .baz span, .bar .baz a, .bar div span, .bar div a {
+  a: b;
+}
+
+<===> basic/cartesian/output.css
 a, b {
   o: b;
 }

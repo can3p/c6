@@ -49,6 +49,7 @@ func expandRuleset(rs *ast.RuleSet) (*ast.StmtList, error) {
 				bl.AppendList(&ast.StmtList{
 					Stmts: collector,
 				})
+				nrs.Block = bl
 				out.Append(nrs)
 				collector = []ast.Stmt{}
 			}
@@ -59,11 +60,66 @@ func expandRuleset(rs *ast.RuleSet) (*ast.StmtList, error) {
 				return nil, err
 			}
 
-			out.AppendList(expanded)
+			for _, stmt := range expanded.Stmts {
+				t, ok := stmt.(*ast.RuleSet)
+
+				if !ok {
+					return nil, fmt.Errorf("Tree can only contain rule sets, but has variable of type %T", stmt)
+				}
+
+				childSel := t.Selectors
+				parentSel := rs.Selectors
+				bl := t.Block
+				resultList := &ast.ComplexSelectorList{}
+
+				for _, psel := range *parentSel {
+					for _, csel := range *childSel {
+						resSel, err := nestSelectors(psel, csel)
+						if err != nil {
+							return nil, err
+						}
+
+						resultList.Append(resSel)
+					}
+				}
+
+				nrs := ast.NewRuleSet()
+				nrs.Selectors = resultList
+				nrs.Block = bl
+				out.Append(nrs)
+			}
 		default:
 			return nil, fmt.Errorf("Unexpected node type in the expanded tree: %T", t)
 		}
 	}
+
+	if len(collector) > 0 {
+		nrs := ast.NewRuleSet()
+		nrs.Selectors = rs.Selectors
+		bl := ast.NewDeclBlock(nrs)
+		bl.AppendList(&ast.StmtList{
+			Stmts: collector,
+		})
+		nrs.Block = bl
+		out.Append(nrs)
+	}
+
+	return out, nil
+}
+
+// @TODO: we should make a copy of selectors there the moment we start mutating them
+func nestSelectors(parent, child *ast.ComplexSelector) (*ast.ComplexSelector, error) {
+	out := &ast.ComplexSelector{
+		CompoundSelector:     parent.CompoundSelector,
+		ComplexSelectorItems: []*ast.ComplexSelectorItem{},
+	}
+
+	out.ComplexSelectorItems = append(out.ComplexSelectorItems, parent.ComplexSelectorItems...)
+	out.ComplexSelectorItems = append(out.ComplexSelectorItems, &ast.ComplexSelectorItem{
+		Combinator:       ast.NewDescendantCombinator(),
+		CompoundSelector: child.CompoundSelector,
+	})
+	out.ComplexSelectorItems = append(out.ComplexSelectorItems, child.ComplexSelectorItems...)
 
 	return out, nil
 }

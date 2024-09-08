@@ -1,6 +1,7 @@
 package ast
 
-/**
+/*
+*
 @see http://www.w3.org/TR/CSS21/grammar.html
 
 UniversalSelector
@@ -14,7 +15,8 @@ type Selector interface {
 	String() string
 }
 
-/**
+/*
+*
 TypeSelector
 */
 type TypeSelector struct {

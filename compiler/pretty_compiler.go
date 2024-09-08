@@ -120,5 +120,11 @@ func (c *PrettyCompiler) Compile(list *ast.StmtList) error {
 		return err
 	}
 
-	return c.CompileStmtList(executed)
+	expanded, err := runtime.ExpandTree(executed)
+
+	if err != nil {
+		return err
+	}
+
+	return c.CompileStmtList(expanded)
 }
