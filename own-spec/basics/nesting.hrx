@@ -44,6 +44,18 @@
   a: b;
 }
 
+<===> basic/cartesian/input.scss
+a,b {
+  o: b;
+
+  c,d {
+    j: k;
+    e,f {
+      h: x;
+    }
+  }
+}
+
 <===> basic/cartesian/output.css
 a, b {
   o: b;
@@ -52,6 +64,35 @@ a c, a d, b c, b d {
   j: k;
 }
 a c e, a c f, a d e, a d f, b c e, b c f, b d e, b d f {
+  h: x;
+}
+
+<===> basic/compound_diff_levels/input.scss
+.foo > {
+  .baz {
+    ~ {
+      a {
+        a: b;
+      }
+    }
+  }
+}
+
+<===> basic/compound_diff_levels/output.css
+.foo > .baz ~ a {
+  a: b;
+}
+
+
+<===> basic/replace/input.scss
+a {
+  & {
+    h: x;
+  }
+}
+
+<===> basic/replace/output.css
+a {
   h: x;
 }
 
