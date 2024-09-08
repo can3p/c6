@@ -28,56 +28,74 @@ func AssertPrettyCompile(t *testing.T, code string, expected string) {
 
 func TestPrettyCompileUniversalSelector(t *testing.T) {
 	AssertPrettyCompile(t,
-		`* { }`,
-		`* {}`)
+		`* {font-weight: bold; }`,
+		`* {
+  font-weight: bold;
+}`)
 }
 
 func TestPrettyCompileClassSelector(t *testing.T) {
 	AssertPrettyCompile(t,
-		`.foo-bar { }`,
-		`.foo-bar {}`)
+		`.foo-bar {font-weight: bold; }`,
+		`.foo-bar {
+  font-weight: bold;
+}`)
 }
 
 func TestPrettyCompileIdSelector(t *testing.T) {
 	AssertPrettyCompile(t,
-		`#myId { }`,
-		`#myId {}`)
+		`#myId {font-weight: bold; }`,
+		`#myId {
+  font-weight: bold;
+}`)
 }
 
 func TestPrettyCompileAttributeSelector(t *testing.T) {
 	AssertPrettyCompile(t,
-		`[type=text] { }`,
-		`[type=text] {}`)
+		`[type=text] {font-weight: bold; }`,
+		`[type=text] {
+  font-weight: bold;
+}`)
 }
 
 func TestPrettyCompileAttributeSelectorWithTypeName(t *testing.T) {
 	AssertPrettyCompile(t,
-		`input[type=text] { }`,
-		`input[type=text] {}`)
+		`input[type=text] {font-weight: bold; }`,
+		`input[type=text] {
+  font-weight: bold;
+}`)
 }
 
 func TestPrettyCompileSelectorGroup(t *testing.T) {
 	AssertPrettyCompile(t,
-		`html, span, div { }`,
-		`html, span, div {}`)
+		`html, span, div {font-weight: bold; }`,
+		`html, span, div {
+  font-weight: bold;
+}`)
 }
 
 func TestPrettyCompileCompoundSelector1(t *testing.T) {
 	AssertPrettyCompile(t,
-		`*.foo.bar { }`,
-		`*.foo.bar {}`)
+		`*.foo.bar {font-weight: bold; }`,
+		`*.foo.bar {
+  font-weight: bold;
+}`)
 }
 
 func TestPrettyCompileCompoundSelector2(t *testing.T) {
 	AssertPrettyCompile(t,
-		`div.foo.bar[href$=pdf] { }`,
-		`div.foo.bar[href$=pdf] {}`)
+		`div.foo.bar[href$=pdf] {font-weight: bold; }`,
+		`div.foo.bar[href$=pdf] {
+  font-weight: bold;
+}`)
 }
 
 func TestPrettyCompileComplexSelector(t *testing.T) {
 	AssertPrettyCompile(t,
-		`*.foo.bar > .posts { }`,
-		`*.foo.bar > .posts {}`)
+		`*.foo.bar > .posts {font-weight: bold; }`,
+		`*.foo.bar > .posts {
+  font-weight: bold;
+}`)
 }
 
 func TestPrettyCompileMultipleDeclarations(t *testing.T) {
