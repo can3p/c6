@@ -54,40 +54,33 @@ func expandRuleset(rs *ast.RuleSet) (*ast.StmtList, error) {
 				collector = []ast.Stmt{}
 			}
 
-			expanded, err := expandRuleset(t)
+			childSel := t.Selectors
+			parentSel := rs.Selectors
+			bl := t.Block
+			resultList := &ast.ComplexSelectorList{}
+
+			for _, psel := range *parentSel {
+				for _, csel := range *childSel {
+					resSel, err := ast.JoinSelectors(psel, csel)
+					if err != nil {
+						return nil, err
+					}
+
+					resultList.Append(resSel)
+				}
+			}
+
+			nrs := ast.NewRuleSet()
+			nrs.Selectors = resultList
+			nrs.Block = bl
+
+			expanded, err := expandRuleset(nrs)
 
 			if err != nil {
 				return nil, err
 			}
 
-			for _, stmt := range expanded.Stmts {
-				t, ok := stmt.(*ast.RuleSet)
-
-				if !ok {
-					return nil, fmt.Errorf("Tree can only contain rule sets, but has variable of type %T", stmt)
-				}
-
-				childSel := t.Selectors
-				parentSel := rs.Selectors
-				bl := t.Block
-				resultList := &ast.ComplexSelectorList{}
-
-				for _, psel := range *parentSel {
-					for _, csel := range *childSel {
-						resSel, err := ast.JoinSelectors(psel, csel)
-						if err != nil {
-							return nil, err
-						}
-
-						resultList.Append(resSel)
-					}
-				}
-
-				nrs := ast.NewRuleSet()
-				nrs.Selectors = resultList
-				nrs.Block = bl
-				out.Append(nrs)
-			}
+			out.AppendList(expanded)
 		default:
 			return nil, fmt.Errorf("Unexpected node type in the expanded tree: %T", t)
 		}

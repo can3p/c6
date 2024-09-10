@@ -96,4 +96,18 @@ a.cl {
   h: x;
 }
 
+<===> basic/multiple_levels_acc/input.scss
+a {
+  b {
+    c & {
+      d: e;
+    }
+  }
+}
+
+<===> basic/multiple_levels_acc/output.css
+c a b {
+  d: e;
+}
+
 <===>
