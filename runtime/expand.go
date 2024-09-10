@@ -74,7 +74,7 @@ func expandRuleset(rs *ast.RuleSet) (*ast.StmtList, error) {
 
 				for _, psel := range *parentSel {
 					for _, csel := range *childSel {
-						resSel, err := nestSelectors(psel, csel)
+						resSel, err := ast.JoinSelectors(psel, csel)
 						if err != nil {
 							return nil, err
 						}
@@ -103,23 +103,6 @@ func expandRuleset(rs *ast.RuleSet) (*ast.StmtList, error) {
 		nrs.Block = bl
 		out.Append(nrs)
 	}
-
-	return out, nil
-}
-
-// @TODO: we should make a copy of selectors there the moment we start mutating them
-func nestSelectors(parent, child *ast.ComplexSelector) (*ast.ComplexSelector, error) {
-	out := &ast.ComplexSelector{
-		CompoundSelector:     parent.CompoundSelector,
-		ComplexSelectorItems: []*ast.ComplexSelectorItem{},
-	}
-
-	out.ComplexSelectorItems = append(out.ComplexSelectorItems, parent.ComplexSelectorItems...)
-	out.ComplexSelectorItems = append(out.ComplexSelectorItems, &ast.ComplexSelectorItem{
-		Combinator:       ast.NewDescendantCombinator(),
-		CompoundSelector: child.CompoundSelector,
-	})
-	out.ComplexSelectorItems = append(out.ComplexSelectorItems, child.ComplexSelectorItems...)
 
 	return out, nil
 }

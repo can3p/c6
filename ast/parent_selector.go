@@ -4,15 +4,13 @@ package ast
 This is a SCSS only selector
 */
 type ParentSelector struct {
-	ParentRuleSet *RuleSet
-	Token         *Token
+	Token *Token
 }
 
 func (self ParentSelector) String() string {
-	// TODO: get parent rule set and render the selector...
-	return "ParentSelector.String()"
+	return "&"
 }
 
-func NewParentSelectorWithToken(parentRuleSet *RuleSet, token *Token) *ParentSelector {
-	return &ParentSelector{parentRuleSet, token}
+func NewParentSelectorWithToken(token *Token) *ParentSelector {
+	return &ParentSelector{token}
 }

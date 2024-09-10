@@ -86,13 +86,13 @@ a c e, a c f, a d e, a d f, b c e, b c f, b d e, b d f {
 
 <===> basic/replace/input.scss
 a {
-  & {
+  &.cl {
     h: x;
   }
 }
 
 <===> basic/replace/output.css
-a {
+a.cl {
   h: x;
 }
 

@@ -332,7 +332,7 @@ func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet) (ast.Selec
 
 	case ast.T_PARENT_SELECTOR:
 
-		return ast.NewParentSelectorWithToken(parentRuleSet, tok), nil
+		return ast.NewParentSelectorWithToken(tok), nil
 
 	case ast.T_FUNCTIONAL_PSEUDO:
 
