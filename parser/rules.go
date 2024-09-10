@@ -135,6 +135,8 @@ func (parser *Parser) ParseStmt() (ast.Stmt, error) {
 		return parser.ParseWhileStmt()
 	case ast.T_CONTENT:
 		return parser.ParseContentStmt()
+	case ast.T_AT_ROOT:
+		return parser.ParseAtRootStmt()
 	case ast.T_ERROR, ast.T_WARN, ast.T_INFO:
 		return parser.ParseLogStmt()
 	case ast.T_BRACKET_CLOSE:
@@ -2117,4 +2119,41 @@ func (parser *Parser) ParseContentStmt() (ast.Stmt, error) {
 	}
 
 	return ast.NewContentStmtWithToken(tok), nil
+}
+
+/*
+@content directive is only allowed in mixin block
+*/
+func (parser *Parser) ParseAtRootStmt() (ast.Stmt, error) {
+	tok, err := parser.expect(ast.T_AT_ROOT)
+	if err != nil {
+		return nil, err
+	}
+
+	stm := ast.NewAtRootStmtWithToken(tok)
+
+	tok = parser.peek()
+
+	if tok.IsSelector() {
+		sel, err := parser.ParseComplexSelector(nil)
+
+		if err != nil {
+			return nil, err
+		}
+
+		stm.Selector = sel
+	} else if tok.Type == ast.T_PAREN_OPEN {
+		return nil, SyntaxError{
+			Reason:      "@at-root does not support expressions like (without: media) yet",
+			ActualToken: parser.peek(),
+		}
+	}
+
+	bl, err := parser.ParseDeclBlock()
+	if err != nil {
+		return nil, err
+	}
+	stm.Block = bl
+
+	return stm, nil
 }
