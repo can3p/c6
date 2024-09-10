@@ -304,7 +304,7 @@ func (parser *Parser) ParseComparisonExpr() (ast.Expr, error) {
 	return expr, nil
 }
 
-func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet) (ast.Selector, error) {
+func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet, pos int) (ast.Selector, error) {
 	debug("ParseSimpleSelector")
 
 	var tok = parser.next()
@@ -331,6 +331,13 @@ func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet) (ast.Selec
 		return ast.NewClassSelectorWithToken(tok), nil
 
 	case ast.T_PARENT_SELECTOR:
+		if pos > 0 {
+			return nil, SyntaxError{
+				Reason:      `"&" may only used at the beginning of a compound selector.`,
+				ActualToken: parser.peek(),
+				File:        parser.File,
+			}
+		}
 
 		return ast.NewParentSelectorWithToken(tok), nil
 
@@ -393,9 +400,12 @@ func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet) (ast.Selec
 }
 
 func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) (*ast.CompoundSelector, error) {
+	debug("ParseCompoundSelector")
+
 	var sels = ast.NewCompoundSelector()
+	idx := 0
 	for {
-		sel, err := parser.ParseSimpleSelector(parentRuleSet)
+		sel, err := parser.ParseSimpleSelector(parentRuleSet, idx)
 
 		if err != nil {
 			return nil, err
@@ -403,6 +413,7 @@ func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) (*ast.Co
 
 		if sel != nil {
 			sels.Append(sel)
+			idx++
 		} else {
 			break
 		}
