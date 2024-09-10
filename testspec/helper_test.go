@@ -64,8 +64,33 @@ func RunSpecs(t *testing.T, hrxPath string, testFiles []string, testOnly string,
 				var context = runtime.NewContext()
 				var parser = parser.NewParser(context)
 
-				var stmts, err = parser.ParseFile(archive, input)
-				if !assert.NoErrorf(t, err, "[example %s] Input: %s, parse failed", fname, input) {
+				baseName := path.Dir(input)
+				errFname := path.Join(baseName, "error")
+				warnFname := path.Join(baseName, "warning")
+				outputFname := path.Join(baseName, "output.css")
+
+				var expectedError string
+
+				if _, err := fs.Stat(archive, errFname); err == nil {
+					expected, err := fs.ReadFile(archive, errFname)
+
+					require.NoErrorf(t, err, "[example %s] Input: %s", fname, errFname)
+					expectedError = string(expected)
+				}
+
+				var stmts, parseErr = parser.ParseFile(archive, input)
+				if parseErr != nil {
+					if expectedError != "" {
+						if !assert.Equalf(t, expectedError, parseErr.Error(), "[example %s] Input: %s", fname, errFname) {
+							addFailure(fname, input, "parser_error_does_not_match")
+						} else {
+							reportSuccess(fname, input)
+						}
+
+						return
+					}
+
+					assert.NoErrorf(t, parseErr, "[example %s] Input: %s, parse failed", fname, input)
 					addFailure(fname, input, "parse_failure")
 					return
 				}
@@ -75,11 +100,6 @@ func RunSpecs(t *testing.T, hrxPath string, testFiles []string, testOnly string,
 
 				compileErr := compiler.Compile(stmts)
 
-				baseName := path.Dir(input)
-				errFname := path.Join(baseName, "error")
-				warnFname := path.Join(baseName, "warning")
-				outputFname := path.Join(baseName, "output.css")
-
 				if _, err := fs.Stat(archive, warnFname); err == nil {
 					if !assert.True(t, false, "[example %s] Input: %s - warning is expected, but we don't handle that yet", fname, input) {
 						addFailure(fname, input, "unhandled_warning")
@@ -87,16 +107,13 @@ func RunSpecs(t *testing.T, hrxPath string, testFiles []string, testOnly string,
 					}
 				}
 
-				if _, err := fs.Stat(archive, errFname); err == nil {
+				if expectedError != "" {
 					if !assert.Errorf(t, compileErr, "[example %s] Input: %s", fname, input) {
 						addFailure(fname, input, "compiler_should_have_errored")
 						return
 					}
 
-					expected, err := fs.ReadFile(archive, errFname)
-
-					if !assert.NoErrorf(t, err, "[example %s] Input: %s", fname, errFname) ||
-						!assert.Equalf(t, string(expected), compileErr.Error(), "[example %s] Input: %s", fname, errFname) {
+					if !assert.Equalf(t, expectedError, compileErr.Error(), "[example %s] Input: %s", fname, errFname) {
 						addFailure(fname, input, "compiler_error_does_not_match")
 						return
 					}
