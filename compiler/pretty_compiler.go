@@ -97,10 +97,24 @@ func (c *PrettyCompiler) CompileStmtList(list *ast.StmtList) error {
 	for idx, stm := range list.Stmts {
 		if idx > 0 {
 			c.printNewline()
-			c.printNewline()
 		}
 
 		if err := c.CompileStmt(stm); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *PrettyCompiler) CompileRoot(list []*ast.StmtList) error {
+	for idx, stm := range list {
+		if idx > 0 {
+			c.printNewline()
+			c.printNewline()
+		}
+
+		if err := c.CompileStmtList(stm); err != nil {
 			return err
 		}
 	}
@@ -126,5 +140,5 @@ func (c *PrettyCompiler) Compile(list *ast.StmtList) error {
 		return err
 	}
 
-	return c.CompileStmtList(expanded)
+	return c.CompileRoot(expanded)
 }

@@ -6,8 +6,8 @@ import (
 	"github.com/c9s/c6/ast"
 )
 
-func ExpandTree(stmts *ast.StmtList) (*ast.StmtList, error) {
-	out := &ast.StmtList{}
+func ExpandTree(stmts *ast.StmtList) ([]*ast.StmtList, error) {
+	out := []*ast.StmtList{}
 
 	for _, stmt := range stmts.Stmts {
 		t, ok := stmt.(*ast.RuleSet)
@@ -22,7 +22,7 @@ func ExpandTree(stmts *ast.StmtList) (*ast.StmtList, error) {
 			return nil, err
 		}
 
-		out.AppendList(ret)
+		out = append(out, ret)
 	}
 
 	return out, nil
