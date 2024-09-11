@@ -429,14 +429,15 @@ EvaluateExpr calls EvaluateBinaryExpr. except EvaluateExpr
 prevents calculate css slash as division.  otherwise it's the same as
 EvaluateBinaryExpr.
 */
-func EvaluateExpr(expr ast.Expr, scope *Scope) (ast.Value, error) {
+func EvaluateExpr(expr ast.Expr, scope *Scope) (v ast.Value, err error) {
 	switch t := expr.(type) {
 
 	case *ast.BinaryExpr:
 		// For binary expression that is a CSS slash, we evaluate the expression as a literal string (unquoted)
 		if t.IsCssSlash() {
 			// return string object without quote
-			return ast.NewString(0, t.Left.(*ast.Number).String()+"/"+t.Right.(*ast.Number).String(), nil), nil
+			s := ast.NewString(0, t.Left.String()+"/"+t.Right.String(), nil)
+			return s, nil
 		}
 		return EvaluateBinaryExpr(t, scope)
 
