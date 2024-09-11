@@ -4363,7 +4363,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"error/syntax/eof_after_bang/input.scss": "parser_error_does_not_match",
 	},
 	"css/keyframes.hrx": {
-		"bubble/empty/input.scss": "compiler_output_does_not_match",
+		"bubble/empty/input.scss": "compiler_panic",
 		"bubble/in-mixin/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 		"bubble/rules/input.scss": "compiler_output_does_not_match",
 		"error/in_keyframe_block/style_rule/input.scss": "compiler_should_have_errored",
@@ -4807,18 +4807,18 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"leading/single/sibling/input.scss": "parse_failure",
 	},
 	"css/selector/combinator/leading.hrx": {
-		"multiple/no_whitespace/input.scss": "parse_failure",
-		"multiple/whitespace/input.scss": "parse_failure",
-		"single/child/input.scss": "parse_failure",
-		"single/next_sibling/input.scss": "parse_failure",
+		"multiple/no_whitespace/input.scss": "unhandled_warning",
+		"multiple/whitespace/input.scss": "unhandled_warning",
+		"single/child/input.scss": "unhandled_warning",
+		"single/next_sibling/input.scss": "unhandled_warning",
 		"single/sibling/input.scss": "parse_failure",
 	},
 	"css/selector/combinator/middle.hrx": {
-		"multiple/no_whitespace/input.scss": "parse_failure",
-		"multiple/whitespace/input.scss": "parse_failure",
+		"multiple/no_whitespace/input.scss": "unhandled_warning",
+		"multiple/whitespace/input.scss": "unhandled_warning",
 	},
 	"css/selector/combinator/only_one_bogus.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"css/selector/combinator/selector_pseudo.hrx": {
 		"leading/multiple/input.scss": "parse_failure",
@@ -4835,11 +4835,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"trailing/single/sibling/input.scss": "parse_failure",
 	},
 	"css/selector/combinator/trailing.hrx": {
-		"multiple/no_whitespace/input.scss": "parse_failure",
-		"multiple/whitespace/input.scss": "parse_failure",
-		"single/child/input.scss": "parse_failure",
-		"single/next_sibling/input.scss": "parse_failure",
-		"single/sibling/input.scss": "parse_failure",
+		"multiple/no_whitespace/input.scss": "unhandled_warning",
+		"multiple/whitespace/input.scss": "unhandled_warning",
+		"single/child/input.scss": "unhandled_warning",
+		"single/next_sibling/input.scss": "unhandled_warning",
+		"single/sibling/input.scss": "unhandled_warning",
 	},
 	"css/selector/escaping.hrx": {
 		"dollar_char/input.scss": "parse_failure",
@@ -4869,7 +4869,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"pseudoselectors/where/with_real/input.scss": "compiler_output_does_not_match",
 	},
 	"css/selector/pseudoselector.hrx": {
-		"nested/adjacent_combinators/input.scss": "parse_failure",
+		"nested/adjacent_combinators/input.scss": "compiler_output_does_not_match",
 	},
 	"css/selector/reference_combinator.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -4882,7 +4882,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"declaration/comment/after_value/silent/input.scss": "parse_failure",
 		"declaration/interleaved/after_nested_rule/input.scss": "unhandled_warning",
 		"declaration/interleaved/around_nested_rule/input.scss": "unhandled_warning",
-		"declaration/interleaved/before_nested_rule/input.scss": "compiler_output_does_not_match",
 		"declaration/interleaved/in_at_rule/input.scss": "unhandled_warning",
 		"declaration/interleaved/in_bubbled_rule/input.scss": "compiler_output_does_not_match",
 	},
@@ -4946,7 +4945,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"loud_comment/input.scss": "compiler_output_does_not_match",
 		"media/in_style_rule/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
 		"media/top/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
-		"style_rule/input.scss": "compiler_output_does_not_match",
+		"style_rule/input.scss": "compiler_panic",
 		"supports/input.scss": "compiler_output_does_not_match",
 	},
 	"css/supports/syntax/anything.hrx": {
@@ -5070,12 +5069,26 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"escape/non_ascii/input.scss": "compiler_output_does_not_match",
 	},
 	"directives/at_root.hrx": {
+		"comment/after_colon/loud/input.scss": "parse_failure",
+		"comment/after_colon/silent/input.scss": "parse_failure",
+		"comment/after_open_paren/loud/input.scss": "parse_failure",
+		"comment/after_open_paren/silent/input.scss": "parse_failure",
+		"comment/after_query/loud/input.scss": "parse_failure",
+		"comment/after_query/silent/input.scss": "parse_failure",
+		"comment/before_close_paren/loud/input.scss": "parse_failure",
+		"comment/before_close_paren/silent/input.scss": "parse_failure",
+		"comment/before_colon/loud/input.scss": "parse_failure",
+		"comment/before_colon/silent/input.scss": "parse_failure",
+		"comment/before_query/loud/input.scss": "parse_failure",
+		"comment/before_query/silent/input.scss": "parse_failure",
+		"comment/no_query/loud/input.scss": "parse_failure",
+		"comment/no_query/silent/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 0, offset 0",
 		"keyframes/all/input.scss": "compiler_output_does_not_match",
 		"load_css/input.scss": "compiler_output_does_not_match",
 		"nested_import/with_builtin_use/input.scss": "parse_failure",
 		"nested_import/with_no_use/input.scss": "parse_failure",
 		"nested_import/with_user_use/input.scss": "parse_failure",
-		"property_only/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement print",
+		"property_only/input.scss": "parse_failure",
 	},
 	"directives/extend/after_target.hrx": {
 		"multiple_recursive/input.scss": "parse_failure",
@@ -5196,7 +5209,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"after/at_rule/unknown/input.scss": "compiler_should_have_errored",
 		"after/indented/include/input.sass": "parser_error_does_not_match",
 		"after/indented/mixin/input.sass": "parser_error_does_not_match",
-		"after/style_rule/input.scss": "compiler_should_have_errored",
+		"after/style_rule/input.scss": "compiler_panic",
 		"as/asterisk/input.scss": "compiler_should_have_errored",
 		"as/invalid/input.scss": "compiler_should_have_errored",
 		"as/no_star/input.scss": "compiler_should_have_errored",
@@ -5225,7 +5238,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"with/space_after_dollar/input.scss": "compiler_should_have_errored",
 		"within/function/input.scss": "compiler_error_does_not_match",
 		"within/mixin/input.scss": "compiler_error_does_not_match",
-		"within/style_rule/input.scss": "compiler_should_have_errored",
+		"within/style_rule/input.scss": "compiler_panic",
 	},
 	"directives/forward/error/with.hrx": {
 		"conflict/input.scss": "compiler_should_have_errored",
@@ -5662,7 +5675,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"at_rule/unknown/input.scss": "compiler_should_have_errored",
 		"indented/include/input.sass": "parser_error_does_not_match",
 		"indented/mixin/input.sass": "parser_error_does_not_match",
-		"style_rule/input.scss": "compiler_should_have_errored",
+		"style_rule/input.scss": "compiler_panic",
 	},
 	"directives/use/error/syntax/as_invalid.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -5708,7 +5721,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"directives/use/error/syntax/within.hrx": {
 		"function/input.scss": "parser_error_does_not_match",
 		"mixin/input.scss": "compiler_error_does_not_match",
-		"style_rule/input.scss": "compiler_should_have_errored",
+		"style_rule/input.scss": "compiler_panic",
 	},
 	"directives/use/error/with.hrx": {
 		"conflict/input.scss": "compiler_should_have_errored",
@@ -5927,13 +5940,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1043.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1060.hrx": {
 		"input.scss": "unhandled_warning",
-	},
-	"libsass-closed-issues/issue_1061.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1063.hrx": {
 		"input.scss": "parse_failure",
@@ -6091,29 +6101,26 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_1207.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"libsass-closed-issues/issue_1208.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_1210/ampersand.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1210/basic.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 3, offset 24",
 	},
 	"libsass-closed-issues/issue_1210/extend.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1210/keyframes.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 3, offset 23",
 	},
 	"libsass-closed-issues/issue_1210/media.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 1, offset 8",
 	},
 	"libsass-closed-issues/issue_1210/nested.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 6, offset 54",
 	},
 	"libsass-closed-issues/issue_1210/with_without.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1215.hrx": {
 		"input.scss": "parse_failure",
@@ -6176,7 +6183,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1263.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_1266/max.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -6218,7 +6225,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1297.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1298.hrx": {
 		"input.scss": "parse_failure",
@@ -6352,18 +6359,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_1440.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass-closed-issues/issue_1441/adjacent.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_1441/child.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_1441/sibling.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass-closed-issues/issue_1448.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_1452.hrx": {
 		"input.scss": "compiler_should_have_errored",
 	},
@@ -6374,7 +6369,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1484.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_1486.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
@@ -6404,7 +6399,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass-closed-issues/issue_1527/selector/only.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_1535.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -6464,10 +6459,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1584.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1585.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1590/ampersand-against-literal.hrx": {
 		"input.scss": "parse_failure",
@@ -6482,7 +6477,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1601.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_1604.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -6533,10 +6528,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1651/with.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1651/without.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1654/basic.hrx": {
 		"input.scss": "parse_failure",
@@ -6710,7 +6705,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1822.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1825.hrx": {
 		"input.scss": "parse_failure",
@@ -6737,13 +6732,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all",
 	},
 	"libsass-closed-issues/issue_1873.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1889.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1890.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1898.hrx": {
 		"input.scss": "parse_failure",
@@ -6965,7 +6960,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2198.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2200.hrx": {
 		"input.scss": "parse_failure",
@@ -7073,7 +7068,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_2358.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2360.hrx": {
 		"input.sass": "parse_failure",
@@ -7109,7 +7104,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2444.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_246.hrx": {
 		"input.scss": "unhandled_warning",
@@ -7553,7 +7548,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_883.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_884.hrx": {
 		"input.scss": "parse_failure",
@@ -7595,7 +7590,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_976.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_978.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -7679,7 +7674,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-todo-issues/issue_238764.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-todo-issues/issue_2818.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -7700,10 +7695,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/at-root/135_test_simple_at_root.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 1, offset 9",
 	},
 	"libsass/at-root/136_test_at_root_with_selector.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 1, offset 9",
 	},
 	"libsass/at-root/137_test_at_root_in_mixin.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
@@ -7718,34 +7713,34 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/at-root/141_test_at_root_with_parent_ref.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 1, offset 9",
 	},
 	"libsass/at-root/142_test_multi_level_at_root_with_parent_ref.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 1, offset 9",
 	},
 	"libsass/at-root/143_test_multi_level_at_root_with_inner_parent_ref.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 1, offset 9",
 	},
 	"libsass/at-root/ampersand.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass/at-root/basic.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 3, offset 24",
 	},
 	"libsass/at-root/extend.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass/at-root/keyframes.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 3, offset 23",
 	},
 	"libsass/at-root/media.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 1, offset 8",
 	},
 	"libsass/at-root/nested.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 6, offset 54",
 	},
 	"libsass/at-root/with_without.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"input.scss": "parse_failure",
 	},
 	"libsass/at-stuff.hrx": {
 		"input.scss": "unhandled_warning",
@@ -7787,58 +7782,52 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/nested/at-root-alone-itpl.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass/base-level-parent/nested/at-root-alone.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 1, offset 10",
 	},
 	"libsass/base-level-parent/nested/at-root-postfix-itpl.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass/base-level-parent/nested/at-root-postfix.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 1, offset 10",
 	},
 	"libsass/base-level-parent/nested/at-root-prefix-itpl.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass/base-level-parent/nested/at-root-prefix.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass/base-level-parent/nested/basic-alone-itpl.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass/base-level-parent/nested/basic-alone.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass/base-level-parent/nested/basic-postfix-itpl.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"libsass/base-level-parent/nested/basic-postfix.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/base-level-parent/nested/basic-prefix-itpl.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"libsass/base-level-parent/nested/basic-prefix.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass/base-level-parent/root/at-root-alone-itpl.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass/base-level-parent/root/at-root-alone.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/root/at-root-postfix-itpl.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass/base-level-parent/root/at-root-postfix.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/root/at-root-prefix-itpl.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "parse_failure",
 	},
 	"libsass/base-level-parent/root/at-root-prefix.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass/base-level-parent/root/basic-alone-itpl.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -7856,7 +7845,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/base-level-parent/root/basic-prefix.hrx": {
-		"input.scss": "compiler_should_have_errored",
+		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass/basic/44_not_number_expression.hrx": {
 		"input.scss": "parse_failure",
@@ -8002,20 +7991,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass/multi-blocks.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass/parent-selector/basic.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"libsass/parent-selector/inner-combinator.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass/parent-selector/inner-pseudo.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/parent-selector/missing.hrx": {
 		"input.scss": "compiler_should_have_errored",
-	},
-	"libsass/parent-selector/outer-combinator.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/parent-selector/outer-pseudo.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -8191,13 +8171,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass/wrapped-selector-whitespace.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"non_conformant/basic/02_simple_nesting.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/basic/04_basic_variables.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/basic/05_empty_levels.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/basic/06_nesting_and_comments.hrx": {
@@ -8208,12 +8182,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"non_conformant/basic/08_selector_combinators.hrx": {
 		"input.scss": "unhandled_warning",
-	},
-	"non_conformant/basic/09_selector_groups_and_combinators.hrx": {
-		"input.scss": "parse_failure",
-	},
-	"non_conformant/basic/10_classes_and_ids.hrx": {
-		"input.scss": "parse_failure",
 	},
 	"non_conformant/basic/11_attribute_selectors.hrx": {
 		"input.scss": "parse_failure",
@@ -8369,7 +8337,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_panic",
 	},
 	"non_conformant/errors/fn-debug/ruleset.hrx": {
-		"input.scss": "unhandled_warning",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/errors/fn-debug/simple.hrx": {
 		"input.scss": "unhandled_warning",
@@ -10249,7 +10217,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scope/nested.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scope/ruleset.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10323,23 +10291,8 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss-tests/031_test_line_comment_in_script.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"non_conformant/scss-tests/032_test_nested_rules.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss-tests/033_test_nested_rules.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss-tests/034_test_nested_rules.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss-tests/035_test_nested_rules_with_declarations.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss-tests/036_test_nested_rules_with_declarations.hrx": {
 		"input.scss": "unhandled_warning",
-	},
-	"non_conformant/scss-tests/037_test_nested_rules_with_declarations.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/038_test_nested_rules_with_fancy_selectors.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10353,9 +10306,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss-tests/041_test_newlines_in_selectors.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss-tests/042_test_newlines_in_selectors.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss-tests/043_test_newlines_in_selectors.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
@@ -10366,7 +10316,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/047_test_unknown_directive_bubbling.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"non_conformant/scss-tests/048_test_namespace_properties.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10560,9 +10510,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss-tests/177_test_prop_name_interpolation_after_hyphen.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss-tests/178_test_star_plus_and_parent.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss-tests/179_test_weird_added_space.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -10632,9 +10579,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss/block_comment_in_script.hrx": {
 		"input.scss": "compiler_panic",
 	},
-	"non_conformant/scss/classes-and-ids.hrx": {
-		"input.scss": "parse_failure",
-	},
 	"non_conformant/scss/color_output.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Undefined variable.",
 	},
@@ -10669,7 +10613,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/css_selector_hacks.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"non_conformant/scss/css_unary_ops.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10764,9 +10708,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss/line_comment_in_script.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"non_conformant/scss/long-selector.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss/media/interpolated.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -10826,12 +10767,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"non_conformant/scss/nested_namespace_properties.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"non_conformant/scss/nested_rules.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss/nested_rules_with_declarations.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/nested_rules_with_fancy_selectors.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10914,9 +10849,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss/simple-lists.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss/star_plus_and_parent.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss/strings.hrx": {
 		"input.scss": "compiler_panic",
 	},
@@ -10930,7 +10862,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/weird-selectors.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"non_conformant/scss/weird_added_space.hrx": {
 		"input.scss": "parse_failure",

@@ -34,27 +34,28 @@ var ForRangeKeywordTokenList = KeywordTokenList{
 
 // TODO: sort by frequency
 var KeywordList = []KeywordToken{
-	KeywordToken{"@else if", T_ELSE_IF},
-	KeywordToken{"@else", T_ELSE},
-	KeywordToken{"@if", T_IF},
-	KeywordToken{"@import", T_IMPORT},
-	KeywordToken{"@media", T_MEDIA},
-	KeywordToken{"@page", T_PAGE},
-	KeywordToken{"@return", T_RETURN},
-	KeywordToken{"@each", T_EACH},
-	KeywordToken{"@when", T_WHEN},
-	KeywordToken{"@include", T_INCLUDE},
-	KeywordToken{"@function", T_FUNCTION},
-	KeywordToken{"@mixin", T_MIXIN},
-	KeywordToken{"@font-face", T_FONT_FACE},
-	KeywordToken{"@for", T_FOR},
-	KeywordToken{"@error", T_ERROR},
-	KeywordToken{"@warn", T_WARN},
-	KeywordToken{"@info", T_INFO},
-	KeywordToken{"@while", T_WHILE},
-	KeywordToken{"@content", T_CONTENT},
-	KeywordToken{"@extend", T_EXTEND},
-	KeywordToken{"@namespace", T_NAMESPACE},
+	{"@else if", T_ELSE_IF},
+	{"@else", T_ELSE},
+	{"@if", T_IF},
+	{"@import", T_IMPORT},
+	{"@media", T_MEDIA},
+	{"@page", T_PAGE},
+	{"@return", T_RETURN},
+	{"@each", T_EACH},
+	{"@when", T_WHEN},
+	{"@include", T_INCLUDE},
+	{"@function", T_FUNCTION},
+	{"@mixin", T_MIXIN},
+	{"@font-face", T_FONT_FACE},
+	{"@for", T_FOR},
+	{"@error", T_ERROR},
+	{"@warn", T_WARN},
+	{"@info", T_INFO},
+	{"@while", T_WHILE},
+	{"@content", T_CONTENT},
+	{"@extend", T_EXTEND},
+	{"@namespace", T_NAMESPACE},
+	{"@at-root", T_AT_ROOT},
 }
 
 var ExprTokenList = KeywordTokenList{
@@ -112,7 +113,8 @@ type Token struct {
 
 type TokenStream chan *Token
 
-/**
+/*
+*
 Implement the stringer interface
 */
 func (tok Token) String() string {
@@ -263,6 +265,7 @@ const (
 	T_MIXIN    // for @mixin
 	T_EXTEND   // for @extend
 	T_FUNCTION // for @function
+	T_AT_ROOT  // for @at-root
 	T_WARN     // @warn
 	T_ERROR    // @error
 	T_INFO     // @info
@@ -338,7 +341,7 @@ const (
 	T_INTEGER
 	T_FLOAT
 
-	T_CDOPEN // for <!--
+	T_CDOPEN  // for <!--
 	T_CDCLOSE // for -->
 
 	/*

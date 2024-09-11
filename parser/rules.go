@@ -135,14 +135,15 @@ func (parser *Parser) ParseStmt() (ast.Stmt, error) {
 		return parser.ParseWhileStmt()
 	case ast.T_CONTENT:
 		return parser.ParseContentStmt()
+	case ast.T_AT_ROOT:
+		return parser.ParseAtRootStmt()
 	case ast.T_ERROR, ast.T_WARN, ast.T_INFO:
 		return parser.ParseLogStmt()
 	case ast.T_BRACKET_CLOSE:
 		return nil, nil
 	}
 
-	if token.IsSelector() {
-
+	if token.IsSelector() || token.IsSelectorCombinator() {
 		return parser.ParseRuleSet()
 	}
 
@@ -304,7 +305,7 @@ func (parser *Parser) ParseComparisonExpr() (ast.Expr, error) {
 	return expr, nil
 }
 
-func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet) (ast.Selector, error) {
+func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet, pos int) (ast.Selector, error) {
 	debug("ParseSimpleSelector")
 
 	var tok = parser.next()
@@ -331,8 +332,15 @@ func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet) (ast.Selec
 		return ast.NewClassSelectorWithToken(tok), nil
 
 	case ast.T_PARENT_SELECTOR:
+		if pos > 0 {
+			return nil, SyntaxError{
+				Reason:      `"&" may only used at the beginning of a compound selector.`,
+				ActualToken: parser.peek(),
+				File:        parser.File,
+			}
+		}
 
-		return ast.NewParentSelectorWithToken(parentRuleSet, tok), nil
+		return ast.NewParentSelectorWithToken(tok), nil
 
 	case ast.T_FUNCTIONAL_PSEUDO:
 
@@ -393,9 +401,12 @@ func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet) (ast.Selec
 }
 
 func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) (*ast.CompoundSelector, error) {
+	debug("ParseCompoundSelector")
+
 	var sels = ast.NewCompoundSelector()
+	idx := 0
 	for {
-		sel, err := parser.ParseSimpleSelector(parentRuleSet)
+		sel, err := parser.ParseSimpleSelector(parentRuleSet, idx)
 
 		if err != nil {
 			return nil, err
@@ -403,6 +414,7 @@ func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) (*ast.Co
 
 		if sel != nil {
 			sels.Append(sel)
+			idx++
 		} else {
 			break
 		}
@@ -416,19 +428,10 @@ func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) (*ast.Co
 func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.ComplexSelector, error) {
 	debug("ParseComplexSelector")
 
-	sel, err := parser.ParseCompoundSelector(parentRuleSet)
-	if err != nil {
-		return nil, err
-	}
-
-	if sel == nil {
-		return nil, nil
-	}
-
-	var complexSel = ast.NewComplexSelector(sel)
+	var complexSel = ast.NewComplexSelector()
 
 	for {
-		var tok = parser.next()
+		var tok = parser.peek()
 		if tok == nil {
 			return complexSel, nil
 		}
@@ -441,34 +444,36 @@ func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.Com
 		case ast.T_ADJACENT_SIBLING_COMBINATOR:
 
 			comb = ast.NewAdjacentCombinatorWithToken(tok)
+			parser.next()
 
 		case ast.T_CHILD_COMBINATOR:
 
 			comb = ast.NewChildCombinatorWithToken(tok)
+			parser.next()
 
 		case ast.T_DESCENDANT_COMBINATOR:
 
 			comb = ast.NewDescendantCombinatorWithToken(tok)
+			parser.next()
 
 		case ast.T_GENERAL_SIBLING_COMBINATOR:
 
 			comb = ast.NewGeneralSiblingCombinatorWithToken(tok)
+			parser.next()
 
 		default:
-			parser.backup()
-			return complexSel, nil
+			if len(complexSel.ComplexSelectorItems) > 0 {
+				return complexSel, nil
+			}
 		}
 
 		if sel, err := parser.ParseCompoundSelector(parentRuleSet); err != nil {
 			return nil, err
-		} else if sel != nil {
+		} else if sel != nil || comb != nil {
 			complexSel.AppendCompoundSelector(comb, sel)
 		} else {
-			return nil, SyntaxError{
-				Reason:      "Expecting a selector after the combinator.",
-				ActualToken: parser.peek(),
-				File:        parser.File,
-			}
+			// nothing found
+			return nil, nil
 		}
 	}
 }
@@ -2106,4 +2111,41 @@ func (parser *Parser) ParseContentStmt() (ast.Stmt, error) {
 	}
 
 	return ast.NewContentStmtWithToken(tok), nil
+}
+
+/*
+@content directive is only allowed in mixin block
+*/
+func (parser *Parser) ParseAtRootStmt() (ast.Stmt, error) {
+	tok, err := parser.expect(ast.T_AT_ROOT)
+	if err != nil {
+		return nil, err
+	}
+
+	stm := ast.NewAtRootStmtWithToken(tok)
+
+	tok = parser.peek()
+
+	if tok.IsSelector() {
+		sel, err := parser.ParseComplexSelector(nil)
+
+		if err != nil {
+			return nil, err
+		}
+
+		stm.Selector = sel
+	} else if tok.Type == ast.T_PAREN_OPEN {
+		return nil, SyntaxError{
+			Reason:      "@at-root does not support expressions like (without: media) yet",
+			ActualToken: parser.peek(),
+		}
+	}
+
+	bl, err := parser.ParseDeclBlock()
+	if err != nil {
+		return nil, err
+	}
+	stm.Block = bl
+
+	return stm, nil
 }

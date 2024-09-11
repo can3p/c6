@@ -129,6 +129,9 @@ func lexAtRule(l *Lexer) (stateFn, error) {
 		case ast.T_FONT_FACE:
 			return lexStart, nil
 
+		case ast.T_AT_ROOT:
+			return lexStart, nil
+
 		default:
 			var r = l.next()
 			for unicode.IsLetter(r) {

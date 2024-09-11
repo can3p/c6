@@ -23,5 +23,6 @@ func (self *RuleSet) GetSubRuleSets() []*RuleSet {
 func (self *RuleSet) CanBeStmt() {}
 
 func (self RuleSet) String() string {
-	return fmt.Sprintf("ruleset selector: %s, rules are %s", self.Selectors.String(), self.Block.String())
+	return fmt.Sprintf("ruleset selector: %s, rules are %s", self.Selectors, self.Block)
+	//return fmt.Sprintf("ruleset selector: %s, rules are %s", self.Selectors.String(), self.Block.String())
 }

@@ -3,8 +3,8 @@ package ast
 // one or more simple selector
 type CompoundSelector []Selector
 
-func (self *CompoundSelector) Append(sel Selector) {
-	var slice = append(*self, sel)
+func (self *CompoundSelector) Append(sel ...Selector) {
+	var slice = append(*self, sel...)
 	*self = slice
 }
 

@@ -8,4 +8,105 @@
   a: b;
 }
 
+<===> basic/multiple_sels/input.scss
+.foo, .bar {
+  a: b;
+}
+
+<===> basic/multiple_sels/output.css
+.foo, .bar {
+  a: b;
+}
+
+<===> basic/multiple_levels/input.scss
+.foo {
+  .bar {
+    a: b;
+  }
+}
+
+<===> basic/multiple_levels/output.css
+.foo .bar {
+  a: b;
+}
+
+<===> basic/multiple_selectors/input.scss
+.foo, .bar {
+  .baz,  div {
+    span,  a {
+      a: b;
+    }
+  }
+}
+
+<===> basic/multiple_selectors/output.css
+.foo .baz span, .foo .baz a, .foo div span, .foo div a, .bar .baz span, .bar .baz a, .bar div span, .bar div a {
+  a: b;
+}
+
+<===> basic/cartesian/input.scss
+a,b {
+  o: b;
+
+  c,d {
+    j: k;
+    e,f {
+      h: x;
+    }
+  }
+}
+
+<===> basic/cartesian/output.css
+a, b {
+  o: b;
+}
+a c, a d, b c, b d {
+  j: k;
+}
+a c e, a c f, a d e, a d f, b c e, b c f, b d e, b d f {
+  h: x;
+}
+
+<===> basic/compound_diff_levels/input.scss
+.foo > {
+  .baz {
+    + {
+      a {
+        a: b;
+      }
+    }
+  }
+}
+
+<===> basic/compound_diff_levels/output.css
+.foo > .baz + a {
+  a: b;
+}
+
+<===> basic/replace/input.scss
+a {
+  &.cl {
+    h: x;
+  }
+}
+
+<===> basic/replace/output.css
+a.cl {
+  h: x;
+}
+
+<===> basic/multiple_levels_acc/input.scss
+a {
+  b {
+    c & {
+      d: e;
+    }
+  }
+}
+
+<===> basic/multiple_levels_acc/output.css
+c a b {
+  d: e;
+}
+
 <===>
