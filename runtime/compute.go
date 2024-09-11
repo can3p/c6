@@ -449,6 +449,22 @@ func EvaluateExpr(expr ast.Expr, scope *Scope) (ast.Value, error) {
 		} else {
 			return val, nil
 		}
+
+	case *ast.List:
+		val := &ast.List{
+			Separator: t.Separator,
+		}
+
+		for _, expr := range t.Exprs {
+			evaluated, err := EvaluateExpr(expr, scope)
+			if err != nil {
+				return nil, err
+			}
+
+			val.Append(evaluated)
+		}
+
+		return val, nil
 	default:
 		return ast.Value(expr), nil
 
