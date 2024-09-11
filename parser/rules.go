@@ -472,7 +472,8 @@ func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.Com
 		} else if sel != nil || comb != nil {
 			complexSel.AppendCompoundSelector(comb, sel)
 		} else {
-			return complexSel, nil
+			// nothing found
+			return nil, nil
 		}
 	}
 }
