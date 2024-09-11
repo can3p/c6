@@ -75,6 +75,17 @@ func (self *BinaryExpr) IsCssSlash() bool {
 			return true
 		}
 	}
+
+	// we also can't divide if any part of the division is a string
+	if self.Op.Type == T_DIV {
+		_, aok := self.Left.(*String)
+		_, bok := self.Right.(*String)
+
+		// it's not grouped, we should inflate it as string
+		if aok || bok {
+			return true
+		}
+	}
 	// otherwise we can divide the value
 	return false
 }

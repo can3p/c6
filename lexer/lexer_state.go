@@ -211,7 +211,7 @@ CSS time unit
 @see https://developer.mozilla.org/zh-TW/docs/Web/CSS/time
 */
 func lexNumberUnit(l *Lexer) (stateFn, error) {
-	tok := l.matchKeywordList(ast.UnitTokenList)
+	tok := l.matchKeywordList(ast.UnitTokenList, true)
 
 	if tok == nil {
 		var r = l.next()

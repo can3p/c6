@@ -24,11 +24,11 @@ func lexExpr(l *Lexer) (stateFn, error) {
 		}
 	}
 
-	if l.matchKeywordList(ast.ExprTokenList) != nil {
+	if l.matchKeywordList(ast.ExprTokenList, true) != nil {
 
-	} else if l.matchKeywordList(ast.FlagTokenList) != nil {
+	} else if l.matchKeywordList(ast.FlagTokenList, true) != nil {
 
-	} else if l.matchKeywordList(ast.ForRangeKeywordTokenList) != nil {
+	} else if l.matchKeywordList(ast.ForRangeKeywordTokenList, true) != nil {
 
 	} else if r == 'U' && r2 == '+' {
 

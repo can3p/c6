@@ -1,5 +1,7 @@
 package ast
 
+import "bytes"
+
 type String struct {
 	// Can be `"`, `'` or ``
 	Quote byte
@@ -8,7 +10,18 @@ type String struct {
 }
 
 func (self String) String() string {
-	return self.Value
+	var b bytes.Buffer
+	if self.Quote > 0 {
+		b.WriteByte(self.Quote)
+	}
+
+	b.WriteString(self.Value)
+
+	if self.Quote > 0 {
+		b.WriteByte(self.Quote)
+	}
+
+	return b.String()
 }
 
 /*
