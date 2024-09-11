@@ -430,6 +430,10 @@ prevents calculate css slash as division.  otherwise it's the same as
 EvaluateBinaryExpr.
 */
 func EvaluateExpr(expr ast.Expr, scope *Scope) (v ast.Value, err error) {
+	//defer func() {
+	//fmt.Printf("EvaluateExpr %s %s %T\n", expr, v, expr)
+	//}()
+
 	switch t := expr.(type) {
 
 	case *ast.BinaryExpr:

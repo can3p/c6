@@ -359,12 +359,12 @@ func (l *Lexer) match(str string) bool {
 //return false
 //}
 
-func (l *Lexer) matchKeywordList(keywords ast.KeywordTokenList) *ast.Token {
+func (l *Lexer) matchKeywordList(keywords ast.KeywordTokenList, ignoreMinus bool) *ast.Token {
 	for _, keyword := range keywords {
 		l.remember()
 		if l.match(keyword.Keyword) {
 			var r = l.peek()
-			if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '-' {
+			if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || (r == '-' && !ignoreMinus) {
 				// try next one
 				l.rollback()
 				continue
