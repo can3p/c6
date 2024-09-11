@@ -11,12 +11,18 @@ type ComplexSelectorItem struct {
 }
 
 func (item *ComplexSelectorItem) String() (css string) {
-	return item.Combinator.String() + item.CompoundSelector.String()
+	if item.Combinator != nil {
+		css += item.Combinator.String()
+	}
+	if item.CompoundSelector != nil {
+		css += item.CompoundSelector.String()
+	}
+
+	return css
 }
 func (item *ComplexSelectorItem) CSSString() (css string) { return item.String() }
 
 type ComplexSelector struct {
-	CompoundSelector     *CompoundSelector
 	ComplexSelectorItems []*ComplexSelectorItem
 }
 
@@ -25,19 +31,19 @@ func (self *ComplexSelector) AppendCompoundSelector(comb Combinator, sel *Compou
 }
 
 func (self *ComplexSelector) String() (css string) {
-	css = self.CompoundSelector.String()
 	for _, item := range self.ComplexSelectorItems {
-		css += item.Combinator.String()
-		css += item.CompoundSelector.String()
+		if item.Combinator != nil {
+			css += item.Combinator.String()
+		}
+		if item.CompoundSelector != nil {
+			css += item.CompoundSelector.String()
+		}
 	}
 	return css
 }
 
 func (self *ComplexSelector) Clone() *ComplexSelector {
-	compountClone := slices.Clone(*self.CompoundSelector)
-	duplicate := &ComplexSelector{
-		CompoundSelector: &compountClone,
-	}
+	duplicate := &ComplexSelector{}
 
 	for _, item := range self.ComplexSelectorItems {
 		compountClone := slices.Clone(*item.CompoundSelector)
@@ -53,9 +59,9 @@ func (self *ComplexSelector) Clone() *ComplexSelector {
 
 func (self *ComplexSelector) CSSString() string { return self.String() }
 
-func NewComplexSelector(sel *CompoundSelector) *ComplexSelector {
+func NewComplexSelector() *ComplexSelector {
 	return &ComplexSelector{
-		CompoundSelector: sel,
+		ComplexSelectorItems: []*ComplexSelectorItem{},
 	}
 }
 
@@ -64,12 +70,7 @@ func JoinSelectors(parent, child *ComplexSelector) (*ComplexSelector, error) {
 	// flatten complex selector to process it in the uniform way.
 	// we probably need to make it a simple array of ComplexSelectorItem in the
 	// first place
-	childItems := []*ComplexSelectorItem{
-		{
-			Combinator:       NewDescendantCombinator(),
-			CompoundSelector: child.CompoundSelector,
-		},
-	}
+	childItems := []*ComplexSelectorItem{}
 
 	childItems = append(childItems, child.ComplexSelectorItems...)
 
@@ -80,8 +81,8 @@ func JoinSelectors(parent, child *ComplexSelector) (*ComplexSelector, error) {
 	parentFound := false
 
 	for _, sel := range childItems {
-		// this cannot happen
-		if len(*sel.CompoundSelector) == 0 {
+		if sel.CompoundSelector == nil {
+			outItems = append(outItems, sel)
 			continue
 		}
 
@@ -97,30 +98,50 @@ func JoinSelectors(parent, child *ComplexSelector) (*ComplexSelector, error) {
 		// if we have found a parent selector we should:
 		// - make a copy of parent selector
 		parentCopy := parent.Clone()
-		// - append remaining compund selector items to the last child of parent
-		if len(parentCopy.ComplexSelectorItems) > 0 {
-
-			parentCopy.ComplexSelectorItems[len(parentCopy.ComplexSelectorItems)-1].CompoundSelector.Append((*sel.CompoundSelector)[1:]...)
-		} else {
-			parentCopy.CompoundSelector.Append((*sel.CompoundSelector)[1:]...)
-		}
+		// - append remaining compound selector items to the last child of parent
+		parentCopy.ComplexSelectorItems[0].Combinator = sel.Combinator
+		parentCopy.ComplexSelectorItems[len(parentCopy.ComplexSelectorItems)-1].CompoundSelector.Append((*sel.CompoundSelector)[1:]...)
 
 		// - insert them into out items
-		outItems = append(outItems, &ComplexSelectorItem{
-			Combinator:       sel.Combinator,
-			CompoundSelector: parentCopy.CompoundSelector,
-		})
 		outItems = append(outItems, parentCopy.ComplexSelectorItems...)
 	}
 
 	if !parentFound {
 		out := &ComplexSelector{
-			CompoundSelector:     parent.CompoundSelector,
 			ComplexSelectorItems: []*ComplexSelectorItem{},
 		}
 
-		out.ComplexSelectorItems = append(out.ComplexSelectorItems, parent.ComplexSelectorItems...)
-		out.ComplexSelectorItems = append(out.ComplexSelectorItems, outItems...)
+		var childCombinator Combinator
+		l := len(parent.ComplexSelectorItems)
+		if parent.ComplexSelectorItems[l-1].CompoundSelector == nil {
+			childCombinator = parent.ComplexSelectorItems[l-1].Combinator
+			out.ComplexSelectorItems = append(out.ComplexSelectorItems, parent.ComplexSelectorItems[:l-1]...)
+		} else {
+			out.ComplexSelectorItems = append(out.ComplexSelectorItems, parent.ComplexSelectorItems...)
+		}
+
+		// when we're joining with a child, it combinator may not be there (e.g. `div`)
+		// or there may be only combinator (e.g. `>`)
+		if outItems[0].Combinator == nil {
+			firstItem := outItems[0]
+			compountClone := slices.Clone(*firstItem.CompoundSelector)
+
+			if childCombinator == nil {
+				childCombinator = NewDescendantCombinator()
+			}
+
+			out.ComplexSelectorItems = append(out.ComplexSelectorItems, &ComplexSelectorItem{
+				Combinator:       childCombinator,
+				CompoundSelector: &compountClone,
+			})
+			out.ComplexSelectorItems = append(out.ComplexSelectorItems, outItems[1:]...)
+		} else {
+			if childCombinator != nil {
+				return nil, fmt.Errorf("parent selector ends with a combinator and child selector starts with one")
+			}
+
+			out.ComplexSelectorItems = append(out.ComplexSelectorItems, outItems...)
+		}
 
 		return out, nil
 	}
@@ -131,7 +152,6 @@ func JoinSelectors(parent, child *ComplexSelector) (*ComplexSelector, error) {
 	}
 
 	return &ComplexSelector{
-		CompoundSelector:     outItems[0].CompoundSelector,
-		ComplexSelectorItems: outItems[1:],
+		ComplexSelectorItems: outItems,
 	}, nil
 }

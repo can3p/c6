@@ -70,7 +70,7 @@ a c e, a c f, a d e, a d f, b c e, b c f, b d e, b d f {
 <===> basic/compound_diff_levels/input.scss
 .foo > {
   .baz {
-    ~ {
+    + {
       a {
         a: b;
       }
@@ -79,10 +79,9 @@ a c e, a c f, a d e, a d f, b c e, b c f, b d e, b d f {
 }
 
 <===> basic/compound_diff_levels/output.css
-.foo > .baz ~ a {
+.foo > .baz + a {
   a: b;
 }
-
 
 <===> basic/replace/input.scss
 a {

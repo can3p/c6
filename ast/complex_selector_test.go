@@ -16,13 +16,21 @@ func TestJoinSelectors(t *testing.T) {
 		{
 			description: "simple concatenation",
 			parent: &ComplexSelector{
-				CompoundSelector: &CompoundSelector{
-					NewTypeSelector("abc"),
+				ComplexSelectorItems: []*ComplexSelectorItem{
+					{
+						CompoundSelector: &CompoundSelector{
+							NewTypeSelector("abc"),
+						},
+					},
 				},
 			},
 			child: &ComplexSelector{
-				CompoundSelector: &CompoundSelector{
-					NewTypeSelector("def"),
+				ComplexSelectorItems: []*ComplexSelectorItem{
+					{
+						CompoundSelector: &CompoundSelector{
+							NewTypeSelector("def"),
+						},
+					},
 				},
 			},
 			result: "abc def",
@@ -30,13 +38,21 @@ func TestJoinSelectors(t *testing.T) {
 		{
 			description: "simple replacement",
 			parent: &ComplexSelector{
-				CompoundSelector: &CompoundSelector{
-					NewTypeSelector("abc"),
+				ComplexSelectorItems: []*ComplexSelectorItem{
+					{
+						CompoundSelector: &CompoundSelector{
+							NewTypeSelector("abc"),
+						},
+					},
 				},
 			},
 			child: &ComplexSelector{
-				CompoundSelector: &CompoundSelector{
-					&ParentSelector{},
+				ComplexSelectorItems: []*ComplexSelectorItem{
+					{
+						CompoundSelector: &CompoundSelector{
+							&ParentSelector{},
+						},
+					},
 				},
 			},
 			result: "abc",
@@ -44,17 +60,23 @@ func TestJoinSelectors(t *testing.T) {
 		{
 			description: "multiple replacements and complex selector",
 			parent: &ComplexSelector{
-				CompoundSelector: &CompoundSelector{
-					NewTypeSelector("abc"),
-					NewClassSelector(".pr"),
+				ComplexSelectorItems: []*ComplexSelectorItem{
+					{
+						CompoundSelector: &CompoundSelector{
+							NewTypeSelector("abc"),
+							NewClassSelector(".pr"),
+						},
+					},
 				},
 			},
 			child: &ComplexSelector{
-				CompoundSelector: &CompoundSelector{
-					&ParentSelector{},
-					NewClassSelector(".cl"),
-				},
 				ComplexSelectorItems: []*ComplexSelectorItem{
+					{
+						CompoundSelector: &CompoundSelector{
+							&ParentSelector{},
+							NewClassSelector(".cl"),
+						},
+					},
 					{
 						Combinator: NewAdjacentCombinatorWithToken(nil),
 						CompoundSelector: &CompoundSelector{
@@ -68,11 +90,13 @@ func TestJoinSelectors(t *testing.T) {
 		{
 			description: "complex selector with multiple items",
 			parent: &ComplexSelector{
-				CompoundSelector: &CompoundSelector{
-					NewTypeSelector("abc"),
-					NewClassSelector(".pr"),
-				},
 				ComplexSelectorItems: []*ComplexSelectorItem{
+					{
+						CompoundSelector: &CompoundSelector{
+							NewTypeSelector("abc"),
+							NewClassSelector(".pr"),
+						},
+					},
 					{
 						Combinator: NewDescendantCombinator(),
 						CompoundSelector: &CompoundSelector{
@@ -82,9 +106,13 @@ func TestJoinSelectors(t *testing.T) {
 				},
 			},
 			child: &ComplexSelector{
-				CompoundSelector: &CompoundSelector{
-					&ParentSelector{},
-					NewClassSelector(".cl"),
+				ComplexSelectorItems: []*ComplexSelectorItem{
+					{
+						CompoundSelector: &CompoundSelector{
+							&ParentSelector{},
+							NewClassSelector(".cl"),
+						},
+					},
 				},
 			},
 			result: "abc.pr def.cl",

@@ -143,8 +143,7 @@ func (parser *Parser) ParseStmt() (ast.Stmt, error) {
 		return nil, nil
 	}
 
-	if token.IsSelector() {
-
+	if token.IsSelector() || token.IsSelectorCombinator() {
 		return parser.ParseRuleSet()
 	}
 
@@ -429,19 +428,10 @@ func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) (*ast.Co
 func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.ComplexSelector, error) {
 	debug("ParseComplexSelector")
 
-	sel, err := parser.ParseCompoundSelector(parentRuleSet)
-	if err != nil {
-		return nil, err
-	}
-
-	if sel == nil {
-		return nil, nil
-	}
-
-	var complexSel = ast.NewComplexSelector(sel)
+	var complexSel = ast.NewComplexSelector()
 
 	for {
-		var tok = parser.next()
+		var tok = parser.peek()
 		if tok == nil {
 			return complexSel, nil
 		}
@@ -454,34 +444,35 @@ func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.Com
 		case ast.T_ADJACENT_SIBLING_COMBINATOR:
 
 			comb = ast.NewAdjacentCombinatorWithToken(tok)
+			parser.next()
 
 		case ast.T_CHILD_COMBINATOR:
 
 			comb = ast.NewChildCombinatorWithToken(tok)
+			parser.next()
 
 		case ast.T_DESCENDANT_COMBINATOR:
 
 			comb = ast.NewDescendantCombinatorWithToken(tok)
+			parser.next()
 
 		case ast.T_GENERAL_SIBLING_COMBINATOR:
 
 			comb = ast.NewGeneralSiblingCombinatorWithToken(tok)
+			parser.next()
 
 		default:
-			parser.backup()
-			return complexSel, nil
+			if len(complexSel.ComplexSelectorItems) > 0 {
+				return complexSel, nil
+			}
 		}
 
 		if sel, err := parser.ParseCompoundSelector(parentRuleSet); err != nil {
 			return nil, err
-		} else if sel != nil {
+		} else if sel != nil || comb != nil {
 			complexSel.AppendCompoundSelector(comb, sel)
 		} else {
-			return nil, SyntaxError{
-				Reason:      "Expecting a selector after the combinator.",
-				ActualToken: parser.peek(),
-				File:        parser.File,
-			}
+			return complexSel, nil
 		}
 	}
 }
