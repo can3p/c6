@@ -34,7 +34,7 @@ func writeFailuresListP(names map[string][][]string) {
 		for _, n := range n {
 			b.WriteString("\t\t\"")
 			b.WriteString(n[0])
-			b.WriteString(fmt.Sprintf("\": \"%s\",\n", strings.TrimSpace(n[1])))
+			b.WriteString(fmt.Sprintf("\": \"%s\",\n", strings.ReplaceAll(strings.TrimSpace(n[1]), `"`, `\"`)))
 		}
 		b.WriteString("\t},\n")
 	}
