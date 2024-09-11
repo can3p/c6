@@ -1396,7 +1396,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"length/input.scss": "compiler_output_does_not_match",
 		"quote/input.scss": "compiler_output_does_not_match",
 		"slice/input.scss": "compiler_output_does_not_match",
-		"to_upper_case/input.scss": "compiler_output_does_not_match",
+		"to_upper_case/input.scss": "parse_failure",
 		"unique_id/input.scss": "compiler_output_does_not_match",
 		"unquote/input.scss": "compiler_output_does_not_match",
 	},
@@ -5011,7 +5011,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"css/unicode_range/error.hrx": {
 		"ident_minus_space_ident/input.scss": "parser_error_does_not_match",
-		"minus_ident_minus/input.scss": "compiler_should_have_errored",
+		"minus_ident_minus/input.scss": "compiler_panic",
 		"minus_number_minus_ident/input.scss": "parser_error_does_not_match",
 		"no_digits/input.scss": "parser_error_does_not_match",
 		"nothing_after_minus/input.scss": "parser_error_does_not_match",
@@ -6126,7 +6126,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1218.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen and (min-width:#{$foo})",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen and (\"min-width:#{$foo}\")",
 	},
 	"libsass-closed-issues/issue_1224.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all and (max-width:768px)",
@@ -6484,9 +6484,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"libsass-closed-issues/issue_1610.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"libsass-closed-issues/issue_1612.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1622.hrx": {
 		"input.scss": "unhandled_warning",
@@ -6921,7 +6918,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_2149.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_2150.hrx": {
 		"input.scss": "parse_failure",
@@ -7412,9 +7409,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_688.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass-closed-issues/issue_690.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_694.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
@@ -7509,7 +7503,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_828.hrx": {
-		"input.scss": "compiler_output_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_829.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
@@ -7952,9 +7946,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass/http_import.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
-	"libsass/image-url.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass/import.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -8170,9 +8161,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"libsass/wrapped-selector-whitespace.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"non_conformant/basic/04_basic_variables.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/basic/06_nesting_and_comments.hrx": {
 		"input.scss": "parse_failure",
@@ -10858,9 +10846,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss/variables.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Undefined variable.",
 	},
-	"non_conformant/scss/vars.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss/weird-selectors.hrx": {
 		"input.scss": "unhandled_warning",
 	},
@@ -11853,18 +11838,18 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"upper_multiple/number_is_smaller/input.scss": "compiler_output_does_not_match",
 	},
 	"values/calculation/round/strategy/to-zero.hrx": {
-		"strategy/to-zero/lower_multiple/number_is_bigger/input.scss": "compiler_output_does_not_match",
+		"strategy/to-zero/lower_multiple/number_is_bigger/input.scss": "parse_failure",
 		"strategy/to-zero/lower_multiple/number_is_negative/input.scss": "parse_failure",
 		"strategy/to-zero/negative/input.scss": "parse_failure",
 		"strategy/to-zero/negative_zero/negative_infinity/input.scss": "compiler_output_does_not_match",
 		"strategy/to-zero/negative_zero/positive_infinity/input.scss": "compiler_output_does_not_match",
-		"strategy/to-zero/positive/input.scss": "compiler_output_does_not_match",
+		"strategy/to-zero/positive/input.scss": "parse_failure",
 		"strategy/to-zero/positive_zero/negative_infinity/input.scss": "compiler_output_does_not_match",
 		"strategy/to-zero/positive_zero/positive_infinity/input.scss": "compiler_output_does_not_match",
-		"strategy/to-zero/upper_multiple/number_is_bigger/input.scss": "compiler_output_does_not_match",
-		"strategy/to-zero/upper_multiple/number_is_half/input.scss": "compiler_output_does_not_match",
+		"strategy/to-zero/upper_multiple/number_is_bigger/input.scss": "parse_failure",
+		"strategy/to-zero/upper_multiple/number_is_half/input.scss": "parse_failure",
 		"strategy/to-zero/upper_multiple/number_is_negative/input.scss": "parse_failure",
-		"strategy/to-zero/upper_multiple/number_is_smaller/input.scss": "compiler_output_does_not_match",
+		"strategy/to-zero/upper_multiple/number_is_smaller/input.scss": "parse_failure",
 	},
 	"values/calculation/round/strategy/up.hrx": {
 		"strategy/up/infinity/input.scss": "compiler_output_does_not_match",
