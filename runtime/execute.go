@@ -39,6 +39,7 @@ func ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, error) {
 }
 
 func executeIfStmt(scope *Scope, stmt *ast.IfStmt) (*ast.StmtList, error) {
+
 	eval := func(e ast.Expr) (bool, error) {
 		v, err := EvaluateExprInBooleanContext(e, scope)
 
@@ -53,6 +54,8 @@ func executeIfStmt(scope *Scope, stmt *ast.IfStmt) (*ast.StmtList, error) {
 		return false, fmt.Errorf("BooleanValue interface is not support for %+v", v)
 	}
 
+	var out *ast.StmtList
+
 	v, err := eval(stmt.Condition)
 
 	if err != nil {
@@ -60,26 +63,33 @@ func executeIfStmt(scope *Scope, stmt *ast.IfStmt) (*ast.StmtList, error) {
 	}
 
 	if v {
-		return &stmt.Block.Stmts, nil
-	}
+		out = &stmt.Block.Stmts
+	} else {
+		for _, elsif := range stmt.ElseIfs {
+			v, err := eval(elsif.Condition)
 
-	for _, elsif := range stmt.ElseIfs {
-		v, err := eval(elsif.Condition)
+			if err != nil {
+				return nil, err
+			}
 
-		if err != nil {
-			return nil, err
+			if v {
+				out = &elsif.Block.Stmts
+				break
+			}
 		}
 
-		if v {
-			return &elsif.Block.Stmts, nil
+		if out == nil && stmt.ElseBlock != nil {
+			out = &stmt.ElseBlock.Stmts
 		}
 	}
 
-	if stmt.ElseBlock != nil {
-		return &stmt.ElseBlock.Stmts, nil
+	if out == nil {
+		return nil, nil
 	}
 
-	return nil, nil
+	child := NewScope(scope)
+
+	return ExecuteList(child, out)
 }
 
 func executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {
