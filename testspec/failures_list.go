@@ -5205,7 +5205,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"directives/forward/error/syntax.hrx": {
 		"after/at_rule/css/input.scss": "compiler_should_have_errored",
 		"after/at_rule/import/input.scss": "parser_error_does_not_match",
-		"after/at_rule/sass/input.scss": "compiler_error_does_not_match",
+		"after/at_rule/sass/input.scss": "compiler_should_have_errored",
 		"after/at_rule/unknown/input.scss": "compiler_should_have_errored",
 		"after/indented/include/input.sass": "parser_error_does_not_match",
 		"after/indented/mixin/input.sass": "parser_error_does_not_match",
@@ -5430,16 +5430,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"directives/if/comment.hrx": {
 		"comment/else/before_block/loud/input.scss": "parse_failure",
-		"comment/else/before_block/silent/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
-		"comment/else_if/after_condition/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 		"comment/else_if/after_condition/silent/input.scss": "parse_failure",
-		"comment/else_if/before_condition/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 		"comment/else_if/before_condition/silent/input.scss": "parse_failure",
 		"comment/else_if/before_if/loud/input.scss": "parse_failure",
 		"comment/else_if/before_if/silent/input.scss": "parse_failure",
-		"comment/if/after_condition/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 		"comment/if/after_condition/silent/input.scss": "parse_failure",
-		"comment/if/before_condition/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
 		"comment/if/before_condition/silent/input.scss": "parse_failure",
 	},
 	"directives/if/error/syntax.hrx": {
@@ -5447,7 +5442,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"directives/if/escaped.hrx": {
 		"if_only/input.scss": "compiler_output_does_not_match",
-		"with_else/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
+		"with_else/input.scss": "compiler_output_does_not_match",
 	},
 	"directives/import/comment.hrx": {
 		"after_comma/loud/input.scss": "parse_failure",
@@ -5671,7 +5666,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"directives/use/error/syntax/after.hrx": {
 		"at_rule/css/input.scss": "compiler_should_have_errored",
 		"at_rule/import/input.scss": "parser_error_does_not_match",
-		"at_rule/sass/input.scss": "compiler_error_does_not_match",
+		"at_rule/sass/input.scss": "compiler_should_have_errored",
 		"at_rule/unknown/input.scss": "compiler_should_have_errored",
 		"indented/include/input.sass": "parser_error_does_not_match",
 		"indented/mixin/input.sass": "parser_error_does_not_match",
@@ -8424,10 +8419,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/control-else.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/errors/import/url/control-if.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/errors/import/url/loop/each.hrx": {
 		"input.scss": "parse_failure",
@@ -9069,7 +9064,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/extend-tests/184_test_control_flow_if.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"non_conformant/extend-tests/185_test_control_flow_for.hrx": {
 		"input.scss": "parse_failure",
@@ -10186,9 +10181,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/sass_4_0/interpolation/trailing_non_name_start.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"non_conformant/scope/clash.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
-	},
 	"non_conformant/scope/each.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -10198,17 +10190,8 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scope/function.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
-	"non_conformant/scope/if.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
-	},
 	"non_conformant/scope/mixin.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
-	},
-	"non_conformant/scope/nested.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scope/ruleset.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scope/while.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
@@ -10226,13 +10209,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/011_test_if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
+		"input.scss": "compiler_unexpected_compile_error - BooleanValue interface is not support for <nil>",
 	},
 	"non_conformant/scss-tests/012_test_if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
+		"input.scss": "compiler_unexpected_compile_error - BooleanValue interface is not support for <nil>",
 	},
 	"non_conformant/scss-tests/013_test_if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
+		"input.scss": "compiler_unexpected_compile_error - BooleanValue interface is not support for <nil>",
 	},
 	"non_conformant/scss-tests/014_test_comment_after_if_directive.hrx": {
 		"input.scss": "parse_failure",
@@ -10660,11 +10643,8 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss/if-in-propset.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss/if.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
-	},
 	"non_conformant/scss/if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
+		"input.scss": "compiler_unexpected_compile_error - BooleanValue interface is not support for <nil>",
 	},
 	"non_conformant/scss/important-in-arglist.hrx": {
 		"input.scss": "parse_failure",
@@ -10868,7 +10848,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/variables.hrx": {
-		"global/first_declaration/nested/input.scss": "unhandled_warning",
+		"global/first_declaration/nested/input.scss": "compiler_panic",
 		"global/first_declaration/top_level/input.scss": "unhandled_warning",
 	},
 	"operators/minus.hrx": {
@@ -12264,6 +12244,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"comment/before_colon/silent/input.scss": "parse_failure",
 		"double_flag/default/input.scss": "unhandled_warning",
 		"double_flag/global/input.scss": "unhandled_warning",
-		"semi_global/in_local/double_nested/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
+		"semi_global/in_local/double_nested/input.scss": "compiler_panic",
 	},
 }

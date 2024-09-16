@@ -27,6 +27,8 @@ func ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, error) {
 	case *ast.AssignStmt:
 		err := executeAssignStmt(scope, t)
 		return nil, err
+	case *ast.IfStmt:
+		return executeIfStmt(scope, t)
 	case *ast.RuleSet:
 		return executeRuleSet(scope, t)
 	case *ast.Property:
@@ -36,12 +38,70 @@ func ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, error) {
 	return nil, fmt.Errorf("Don't know how to execute the statement %v", stmt)
 }
 
+func executeIfStmt(scope *Scope, stmt *ast.IfStmt) (*ast.StmtList, error) {
+
+	eval := func(e ast.Expr) (bool, error) {
+		v, err := EvaluateExprInBooleanContext(e, scope)
+
+		if err != nil {
+			return false, err
+		}
+
+		if bval, ok := v.(ast.BooleanValue); ok {
+			return bval.Boolean(), nil
+		}
+
+		return false, fmt.Errorf("BooleanValue interface is not support for %+v", v)
+	}
+
+	var out *ast.StmtList
+
+	v, err := eval(stmt.Condition)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if v {
+		out = &stmt.Block.Stmts
+	} else {
+		for _, elsif := range stmt.ElseIfs {
+			v, err := eval(elsif.Condition)
+
+			if err != nil {
+				return nil, err
+			}
+
+			if v {
+				out = &elsif.Block.Stmts
+				break
+			}
+		}
+
+		if out == nil && stmt.ElseBlock != nil {
+			out = &stmt.ElseBlock.Stmts
+		}
+	}
+
+	if out == nil {
+		return nil, nil
+	}
+
+	child := NewScope(scope)
+
+	return ExecuteList(child, out)
+}
+
 func executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {
 	varName := stmt.Variable.Name
 	val, err := EvaluateExpr(stmt.Expr, scope)
 
 	if err != nil {
 		return err
+	}
+
+	if stmt.Global {
+		scope.GetGlobal().Insert(varName, val)
 	}
 
 	scope.Insert(varName, val)
