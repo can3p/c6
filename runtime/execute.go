@@ -100,6 +100,10 @@ func executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {
 		return err
 	}
 
+	if stmt.Global {
+		scope.GetGlobal().Insert(varName, val)
+	}
+
 	scope.Insert(varName, val)
 
 	return nil

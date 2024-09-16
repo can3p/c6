@@ -28,3 +28,13 @@ func (s *Scope) Lookup(name string) (ast.Value, error) {
 func (s *Scope) Insert(name string, obj ast.Value) {
 	s.Variables[name] = obj
 }
+
+func (s *Scope) GetGlobal() *Scope {
+	scope := s
+
+	for scope.Parent != nil {
+		scope = scope.Parent
+	}
+
+	return scope
+}
