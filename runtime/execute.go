@@ -44,36 +44,35 @@ func ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, error) {
 	return nil, fmt.Errorf("Don't know how to execute the statement %v", stmt)
 }
 
-func executeWhileStmt(scope *Scope, stmt *ast.WhileStmt) (*ast.StmtList, error) {
-	eval := func(e ast.Expr, scope *Scope) (bool, error) {
-		v, err := EvaluateExprInBooleanContext(e, scope)
+func executeCondition(e ast.Expr, scope *Scope) (bool, error) {
+	v, err := EvaluateExprInBooleanContext(e, scope)
 
-		if err != nil {
-			return false, err
-		}
-
-		if v == nil {
-			return false, nil
-		}
-
-		if bval, ok := v.(ast.BooleanValue); ok {
-			return bval.Boolean(), nil
-		}
-
-		if _, ok := v.(ast.Null); ok {
-			return false, nil
-		}
-
-		return false, fmt.Errorf("BooleanValue interface is not support for %T", v)
+	if err != nil {
+		return false, err
 	}
 
+	if v == nil {
+		return false, nil
+	}
+
+	if bval, ok := v.(ast.BooleanValue); ok {
+		return bval.Boolean(), nil
+	}
+
+	if _, ok := v.(ast.Null); ok {
+		return false, nil
+	}
+
+	return false, fmt.Errorf("BooleanValue interface is not support for %T", v)
+}
+
+func executeWhileStmt(scope *Scope, stmt *ast.WhileStmt) (*ast.StmtList, error) {
 	child := NewScope(scope)
 	count := 0
 	out := &ast.StmtList{}
 
 	for {
-		keepGoing, err := eval(stmt.Condition, child)
-		fmt.Println(stmt.Condition, "evals to", keepGoing)
+		keepGoing, err := executeCondition(stmt.Condition, child)
 
 		if err != nil {
 			return nil, err
@@ -88,8 +87,6 @@ func executeWhileStmt(scope *Scope, stmt *ast.WhileStmt) (*ast.StmtList, error) 
 		if err != nil {
 			return nil, err
 		}
-
-		fmt.Println("while body", l)
 
 		out.AppendList(l)
 		count++
@@ -168,24 +165,9 @@ func executeForStmt(scope *Scope, stmt *ast.ForStmt) (*ast.StmtList, error) {
 }
 
 func executeIfStmt(scope *Scope, stmt *ast.IfStmt) (*ast.StmtList, error) {
-
-	eval := func(e ast.Expr) (bool, error) {
-		v, err := EvaluateExprInBooleanContext(e, scope)
-
-		if err != nil {
-			return false, err
-		}
-
-		if bval, ok := v.(ast.BooleanValue); ok {
-			return bval.Boolean(), nil
-		}
-
-		return false, fmt.Errorf("BooleanValue interface is not support for %+v", v)
-	}
-
 	var out *ast.StmtList
 
-	v, err := eval(stmt.Condition)
+	v, err := executeCondition(stmt.Condition, scope)
 
 	if err != nil {
 		return nil, err
@@ -195,7 +177,7 @@ func executeIfStmt(scope *Scope, stmt *ast.IfStmt) (*ast.StmtList, error) {
 		out = &stmt.Block.Stmts
 	} else {
 		for _, elsif := range stmt.ElseIfs {
-			v, err := eval(elsif.Condition)
+			v, err := executeCondition(elsif.Condition, scope)
 
 			if err != nil {
 				return nil, err
@@ -230,10 +212,8 @@ func executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {
 	}
 
 	if stmt.Global {
-		fmt.Println("Inserting global", varName, val)
 		scope.GetGlobal().Insert(varName, val)
 	} else {
-		fmt.Println("Inserting local", varName, val)
 		scope.Insert(varName, val)
 	}
 

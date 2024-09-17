@@ -10188,15 +10188,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss-tests/008_test_sass_script.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss-tests/011_test_if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - BooleanValue interface is not support for <nil>",
-	},
-	"non_conformant/scss-tests/012_test_if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - BooleanValue interface is not support for <nil>",
-	},
-	"non_conformant/scss-tests/013_test_if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - BooleanValue interface is not support for <nil>",
-	},
 	"non_conformant/scss-tests/014_test_comment_after_if_directive.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -10622,9 +10613,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"non_conformant/scss/if-in-propset.hrx": {
 		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss/if_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - BooleanValue interface is not support for <nil>",
 	},
 	"non_conformant/scss/important-in-arglist.hrx": {
 		"input.scss": "parse_failure",

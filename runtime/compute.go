@@ -75,6 +75,13 @@ func Compute(op *ast.Op, a ast.Value, b ast.Value) (ast.Value, error) {
 			case *ast.Boolean:
 				return ast.NewBoolean(ta.Value == tb.Value), nil
 			}
+		case *ast.String:
+			switch tb := b.(type) {
+			case *ast.String:
+				return ast.NewBoolean(ta.Value == tb.Value), nil
+			default:
+				return nil, fmt.Errorf("Cannot compare string [%s] to non-string [%s]", a, b)
+			}
 		case *ast.Number:
 			switch tb := b.(type) {
 			case *ast.Number:
