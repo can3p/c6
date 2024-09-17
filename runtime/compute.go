@@ -340,6 +340,13 @@ func EvaluateExprInBooleanContext(anyexpr ast.Expr, scope *Scope) (ast.Value, er
 	case *ast.UnaryExpr:
 		return EvaluateUnaryExprInBooleanContext(expr, scope)
 
+	case *ast.Variable:
+		if lval, err := scope.Lookup(expr.NormalizedName()); err != nil {
+			return nil, err
+		} else {
+			return lval, nil
+		}
+
 	default:
 		if bval, ok := expr.(ast.BooleanValue); ok {
 			return ast.NewBoolean(bval.Boolean()), nil
@@ -367,6 +374,11 @@ func EvaluateBinaryExprInBooleanContext(expr *ast.BinaryExpr, scope *Scope) (ast
 			return nil, err
 		}
 
+	case *ast.Variable:
+		if lval, err = scope.Lookup(expr.NormalizedName()); err != nil {
+			return nil, err
+		}
+
 	default:
 		lval = expr
 	}
@@ -381,6 +393,11 @@ func EvaluateBinaryExprInBooleanContext(expr *ast.BinaryExpr, scope *Scope) (ast
 	case *ast.BinaryExpr:
 		rval, err = EvaluateBinaryExprInBooleanContext(expr, scope)
 		if err != nil {
+			return nil, err
+		}
+
+	case *ast.Variable:
+		if rval, err = scope.Lookup(expr.NormalizedName()); err != nil {
 			return nil, err
 		}
 
@@ -418,7 +435,7 @@ func EvaluateUnaryExprInBooleanContext(expr *ast.UnaryExpr, scope *Scope) (ast.V
 		if bval, ok := val.(ast.BooleanValue); ok {
 			return ast.NewBoolean(bval.Boolean()), nil
 		} else {
-			return nil, fmt.Errorf("BooleanValue interface is not support for %+v", val)
+			return nil, fmt.Errorf("BooleanValue interface is not support for %v", val)
 		}
 	}
 	return val, nil

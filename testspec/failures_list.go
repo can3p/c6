@@ -8417,7 +8417,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/errors/import/url/loop/while.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/errors/import/url/mixin/control-else/outside.hrx": {
 		"input.scss": "parse_failure",
@@ -8477,7 +8477,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/invalid-parent/function-in-while.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/errors/invalid-parent/mixin-in-each.hrx": {
 		"input.scss": "parser_error_does_not_match",
@@ -8495,7 +8495,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/invalid-parent/mixin-in-while.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/errors/invalid-parent/return-in-mixin.hrx": {
 		"input.scss": "compiler_error_does_not_match",
@@ -10176,9 +10176,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scope/mixin.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
-	"non_conformant/scope/while.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
-	},
 	"non_conformant/scss-tests/002_test_one_line_comments.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
@@ -10815,17 +10812,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss/weird_added_space.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"non_conformant/scss/while.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
-	},
-	"non_conformant/scss/while_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
-	},
 	"non_conformant/scss/while_in_functions.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss/while_without_condition.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/scss/zero-compression.hrx": {
 		"input.scss": "compiler_output_does_not_match",

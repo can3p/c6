@@ -6,6 +6,8 @@ import (
 	"github.com/c9s/c6/ast"
 )
 
+const MaxWhileIterations = 10_000
+
 func ExecuteList(scope *Scope, stmts *ast.StmtList) (*ast.StmtList, error) {
 	out := &ast.StmtList{}
 
@@ -31,6 +33,8 @@ func ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, error) {
 		return executeIfStmt(scope, t)
 	case *ast.ForStmt:
 		return executeForStmt(scope, t)
+	case *ast.WhileStmt:
+		return executeWhileStmt(scope, t)
 	case *ast.RuleSet:
 		return executeRuleSet(scope, t)
 	case *ast.Property:
@@ -38,6 +42,64 @@ func ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, error) {
 	}
 
 	return nil, fmt.Errorf("Don't know how to execute the statement %v", stmt)
+}
+
+func executeWhileStmt(scope *Scope, stmt *ast.WhileStmt) (*ast.StmtList, error) {
+	eval := func(e ast.Expr, scope *Scope) (bool, error) {
+		v, err := EvaluateExprInBooleanContext(e, scope)
+
+		if err != nil {
+			return false, err
+		}
+
+		if v == nil {
+			return false, nil
+		}
+
+		if bval, ok := v.(ast.BooleanValue); ok {
+			return bval.Boolean(), nil
+		}
+
+		if _, ok := v.(ast.Null); ok {
+			return false, nil
+		}
+
+		return false, fmt.Errorf("BooleanValue interface is not support for %T", v)
+	}
+
+	child := NewScope(scope)
+	count := 0
+	out := &ast.StmtList{}
+
+	for {
+		keepGoing, err := eval(stmt.Condition, child)
+		fmt.Println(stmt.Condition, "evals to", keepGoing)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if !keepGoing {
+			break
+		}
+
+		l, err := ExecuteList(child, &stmt.Block.Stmts)
+
+		if err != nil {
+			return nil, err
+		}
+
+		fmt.Println("while body", l)
+
+		out.AppendList(l)
+		count++
+
+		if count == MaxWhileIterations {
+			return nil, fmt.Errorf("While loop had %d iterations, most probably it's an infinite loop", count)
+		}
+	}
+
+	return out, nil
 }
 
 func executeForStmt(scope *Scope, stmt *ast.ForStmt) (*ast.StmtList, error) {
@@ -168,10 +230,12 @@ func executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {
 	}
 
 	if stmt.Global {
+		fmt.Println("Inserting global", varName, val)
 		scope.GetGlobal().Insert(varName, val)
+	} else {
+		fmt.Println("Inserting local", varName, val)
+		scope.Insert(varName, val)
 	}
-
-	scope.Insert(varName, val)
 
 	return nil
 }
