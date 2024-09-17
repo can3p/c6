@@ -29,6 +29,8 @@ func ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, error) {
 		return nil, err
 	case *ast.IfStmt:
 		return executeIfStmt(scope, t)
+	case *ast.ForStmt:
+		return executeForStmt(scope, t)
 	case *ast.RuleSet:
 		return executeRuleSet(scope, t)
 	case *ast.Property:
@@ -36,6 +38,71 @@ func ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, error) {
 	}
 
 	return nil, fmt.Errorf("Don't know how to execute the statement %v", stmt)
+}
+
+func executeForStmt(scope *Scope, stmt *ast.ForStmt) (*ast.StmtList, error) {
+
+	eval := func(e ast.Expr) (int, error) {
+		v, err := EvaluateExpr(e, scope)
+
+		if err != nil {
+			return 0, err
+		}
+
+		num, ok := v.(*ast.Number)
+
+		if !ok {
+			return 0, fmt.Errorf("Expected to get a number but got %T", v)
+		}
+
+		return num.Integer(), nil
+	}
+
+	from, err := eval(stmt.From)
+
+	if err != nil {
+		return nil, err
+	}
+
+	to, err := eval(stmt.To)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if from == to {
+		return nil, nil
+	}
+
+	step := 1
+
+	if to < from {
+		step = -1
+	}
+
+	// to simplify the loop,
+	// since we can now treat both loops as exclusive upper limit
+	if stmt.Inclusive {
+		to = to + step
+	}
+
+	out := &ast.StmtList{}
+
+	for from != to {
+		child := NewScope(scope)
+		child.Insert(stmt.Variable.NormalizedName(), ast.NewNumber(float64(from), nil, nil))
+
+		l, err := ExecuteList(child, &stmt.Block.Stmts)
+
+		if err != nil {
+			return nil, err
+		}
+
+		out.AppendList(l)
+		from = from + step
+	}
+
+	return out, nil
 }
 
 func executeIfStmt(scope *Scope, stmt *ast.IfStmt) (*ast.StmtList, error) {

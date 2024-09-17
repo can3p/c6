@@ -1645,7 +1645,8 @@ func (parser *Parser) ParseForStmt() (ast.Stmt, error) {
 
 		if tok.Type == ast.T_FOR_THROUGH {
 
-			stm.Through = endExpr
+			stm.To = endExpr
+			stm.Inclusive = true
 
 		} else if tok.Type == ast.T_FOR_TO {
 

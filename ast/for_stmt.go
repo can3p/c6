@@ -1,17 +1,21 @@
 package ast
 
 type ForStmt struct {
-	Variable *Variable
-	From     Expr
-	Through  Expr
-	To       Expr
-	Block    *DeclBlock
+	Variable  *Variable
+	From      Expr
+	To        Expr
+	Inclusive bool
+	Block     *DeclBlock
 }
 
 func (stm ForStmt) CanBeStmt() {}
 
 func (stm ForStmt) String() string {
-	return "@for " + stm.Variable.String() + " from " + stm.From.String() + " through " + stm.Through.String() + " {  }\n"
+	var inclusive = " inclusive"
+	if !stm.Inclusive {
+		inclusive = " exclusive"
+	}
+	return "@for " + stm.Variable.String() + " from " + stm.From.String() + " through " + stm.To.String() + inclusive + " {  }\n"
 }
 
 func NewForStmt(variable *Variable) *ForStmt {

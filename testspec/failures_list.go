@@ -5120,38 +5120,24 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"directives/for.hrx": {
-		"comment/after_from/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 10 {  }",
 		"comment/after_from/silent/input.scss": "parse_failure",
-		"comment/after_through/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 10 {  }",
 		"comment/after_through/silent/input.scss": "parse_failure",
-		"comment/before_block/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 10 {  }",
 		"comment/before_block/silent/input.scss": "parse_failure",
-		"comment/before_from/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 10 {  }",
 		"comment/before_from/silent/input.scss": "parse_failure",
-		"comment/before_through/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 10 {  }",
 		"comment/before_through/silent/input.scss": "parse_failure",
 		"comment/before_var/loud/input.scss": "parse_failure",
 		"comment/before_var/silent/input.scss": "parse_failure",
-		"empty/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: runtime error: invalid memory address or nil pointer dereference)",
-		"error/from_float/input.scss": "compiler_error_does_not_match",
+		"empty/input.scss": "compiler_panic",
+		"error/from_float/input.scss": "compiler_should_have_errored",
 		"error/from_type/input.scss": "compiler_error_does_not_match",
-		"error/incompatible_units/input.scss": "compiler_error_does_not_match",
-		"error/to_float/input.scss": "compiler_error_does_not_match",
+		"error/incompatible_units/input.scss": "compiler_should_have_errored",
+		"error/to_float/input.scss": "compiler_should_have_errored",
 		"error/to_type/input.scss": "compiler_error_does_not_match",
-		"error/unit_coersion_to_float/input.scss": "compiler_error_does_not_match",
-		"exclusive_backward/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: runtime error: invalid memory address or nil pointer dereference)",
-		"exclusive_forward/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: runtime error: invalid memory address or nil pointer dereference)",
+		"error/unit_coersion_to_float/input.scss": "compiler_should_have_errored",
 		"in_declaration/input.scss": "compiler_output_does_not_match",
-		"inclusive_backward/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 5 through 1 {  }",
-		"inclusive_forward/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 5 {  }",
-		"negative_to_negative/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from -5 through -1 {  }",
-		"negative_to_positive/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from -1 through 3 {  }",
-		"positive_to_negative/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 2 through -1 {  }",
-		"to_scope/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through $limit {  }",
-		"unit/compatible/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 5mm through 1cm {  }",
-		"unit/from_unitless/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 5px {  }",
-		"unit/same/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1px through 5px {  }",
-		"unit/to_unitless/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1px through 5 {  }",
+		"unit/compatible/input.scss": "compiler_output_does_not_match",
+		"unit/same/input.scss": "compiler_output_does_not_match",
+		"unit/to_unitless/input.scss": "compiler_output_does_not_match",
 	},
 	"directives/forward/css.hrx": {
 		"forward_into_import/input.scss": "compiler_output_does_not_match",
@@ -8428,7 +8414,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/loop/for.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 2 {  }",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
 	},
 	"non_conformant/errors/import/url/loop/while.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (if statement STRING() un-implemented)",
@@ -8479,7 +8465,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parser_error_does_not_match",
 	},
 	"non_conformant/errors/invalid-parent/function-in-for.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/errors/invalid-parent/function-in-function.hrx": {
 		"input.scss": "parser_error_does_not_match",
@@ -8497,7 +8483,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parser_error_does_not_match",
 	},
 	"non_conformant/errors/invalid-parent/mixin-in-for.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/errors/invalid-parent/mixin-in-function.hrx": {
 		"input.scss": "parser_error_does_not_match",
@@ -10184,9 +10170,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scope/each.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"non_conformant/scope/for.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: runtime error: invalid memory address or nil pointer dereference)",
-	},
 	"non_conformant/scope/function.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
@@ -10476,7 +10459,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/176_test_newline_selector_rendered_multiple_times.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @for $i from 1 through 2 {  }",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/177_test_prop_name_interpolation_after_hyphen.hrx": {
 		"input.scss": "compiler_output_does_not_match",
