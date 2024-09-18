@@ -50,7 +50,7 @@ var KeywordList = []KeywordToken{
 	{"@for", T_FOR},
 	{"@error", T_ERROR},
 	{"@warn", T_WARN},
-	{"@info", T_INFO},
+	{"@debug", T_DEBUG},
 	{"@while", T_WHILE},
 	{"@content", T_CONTENT},
 	{"@extend", T_EXTEND},
@@ -268,7 +268,7 @@ const (
 	T_AT_ROOT  // for @at-root
 	T_WARN     // @warn
 	T_ERROR    // @error
-	T_INFO     // @info
+	T_DEBUG    // @debug
 	T_FOR
 	T_FOR_FROM
 	T_FOR_THROUGH

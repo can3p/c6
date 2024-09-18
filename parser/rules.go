@@ -137,7 +137,7 @@ func (parser *Parser) ParseStmt() (ast.Stmt, error) {
 		return parser.ParseContentStmt()
 	case ast.T_AT_ROOT:
 		return parser.ParseAtRootStmt()
-	case ast.T_ERROR, ast.T_WARN, ast.T_INFO:
+	case ast.T_ERROR, ast.T_WARN, ast.T_DEBUG:
 		return parser.ParseLogStmt()
 	case ast.T_BRACKET_CLOSE:
 		return nil, nil
@@ -2076,8 +2076,19 @@ func (parser *Parser) ParseFontFaceStmt() (ast.Stmt, error) {
 }
 
 func (parser *Parser) ParseLogStmt() (ast.Stmt, error) {
-	if directiveTok := parser.acceptAnyOf3(ast.T_ERROR, ast.T_WARN, ast.T_INFO); directiveTok != nil {
-		expr, err := parser.ParseExpr(false)
+	if directiveTok := parser.acceptAnyOf3(ast.T_ERROR, ast.T_WARN, ast.T_DEBUG); directiveTok != nil {
+		var ll ast.LogLevel
+
+		switch directiveTok.Type {
+		case ast.T_DEBUG:
+			ll = ast.LogLevelDebug
+		case ast.T_WARN:
+			ll = ast.LogLevelWarn
+		default:
+			ll = ast.LogLevelError
+		}
+
+		expr, err := parser.ParseString()
 		if err != nil {
 			return nil, err
 		}
@@ -2086,14 +2097,11 @@ func (parser *Parser) ParseLogStmt() (ast.Stmt, error) {
 			return nil, err
 		}
 
-		return &ast.LogStmt{
-			Directive: directiveTok,
-			Expr:      expr,
-		}, nil
+		return ast.NewLogStmt(expr, directiveTok, ll), nil
 
 	}
 	return nil, SyntaxError{
-		Reason:      "Expecting @error, @warn, @info directive",
+		Reason:      "Expecting @error, @warn, @debug directive",
 		ActualToken: parser.peek(),
 	}
 }

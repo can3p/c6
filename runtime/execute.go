@@ -8,11 +8,25 @@ import (
 
 const MaxWhileIterations = 10_000
 
-func ExecuteList(scope *Scope, stmts *ast.StmtList) (*ast.StmtList, error) {
+type Printer func(msg any)
+
+type Runtime struct {
+	DebugPrinter Printer
+	WarnPrinter  Printer
+}
+
+func NewRuntime(debug, warn Printer) *Runtime {
+	return &Runtime{
+		DebugPrinter: debug,
+		WarnPrinter:  warn,
+	}
+}
+
+func (r *Runtime) ExecuteList(scope *Scope, stmts *ast.StmtList) (*ast.StmtList, error) {
 	out := &ast.StmtList{}
 
 	for _, stmt := range stmts.Stmts {
-		ret, err := ExecuteSingle(scope, stmt)
+		ret, err := r.ExecuteSingle(scope, stmt)
 
 		if err != nil {
 			return nil, err
@@ -24,27 +38,30 @@ func ExecuteList(scope *Scope, stmts *ast.StmtList) (*ast.StmtList, error) {
 	return out, nil
 }
 
-func ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, error) {
+func (r *Runtime) ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, error) {
 	switch t := stmt.(type) {
+	case *ast.LogStmt:
+		err := r.executeLogStmt(scope, t)
+		return nil, err
 	case *ast.AssignStmt:
-		err := executeAssignStmt(scope, t)
+		err := r.executeAssignStmt(scope, t)
 		return nil, err
 	case *ast.IfStmt:
-		return executeIfStmt(scope, t)
+		return r.executeIfStmt(scope, t)
 	case *ast.ForStmt:
-		return executeForStmt(scope, t)
+		return r.executeForStmt(scope, t)
 	case *ast.WhileStmt:
-		return executeWhileStmt(scope, t)
+		return r.executeWhileStmt(scope, t)
 	case *ast.RuleSet:
-		return executeRuleSet(scope, t)
+		return r.executeRuleSet(scope, t)
 	case *ast.Property:
-		return executeProperty(scope, t)
+		return r.executeProperty(scope, t)
 	}
 
 	return nil, fmt.Errorf("Don't know how to execute the statement %v", stmt)
 }
 
-func executeCondition(e ast.Expr, scope *Scope) (bool, error) {
+func (r *Runtime) executeCondition(e ast.Expr, scope *Scope) (bool, error) {
 	v, err := EvaluateExprInBooleanContext(e, scope)
 
 	if err != nil {
@@ -66,13 +83,13 @@ func executeCondition(e ast.Expr, scope *Scope) (bool, error) {
 	return false, fmt.Errorf("BooleanValue interface is not support for %T", v)
 }
 
-func executeWhileStmt(scope *Scope, stmt *ast.WhileStmt) (*ast.StmtList, error) {
+func (r *Runtime) executeWhileStmt(scope *Scope, stmt *ast.WhileStmt) (*ast.StmtList, error) {
 	child := NewScope(scope)
 	count := 0
 	out := &ast.StmtList{}
 
 	for {
-		keepGoing, err := executeCondition(stmt.Condition, child)
+		keepGoing, err := r.executeCondition(stmt.Condition, child)
 
 		if err != nil {
 			return nil, err
@@ -82,7 +99,7 @@ func executeWhileStmt(scope *Scope, stmt *ast.WhileStmt) (*ast.StmtList, error) 
 			break
 		}
 
-		l, err := ExecuteList(child, &stmt.Block.Stmts)
+		l, err := r.ExecuteList(child, &stmt.Block.Stmts)
 
 		if err != nil {
 			return nil, err
@@ -99,7 +116,7 @@ func executeWhileStmt(scope *Scope, stmt *ast.WhileStmt) (*ast.StmtList, error) 
 	return out, nil
 }
 
-func executeForStmt(scope *Scope, stmt *ast.ForStmt) (*ast.StmtList, error) {
+func (r *Runtime) executeForStmt(scope *Scope, stmt *ast.ForStmt) (*ast.StmtList, error) {
 
 	eval := func(e ast.Expr) (int, error) {
 		v, err := EvaluateExpr(e, scope)
@@ -151,7 +168,7 @@ func executeForStmt(scope *Scope, stmt *ast.ForStmt) (*ast.StmtList, error) {
 		child := NewScope(scope)
 		child.Insert(stmt.Variable.NormalizedName(), ast.NewNumber(float64(from), nil, nil))
 
-		l, err := ExecuteList(child, &stmt.Block.Stmts)
+		l, err := r.ExecuteList(child, &stmt.Block.Stmts)
 
 		if err != nil {
 			return nil, err
@@ -164,10 +181,10 @@ func executeForStmt(scope *Scope, stmt *ast.ForStmt) (*ast.StmtList, error) {
 	return out, nil
 }
 
-func executeIfStmt(scope *Scope, stmt *ast.IfStmt) (*ast.StmtList, error) {
+func (r *Runtime) executeIfStmt(scope *Scope, stmt *ast.IfStmt) (*ast.StmtList, error) {
 	var out *ast.StmtList
 
-	v, err := executeCondition(stmt.Condition, scope)
+	v, err := r.executeCondition(stmt.Condition, scope)
 
 	if err != nil {
 		return nil, err
@@ -177,7 +194,7 @@ func executeIfStmt(scope *Scope, stmt *ast.IfStmt) (*ast.StmtList, error) {
 		out = &stmt.Block.Stmts
 	} else {
 		for _, elsif := range stmt.ElseIfs {
-			v, err := executeCondition(elsif.Condition, scope)
+			v, err := r.executeCondition(elsif.Condition, scope)
 
 			if err != nil {
 				return nil, err
@@ -200,10 +217,34 @@ func executeIfStmt(scope *Scope, stmt *ast.IfStmt) (*ast.StmtList, error) {
 
 	child := NewScope(scope)
 
-	return ExecuteList(child, out)
+	return r.ExecuteList(child, out)
 }
 
-func executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {
+func (r *Runtime) executeLogStmt(scope *Scope, stmt *ast.LogStmt) error {
+	if stmt.Expr == nil {
+		return fmt.Errorf("Expected expression")
+	}
+
+	v, err := EvaluateExpr(stmt.Expr, scope)
+
+	if err != nil {
+		return err
+	}
+
+	switch stmt.LogLevel {
+	case ast.LogLevelDebug:
+		r.DebugPrinter(v)
+	case ast.LogLevelWarn:
+		r.WarnPrinter(v)
+	default:
+		//nolint:govet,staticcheck
+		return fmt.Errorf(v.String())
+	}
+
+	return nil
+}
+
+func (r *Runtime) executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {
 	varName := stmt.Variable.Name
 	val, err := EvaluateExpr(stmt.Expr, scope)
 
@@ -220,10 +261,10 @@ func executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {
 	return nil
 }
 
-func executeRuleSet(scope *Scope, stmt *ast.RuleSet) (*ast.StmtList, error) {
+func (r *Runtime) executeRuleSet(scope *Scope, stmt *ast.RuleSet) (*ast.StmtList, error) {
 	child := NewScope(scope)
 
-	res, err := ExecuteList(child, &stmt.Block.Stmts)
+	res, err := r.ExecuteList(child, &stmt.Block.Stmts)
 
 	if err != nil {
 		return nil, err
@@ -240,7 +281,7 @@ func executeRuleSet(scope *Scope, stmt *ast.RuleSet) (*ast.StmtList, error) {
 	}, nil
 }
 
-func executeProperty(scope *Scope, stmt *ast.Property) (*ast.StmtList, error) {
+func (r *Runtime) executeProperty(scope *Scope, stmt *ast.Property) (*ast.StmtList, error) {
 	ret := ast.NewProperty(stmt.Name.Token)
 
 	for _, e := range stmt.Values {

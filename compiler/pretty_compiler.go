@@ -3,6 +3,7 @@ package compiler
 import (
 	"bytes"
 	"fmt"
+	"os"
 
 	"github.com/c9s/c6/ast"
 	"github.com/c9s/c6/runtime"
@@ -12,15 +13,43 @@ const indentSpace = "  "
 
 var ErrUnknownAstNode = fmt.Errorf("Unknown ast node to compile")
 
-type PrettyCompiler struct {
-	Buffer *bytes.Buffer
-	Indent int
+type Option func(p *PrettyCompiler)
+
+func DefaultPrinter(msg any) {
+	fmt.Fprintln(os.Stderr, msg)
 }
 
-func NewPrettyCompiler(buf *bytes.Buffer) *PrettyCompiler {
-	return &PrettyCompiler{
-		Buffer: buf,
-		Indent: 0,
+type PrettyCompiler struct {
+	Buffer       *bytes.Buffer
+	Indent       int
+	DebugPrinter runtime.Printer
+	WarnPrinter  runtime.Printer
+}
+
+func NewPrettyCompiler(buf *bytes.Buffer, o ...Option) *PrettyCompiler {
+	c := &PrettyCompiler{
+		Buffer:       buf,
+		Indent:       0,
+		DebugPrinter: DefaultPrinter,
+		WarnPrinter:  DefaultPrinter,
+	}
+
+	for _, o := range o {
+		o(c)
+	}
+
+	return c
+}
+
+func WithDebug(p runtime.Printer) Option {
+	return func(c *PrettyCompiler) {
+		c.DebugPrinter = p
+	}
+}
+
+func WithWarn(p runtime.Printer) Option {
+	return func(c *PrettyCompiler) {
+		c.WarnPrinter = p
 	}
 }
 
@@ -128,7 +157,8 @@ func (c *PrettyCompiler) CompileRoot(list []*ast.StmtList) error {
 
 func (c *PrettyCompiler) Compile(list *ast.StmtList) error {
 	scope := runtime.NewScope(nil)
-	executed, err := runtime.ExecuteList(scope, list)
+	r := runtime.NewRuntime(c.DebugPrinter, c.WarnPrinter)
+	executed, err := r.ExecuteList(scope, list)
 
 	if err != nil {
 		return err
