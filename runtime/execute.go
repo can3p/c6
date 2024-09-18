@@ -237,6 +237,7 @@ func (r *Runtime) executeLogStmt(scope *Scope, stmt *ast.LogStmt) error {
 	case ast.LogLevelWarn:
 		r.WarnPrinter(v)
 	default:
+		//nolint:govet,staticcheck
 		return fmt.Errorf(v.String())
 	}
 
