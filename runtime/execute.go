@@ -56,6 +56,11 @@ func (r *Runtime) ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, err
 		return r.executeRuleSet(scope, t)
 	case *ast.Property:
 		return r.executeProperty(scope, t)
+	case *ast.MixinStmt:
+		err := r.executeMixinStmt(scope, t)
+		return nil, err
+	case *ast.IncludeStmt:
+		return r.executeIncludeStmt(scope, t)
 	}
 
 	return nil, fmt.Errorf("Don't know how to execute the statement %v", stmt)
@@ -242,6 +247,22 @@ func (r *Runtime) executeLogStmt(scope *Scope, stmt *ast.LogStmt) error {
 	}
 
 	return nil
+}
+
+func (r *Runtime) executeMixinStmt(scope *Scope, stmt *ast.MixinStmt) error {
+	scope.InsertMixin(stmt.NormalizedName(), stmt)
+
+	return nil
+}
+
+func (r *Runtime) executeIncludeStmt(scope *Scope, stmt *ast.IncludeStmt) (*ast.StmtList, error) {
+	m, err := scope.LookupMixin(stmt.NormalizedName())
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &m.Block.Stmts, nil
 }
 
 func (r *Runtime) executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {
