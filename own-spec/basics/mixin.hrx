@@ -12,4 +12,18 @@ p {
   a: b;
 }
 
+<===> basic/one_arg/input.scss
+@mixin abc($a) {
+  a: $a;
+}
+
+p {
+  @include abc(123);
+}
+
+<===> basic/one_arg/output.css
+p {
+  a: 123
+}
+
 <===>
