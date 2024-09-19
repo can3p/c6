@@ -3,7 +3,7 @@ package testspec
 var BlacklistedSpecs = map[string]map[string]string{
 	"arguments/invocation.hrx": {
 		"function/error/positional_after_named/input.scss": "parser_error_does_not_match",
-		"mixin/error/duplicate_named/input.scss": "compiler_error_does_not_match",
+		"mixin/error/duplicate_named/input.scss": "compiler_should_have_errored",
 		"mixin/error/duplicate_named_normalization/input.scss": "parser_error_does_not_match",
 		"mixin/error/positional_after_named/input.scss": "parser_error_does_not_match",
 	},
@@ -1369,7 +1369,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"core_functions/global/meta.hrx": {
 		"call/input.scss": "compiler_output_does_not_match",
-		"content_exists/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"content_exists/input.scss": "compiler_output_does_not_match",
 		"feature_exists/input.scss": "compiler_output_does_not_match",
 		"function_exists/input.scss": "compiler_output_does_not_match",
 		"get_function/input.scss": "compiler_output_does_not_match",
@@ -4302,7 +4302,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"css/font-face.hrx": {
 		"bubble/deeply-nested/input.scss": "unhandled_warning",
 		"bubble/empty/input.scss": "parse_failure",
-		"bubble/in-mixin/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"bubble/in-mixin/input.scss": "compiler_unexpected_compile_error - Unexpected node type in the expanded tree: *ast.FontFaceStmt",
 		"bubble/loaded/import/input.scss": "parse_failure",
 		"bubble/loaded/meta-load-css/input.scss": "unhandled_warning",
 		"bubble/rules/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement",
@@ -4364,7 +4364,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"css/keyframes.hrx": {
 		"bubble/empty/input.scss": "compiler_panic",
-		"bubble/in-mixin/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"bubble/in-mixin/input.scss": "compiler_output_does_not_match",
 		"bubble/rules/input.scss": "compiler_output_does_not_match",
 		"error/in_keyframe_block/style_rule/input.scss": "compiler_should_have_errored",
 		"in_keyframe_block/known_at_rule/input.scss": "compiler_output_does_not_match",
@@ -5223,7 +5223,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"with/no_arguments/input.scss": "compiler_should_have_errored",
 		"with/space_after_dollar/input.scss": "compiler_should_have_errored",
 		"within/function/input.scss": "compiler_error_does_not_match",
-		"within/mixin/input.scss": "compiler_error_does_not_match",
+		"within/mixin/input.scss": "compiler_should_have_errored",
 		"within/style_rule/input.scss": "compiler_panic",
 	},
 	"directives/forward/error/with.hrx": {
@@ -5549,9 +5549,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"comment/include/before_name/silent/input.scss": "parse_failure",
 		"comment/include/before_using/loud/input.scss": "parse_failure",
 		"comment/include/before_using/silent/input.scss": "parse_failure",
-		"comment/mixin/after_args/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 		"comment/mixin/after_args/silent/input.scss": "parse_failure",
-		"comment/mixin/before_name/loud/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 		"comment/mixin/before_name/silent/input.scss": "parse_failure",
 		"custom_ident_include/input.scss": "parse_failure",
 		"custom_ident_name/input.scss": "parse_failure",
@@ -5701,7 +5699,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"directives/use/error/syntax/within.hrx": {
 		"function/input.scss": "parser_error_does_not_match",
-		"mixin/input.scss": "compiler_error_does_not_match",
+		"mixin/input.scss": "compiler_should_have_errored",
 		"style_rule/input.scss": "compiler_panic",
 	},
 	"directives/use/error/with.hrx": {
@@ -5915,7 +5913,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1030.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1036.hrx": {
 		"input.scss": "parse_failure",
@@ -6404,7 +6402,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1550/mixin_embedded.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass-closed-issues/issue_1550/while_embedded.hrx": {
 		"input.scss": "compiler_error_does_not_match",
@@ -6479,7 +6477,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "unhandled_warning",
 	},
 	"libsass-closed-issues/issue_1640.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Tree can only contain rule sets, but has variable of type *ast.IfStmt",
 	},
 	"libsass-closed-issues/issue_1644/complex.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -6594,9 +6592,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"libsass-closed-issues/issue_1732/valid/mixin-call.hrx": {
 		"input.scss": "parse_failure",
-	},
-	"libsass-closed-issues/issue_1732/valid/mixin-def.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"libsass-closed-issues/issue_1732/valid/propset.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -6800,7 +6795,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2006.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 7, offset 51",
 	},
 	"libsass-closed-issues/issue_2007.hrx": {
 		"input.scss": "parse_failure",
@@ -6971,22 +6966,22 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_2260/inner-parent-no-compound.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Tree can only contain rule sets, but has variable of type *ast.AtRootStmt",
 	},
 	"libsass-closed-issues/issue_2260/inner-parent-with-compound.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Tree can only contain rule sets, but has variable of type *ast.AtRootStmt",
 	},
 	"libsass-closed-issues/issue_2260/no-parent-no-compound.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Tree can only contain rule sets, but has variable of type *ast.AtRootStmt",
 	},
 	"libsass-closed-issues/issue_2260/no-parent-with-compound.hrx": {
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_2260/outer-parent-no-compound.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Unexpected node type in the expanded tree: *ast.AtRootStmt",
 	},
 	"libsass-closed-issues/issue_2260/outer-parent-with-compound.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Unexpected node type in the expanded tree: *ast.AtRootStmt",
 	},
 	"libsass-closed-issues/issue_2261.hrx": {
 		"input.scss": "parse_failure",
@@ -7109,7 +7104,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2482.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass-closed-issues/issue_2509.hrx": {
 		"input.scss": "parse_failure",
@@ -7229,7 +7224,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_487.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_492.hrx": {
 		"input.scss": "parse_failure",
@@ -7298,10 +7293,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_579.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_59.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Unexpected node type in the expanded tree: *ast.ContentStmt",
 	},
 	"libsass-closed-issues/issue_590.hrx": {
 		"input.scss": "parse_failure",
@@ -7322,7 +7317,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_613.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"libsass-closed-issues/issue_615.hrx": {
 		"input.scss": "parse_failure",
@@ -7429,9 +7424,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_72.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass-closed-issues/issue_73.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
-	},
 	"libsass-closed-issues/issue_733.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
@@ -7457,7 +7449,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_77.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Unexpected node type in the expanded tree: *ast.ContentStmt",
 	},
 	"libsass-closed-issues/issue_783.hrx": {
 		"input.scss": "compiler_panic",
@@ -7622,7 +7614,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass-todo-issues/issue_2096.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Tree can only contain rule sets, but has variable of type *ast.ImportStmt",
 	},
 	"libsass-todo-issues/issue_221260.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -7676,7 +7668,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 1, offset 9",
 	},
 	"libsass/at-root/137_test_at_root_in_mixin.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Unexpected node type in the expanded tree: *ast.AtRootStmt",
 	},
 	"libsass/at-root/138_test_at_root_in_media.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen",
@@ -7922,7 +7914,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass/error-directive-nested/mixin.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass/http_import.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
@@ -8210,7 +8202,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/basic/31_if_in_mixin.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Unexpected node type in the expanded tree: *ast.IfStmt",
 	},
 	"non_conformant/basic/32_percentages.hrx": {
 		"input.scss": "unhandled_warning",
@@ -8474,7 +8466,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/invalid-parent/function-in-mixin.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/errors/invalid-parent/function-in-while.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -8489,10 +8481,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parser_error_does_not_match",
 	},
 	"non_conformant/errors/invalid-parent/mixin-in-if.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/errors/invalid-parent/mixin-in-mixin.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/errors/invalid-parent/mixin-in-while.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -9322,10 +9314,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/mixin/environment_locality.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Unexpected node type in the expanded tree: *ast.AssignStmt",
 	},
 	"non_conformant/mixin/error/no_content.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"non_conformant/nesting/not.hrx": {
 		"multiple_parent_selectors_with_trailing_ident/input.scss": "compiler_output_does_not_match",
@@ -10174,7 +10166,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/scope/mixin.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Tree can only contain rule sets, but has variable of type *ast.AssignStmt",
 	},
 	"non_conformant/scss-tests/002_test_one_line_comments.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10278,23 +10270,8 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss-tests/053_test_no_namespace_properties_without_space.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss-tests/054_test_basic_mixins.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
-	},
 	"non_conformant/scss-tests/055_test_basic_mixins.hrx": {
 		"input.scss": "unhandled_warning",
-	},
-	"non_conformant/scss-tests/056_test_basic_mixins.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
-	},
-	"non_conformant/scss-tests/057_test_mixins_with_empty_args.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
-	},
-	"non_conformant/scss-tests/058_test_mixins_with_empty_args.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
-	},
-	"non_conformant/scss-tests/059_test_mixins_with_empty_args.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss-tests/060_test_mixins_with_args.hrx": {
 		"input.scss": "parse_failure",
@@ -10425,9 +10402,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss-tests/130_test_random_directive_interpolation.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss-tests/131_test_nested_mixin_def.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
-	},
 	"non_conformant/scss-tests/132_test_nested_mixin_shadow.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -10465,10 +10439,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/183_test_passing_required_args_as_a_keyword_arg.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/184_test_passing_all_as_keyword_args_in_opposite_order.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/185_test_keyword_args_in_functions.hrx": {
 		"input.scss": "parse_failure",
@@ -10508,9 +10482,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"non_conformant/scss/basic_function.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
-	},
-	"non_conformant/scss/basic_mixins.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
 	},
 	"non_conformant/scss/basic_prop_name_interpolation.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10609,7 +10580,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/if-in-mixin.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_unexpected_compile_error - Unexpected node type in the expanded tree: *ast.IfStmt",
 	},
 	"non_conformant/scss/if-in-propset.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -10677,9 +10648,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss/mixins_with_args.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"non_conformant/scss/mixins_with_empty_args.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
-	},
 	"non_conformant/scss/multiline-var.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -10726,10 +10694,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/passing_all_as_keyword_args_in_opposite_order.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/passing_required_args_as_a_keyword_arg.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement {mixin}",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/percentages.hrx": {
 		"input.scss": "unhandled_warning",
@@ -12192,10 +12160,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"positive/input.scss": "compiler_output_does_not_match",
 	},
 	"values/strings.hrx": {
-		"new-line/cr/input.scss": "compiler_error_does_not_match",
+		"new-line/cr/input.scss": "compiler_should_have_errored",
 		"new-line/escaped/input.scss": "compiler_output_does_not_match",
-		"new-line/ff/input.scss": "compiler_error_does_not_match",
-		"new-line/raw/input.scss": "compiler_error_does_not_match",
+		"new-line/ff/input.scss": "compiler_should_have_errored",
+		"new-line/raw/input.scss": "compiler_should_have_errored",
 	},
 	"variables.hrx": {
 		"comment/after_colon/loud/input.scss": "compiler_panic",
