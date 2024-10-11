@@ -45,3 +45,19 @@ p {
 }
 
 <===>
+https://sass-lang.com/playground/#eJwzNHTIzazIzFNITErWUEnUVKjmUlBItFJQSbTmquXiKgDzHTLzknNKU1KhiqwUDDWBsgDg0w/B?s=L1C1-L7C2
+<===> basic/named_arg/input.scss
+@mixin abc($a) {
+  a: $a;
+}
+
+p {
+  @include abc($a: 1);
+}
+
+<===> basic/named_arg/output.css
+p {
+  a: 1;
+}
+
+<===>
