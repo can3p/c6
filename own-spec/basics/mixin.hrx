@@ -27,3 +27,21 @@ p {
 }
 
 <===>
+https://sass-lang.com/playground/#eJwzNHTIzazIzFNITErWUEnUUVBJslIw0lSo5lJQSLRSUEm0BjKAQipJ1ly1XFwFYAmHzLzknNKUVLAmQyNjTaAcAKuxEmw=?s=L1C1-L8C2
+<===> basic/one_arg_and_default/input.scss
+@mixin abc($a, $b: 2) {
+  a: $a;
+  b: $b;
+}
+
+p {
+  @include abc(123);
+}
+
+<===> basic/one_arg_and_default/output.css
+p {
+  a: 123;
+  b: 2;
+}
+
+<===>

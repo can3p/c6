@@ -267,7 +267,17 @@ func (r *Runtime) executeIncludeStmt(scope *Scope, stmt *ast.IncludeStmt) (*ast.
 	if m.ArgumentList != nil {
 		for idx, v := range m.ArgumentList.Arguments {
 			name := v.Name.Str
-			val, err := EvaluateExpr(stmt.ArgumentList[idx], child)
+
+			var val ast.Value
+			var err error
+
+			if idx < len(stmt.ArgumentList) {
+				val, err = EvaluateExpr(stmt.ArgumentList[idx], child)
+			} else if v.DefaultValue != nil {
+				val, err = EvaluateExpr(v.DefaultValue, child)
+			} else {
+				return nil, fmt.Errorf("Failed to resolve argument nr %d, including mixin %s", idx+1, stmt.NormalizedName())
+			}
 
 			if err != nil {
 				return nil, err
