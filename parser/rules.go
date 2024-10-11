@@ -1963,55 +1963,23 @@ func (parser *Parser) ParseFunctionPrototype() (*ast.ArgumentList, error) {
 	return args, nil
 }
 
-func (parser *Parser) ParseFunctionCallArgument() (*ast.Argument, error) {
-	debug("ParseFunctionCallArgument")
-
-	var varTok *ast.Token
-	if varTok = parser.accept(ast.T_VARIABLE); varTok == nil {
-		return nil, nil
-	}
-
-	var arg = ast.NewArgumentWithToken(varTok)
-
-	if parser.accept(ast.T_COLON) != nil {
-		val, err := parser.ParseValueStrict()
-		if err != nil {
-			return nil, err
-		}
-
-		arg.DefaultValue = val
-	}
-	return arg, nil
-}
-
-func (parser *Parser) ParseFunctionCallArguments() (*ast.ArgumentList, error) {
+func (parser *Parser) ParseFunctionCallArguments() ([]ast.Expr, error) {
 	debug("ParseFunctionCallArguments")
 
-	var args = ast.NewArgumentList()
+	args := []ast.Expr{}
 
 	if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
 		return nil, err
 	}
 	var tok = parser.peek()
 	for tok.Type != ast.T_PAREN_CLOSE {
-		var arg *ast.Argument
-		var err error
-		if arg, err = parser.ParseFunctionCallArgument(); err != nil {
+		val, err := parser.ParseExpr(false)
+		if err != nil {
 			return nil, err
-		} else if arg != nil {
-			args.Add(arg)
-		} else {
-			// if fail
-			break
 		}
-		if tok = parser.accept(ast.T_COMMA); tok != nil {
-			continue
-		} else if tok = parser.accept(ast.T_VARIABLE_LENGTH_ARGUMENTS); tok != nil {
-			arg.VariableLength = true
-			break
-		} else {
-			break
-		}
+
+		args = append(args, val)
+		tok = parser.peek()
 	}
 	if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
 		return nil, err
@@ -2037,7 +2005,7 @@ func (parser *Parser) ParseIncludeStmt() (ast.Stmt, error) {
 
 		stm.MixinIdent = tok2
 
-		if al, err := parser.ParseFunctionPrototype(); err != nil {
+		if al, err := parser.ParseFunctionCallArguments(); err != nil {
 			return nil, err
 		} else {
 			stm.ArgumentList = al

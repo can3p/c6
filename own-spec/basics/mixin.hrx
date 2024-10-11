@@ -13,17 +13,17 @@ p {
 }
 
 <===> basic/one_arg/input.scss
-@mixin abc($a) {
+@mixin abc2($a) {
   a: $a;
 }
 
 p {
-  @include abc(123);
+  @include abc2(123);
 }
 
 <===> basic/one_arg/output.css
 p {
-  a: 123
+  a: 123;
 }
 
 <===>

@@ -262,7 +262,23 @@ func (r *Runtime) executeIncludeStmt(scope *Scope, stmt *ast.IncludeStmt) (*ast.
 		return nil, err
 	}
 
-	return &m.Block.Stmts, nil
+	child := NewScope(scope)
+
+	if m.ArgumentList != nil {
+		for idx, v := range m.ArgumentList.Arguments {
+			name := v.Name.Str
+			val, err := EvaluateExpr(stmt.ArgumentList[idx], child)
+
+			if err != nil {
+				return nil, err
+			}
+
+			child.Insert(name, val)
+		}
+	}
+
+	l, err := r.ExecuteList(child, &m.Block.Stmts)
+	return l, err
 }
 
 func (r *Runtime) executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {

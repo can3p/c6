@@ -5,7 +5,7 @@ import "strings"
 type IncludeStmt struct {
 	Token        *Token // @include
 	MixinIdent   *Token // mixin identitfier
-	ArgumentList *ArgumentList
+	ArgumentList []Expr
 	ContentBlock *DeclBlock // if any
 }
 
