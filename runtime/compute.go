@@ -501,17 +501,6 @@ func EvaluateExpr(expr ast.Expr, scope *Scope) (v ast.Value, err error) {
 
 }
 
-func EvaluateFunctionCall(fcall ast.FunctionCall, context *Context) (ast.Value, error) {
-	if fun, ok := context.Functions.Get(fcall.Ident.Str); ok {
-
-		_ = fun
-
-	} else {
-		return nil, fmt.Errorf("Function %s is undefined.", fcall.Ident.Str)
-	}
-	return nil, nil
-}
-
 /*
 EvaluateBinaryExpr recursively.
 */
