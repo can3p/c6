@@ -6,13 +6,12 @@ import (
 	"testing"
 
 	"github.com/c9s/c6/parser"
-	"github.com/c9s/c6/runtime"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func AssertPrettyCompile(t *testing.T, code string, expected string) {
-	var context = runtime.NewContext()
+	var context = parser.NewContext()
 	var parser = parser.NewParser(context)
 	stmts, err := parser.ParseScss(code)
 	require.NoError(t, err)

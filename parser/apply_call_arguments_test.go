@@ -34,11 +34,12 @@ func TestApplyCallArguments(t *testing.T) {
 
 			callArgs := includeStmt.ArgumentList
 
-			text = fmt.Sprintf(`@mixin abc(%s);`, ex.proto)
+			text = fmt.Sprintf(`@mixin abc(%s) {};`, ex.proto)
 			stmts, err = RunParserTest(text)
 			require.NoError(t, err)
 
 			mixinStmt, ok := stmts.Stmts[0].(*ast.MixinStmt)
+			require.True(t, ok)
 
 			protoArgs := mixinStmt.ArgumentList
 

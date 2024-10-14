@@ -618,52 +618,6 @@ func (parser *Parser) ParseNumber() (ast.Expr, error) {
 	return ast.NewNumber(val, nil, tok), nil
 }
 
-/*
-This parse method looks up the argument in the function declaration and convert
-the keyword arguments into the argument list. this way, we can handle the function call
-in a simple way - push/pop the stack.
-
-@param fcall ast.FunctionCall The current parsing function call ast node
-@return arguments []Expr
-*/
-func (parser *Parser) ParseKeywordArguments(fcall *ast.FunctionCall) (*ast.FunctionCallArguments, error) {
-	// look up function declaration
-	var item, ok = parser.GlobalContext.Functions.Get(fcall.Ident.Str)
-	if !ok {
-		return nil, fmt.Errorf("Undefined function %s", fcall.Ident.Str)
-	}
-	var fun = item.(*ast.Function)
-
-	var arguments = ast.FunctionCallArguments{}
-	for tok := parser.accept(ast.T_VARIABLE); tok != nil; tok = parser.accept(ast.T_VARIABLE) {
-		var argdef = fun.ArgumentList.Lookup(tok.Str)
-		if argdef == nil {
-			return nil, fmt.Errorf("Undefined function argument: %s", tok.Str)
-		}
-
-		if _, err := parser.expect(ast.T_COLON); err != nil {
-			return nil, err
-		}
-
-		argExpr, err := parser.ParseExpr(false)
-		if err != nil {
-			return nil, err
-		}
-
-		// TODO: this should be checked?
-		parser.accept(ast.T_COMMA)
-
-		var arg = ast.NewFunctionCallArgument(argExpr)
-		arg.ArgumentDefineReference = argdef
-
-		arguments = append(arguments, arg)
-	}
-
-	// sort arguments by ArgumentDefineReference
-	arguments.Sort()
-	return &arguments, nil
-}
-
 func (parser *Parser) ParseFunctionCall() (*ast.FunctionCall, error) {
 	var identTok = parser.next()
 
@@ -671,42 +625,13 @@ func (parser *Parser) ParseFunctionCall() (*ast.FunctionCall, error) {
 
 	var fcall = ast.NewFunctionCallWithToken(identTok)
 
-	if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
+	al, err := parser.ParseFunctionCallArguments()
+
+	if err != nil {
 		return nil, err
 	}
 
-	var tok = parser.peek()
-	var tok2 = parser.peekBy(2)
-	if tok.Type == ast.T_VARIABLE && tok2.Type == ast.T_COLON {
-
-		args, err := parser.ParseKeywordArguments(fcall)
-		if err != nil {
-			return nil, err
-		}
-
-		fcall.Arguments = *args
-
-	} else {
-		for tok.Type != ast.T_PAREN_CLOSE {
-
-			if arg, err := parser.ParseFactor(); err != nil {
-				return nil, err
-			} else if arg != nil {
-				fcall.AppendArgument(arg)
-				debug("ParseFunctionCall => arg: %+v", arg)
-			} else {
-				break
-			}
-
-			if parser.accept(ast.T_COMMA) != nil {
-				tok = parser.peek()
-				continue
-			}
-		}
-	}
-	if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
-		return nil, err
-	}
+	fcall.Arguments = al
 
 	return fcall, nil
 }
@@ -1862,7 +1787,7 @@ func (parser *Parser) ParseFunctionDeclaration() (ast.Stmt, error) {
 	} else {
 		fun.Block = bl
 	}
-	parser.GlobalContext.Functions.Set(identTok.Str, fun)
+	//parser.GlobalContext.Functions.Set(identTok.Str, fun)
 	return fun, nil
 }
 
@@ -1901,7 +1826,7 @@ func (parser *Parser) ParseMixinStmt() (ast.Stmt, error) {
 		stm.Block = b
 	}
 
-	parser.GlobalContext.Mixins.Set(stm.Ident.Str, stm)
+	//parser.GlobalContext.Mixins.Set(stm.Ident.Str, stm)
 	return stm, nil
 }
 
