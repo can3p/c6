@@ -472,6 +472,55 @@ func EvaluateExpr(expr ast.Expr, scope *Scope) (v ast.Value, err error) {
 	case *ast.UnaryExpr:
 		return EvaluateUnaryExpr(t, scope)
 
+	case *ast.ListLookup:
+		if val, err := scope.Lookup(t.Variable.NormalizedName()); err != nil {
+			return nil, err
+		} else {
+			l, ok := val.(*ast.List)
+
+			if !ok {
+				return nil, fmt.Errorf("%s is not a list", t.Variable.NormalizedName())
+			}
+
+			if t.Idx >= l.Len() {
+				return nil, fmt.Errorf("%s lookup is out of bounds, idx = %d, len = %d", t.Variable.NormalizedName(), t.Idx, l.Len())
+			}
+
+			return EvaluateExpr(l.Exprs[t.Idx], scope)
+		}
+
+	case *ast.ListSlice:
+		if val, err := scope.Lookup(t.Variable.NormalizedName()); err != nil {
+			return nil, err
+		} else {
+			l, ok := val.(*ast.List)
+
+			if !ok {
+				return nil, fmt.Errorf("%s is not a list", t.Variable.NormalizedName())
+			}
+
+			if t.FromIdx > l.Len() {
+				return nil, fmt.Errorf("%s lookup is out of bounds, idx = %d, len = %d", t.Variable.NormalizedName(), t.FromIdx, l.Len())
+			}
+
+			val := &ast.List{
+				Separator: " ",
+			}
+
+			if t.FromIdx < l.Len() {
+				for _, expr := range l.Exprs[t.FromIdx:] {
+					evaluated, err := EvaluateExpr(expr, scope)
+					if err != nil {
+						return nil, err
+					}
+
+					val.Append(evaluated)
+				}
+			}
+
+			return val, nil
+		}
+
 	case *ast.Variable:
 		if val, err := scope.Lookup(t.NormalizedName()); err != nil {
 			return nil, err
