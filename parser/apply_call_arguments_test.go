@@ -45,6 +45,18 @@ func TestApplyCallArguments(t *testing.T) {
 			proto:       "$a, $b...",
 			expected:    "$a: 1, $b: [2 3]",
 		},
+		{
+			description: "spread in callsite",
+			args:        "1, $d...",
+			proto:       "$a, $b, $c",
+			expected:    "$a: 1, $b: $d[0], $c: $d[1]",
+		},
+		{
+			description: "spread in callsite crossed with the spread in the proto",
+			args:        "1, $d...",
+			proto:       "$a, $b, $c...",
+			expected:    "$a: 1, $b: $d[0], $c: $d[1:]",
+		},
 	}
 
 	for _, ex := range ex {

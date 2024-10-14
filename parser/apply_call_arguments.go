@@ -12,15 +12,25 @@ func ApplyCallArguments(protoList *ast.ArgumentList, callList *ast.CallArgumentL
 	kwMap := map[string]*ast.CallArgument{}
 	kwArgsIdx := len(callList.Args)
 
-	var spreadFound bool
+	var spreadInProtoFound bool
+	var spreadInCallSite *ast.Variable
 
 	if l := len(protoList.Arguments); l > 0 && protoList.Arguments[l-1].VariableLength {
-		spreadFound = true
+		spreadInProtoFound = true
+	}
+
+	if l := len(callList.Args); l > 0 && callList.Args[l-1].VariableLength {
+		v, ok := callList.Args[l-1].Value.(*ast.Variable)
+		if !ok {
+			return nil, fmt.Errorf("only a list could be used with spread operator")
+		}
+
+		spreadInCallSite = v
 	}
 
 	for idx, arg := range callList.Args {
 		if arg.Name != nil {
-			if spreadFound {
+			if spreadInProtoFound || spreadInCallSite != nil {
 				return nil, fmt.Errorf("Named arguments cannot work with spread operator")
 			}
 
@@ -45,18 +55,26 @@ func ApplyCallArguments(protoList *ast.ArgumentList, callList *ast.CallArgumentL
 
 		// spread var is always the last one, this is (should be) checked in parser
 		if proto.VariableLength {
-			list := ast.NewList(" ")
-			if idx < len(callList.Args) {
-				for _, callArg := range callList.Args[idx:] {
-					list.Append(callArg.Value)
+			if spreadInCallSite != nil && idx >= len(callList.Args)-1 {
+				val = ast.NewListSlice(spreadInCallSite, idx-(len(callList.Args)-1))
+			} else {
+
+				list := ast.NewList(" ")
+				if idx < len(callList.Args) {
+					for _, callArg := range callList.Args[idx:] {
+						list.Append(callArg.Value)
+					}
 				}
+				val = list
 			}
 
-			out.Args = append(out.Args, ast.NewCallArgumentWithToken(v, list))
+			out.Args = append(out.Args, ast.NewCallArgumentWithToken(v, val))
 			break
 		}
 
-		if idx < kwArgsIdx {
+		if spreadInCallSite != nil && idx >= len(callList.Args)-1 {
+			val = ast.NewListLookup(spreadInCallSite, idx-(len(callList.Args)-1))
+		} else if idx < kwArgsIdx {
 			val = callList.Args[idx].Value
 		} else if arg, ok := kwMap[v.NormalizedName()]; ok {
 			val = arg.Value
