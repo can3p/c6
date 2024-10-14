@@ -1963,23 +1963,64 @@ func (parser *Parser) ParseFunctionPrototype() (*ast.ArgumentList, error) {
 	return args, nil
 }
 
-func (parser *Parser) ParseFunctionCallArguments() ([]ast.Expr, error) {
+func (parser *Parser) ParseFunctionCallArguments() (*ast.CallArgumentList, error) {
 	debug("ParseFunctionCallArguments")
 
-	args := []ast.Expr{}
+	args := &ast.CallArgumentList{}
 
 	if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
 		return nil, err
 	}
 	var tok = parser.peek()
-	for tok.Type != ast.T_PAREN_CLOSE {
-		val, err := parser.ParseExpr(false)
-		if err != nil {
-			return nil, err
+	idx := 0
+	for {
+		idx++
+		if idx > 100 {
+			return nil, fmt.Errorf("stackoverflow")
 		}
 
-		args = append(args, val)
+		var val ast.Expr
+		var pos = parser.Pos
+
+		if listValue, err := parser.ParseSpaceSepList(); err != nil {
+			return nil, err
+		} else if listValue != nil {
+			val = listValue
+		} else {
+			parser.restore(pos)
+
+			val, err = parser.ParseExpr(false)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if tok != nil {
+			fmt.Println("tok", tok.String())
+		}
+		if val != nil {
+			fmt.Println("val", val.String())
+		}
+
+		arg := ast.NewCallArgumentWithToken(nil, val)
+
 		tok = parser.peek()
+		if tok.Type == ast.T_VARIABLE_LENGTH_ARGUMENTS {
+			arg.VariableLength = true
+			parser.next()
+			tok = parser.peek()
+		}
+
+		args.Args = append(args.Args, arg)
+
+		if tok.Type == ast.T_COMMA {
+			parser.next()
+			tok = parser.peek()
+		} else if tok.Type == ast.T_PAREN_CLOSE {
+			break
+		} else {
+			return nil, fmt.Errorf("Unexpected token: %s", tok.String())
+		}
 	}
 	if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
 		return nil, err

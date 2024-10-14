@@ -271,8 +271,8 @@ func (r *Runtime) executeIncludeStmt(scope *Scope, stmt *ast.IncludeStmt) (*ast.
 			var val ast.Value
 			var err error
 
-			if idx < len(stmt.ArgumentList) {
-				val, err = EvaluateExpr(stmt.ArgumentList[idx], child)
+			if idx < len(stmt.ArgumentList.Args) {
+				val, err = EvaluateExpr(stmt.ArgumentList.Args[idx], child)
 			} else if v.DefaultValue != nil {
 				val, err = EvaluateExpr(v.DefaultValue, child)
 			} else {

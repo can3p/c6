@@ -21,9 +21,9 @@ const (
 )
 
 func debug(format string, args ...interface{}) {
-	if debugParser {
-		fmt.Printf(format+"\n", args...)
-	}
+	//if debugParser {
+	fmt.Printf(format+"\n", args...)
+	//}
 }
 
 func getFileTypeByExtension(extension string) uint {

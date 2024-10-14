@@ -23,7 +23,7 @@ func (list List) String() string {
 	for _, expr := range list.Exprs {
 		exprstrs = append(exprstrs, expr.String())
 	}
-	return strings.Join(exprstrs, list.Separator)
+	return "[" + strings.Join(exprstrs, list.Separator) + "]"
 }
 
 func (list *List) Len() int {
