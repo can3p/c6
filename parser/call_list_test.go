@@ -39,6 +39,12 @@ func TestCallArguments(t *testing.T) {
 			argNum:      3,
 			expected:    "$a, (2+3), $c: 2px",
 		},
+		{
+			description: "multiple named arguments",
+			args:        "$a, 2 + 3, $g: 1px 2px 3px, $c: 2px",
+			argNum:      4,
+			expected:    "$a, (2+3), $g: [1px 2px 3px], $c: 2px",
+		},
 	}
 
 	for _, ex := range ex {

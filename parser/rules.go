@@ -1991,14 +1991,9 @@ func (parser *Parser) ParseFunctionCallArguments() (*ast.CallArgumentList, error
 	if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
 		return nil, err
 	}
-	var tok = parser.peek()
-	idx := 0
-	for {
-		idx++
-		if idx > 100 {
-			return nil, fmt.Errorf("stackoverflow")
-		}
 
+	var tok = parser.peek()
+	for {
 		var val ast.Expr
 		var name *ast.Variable
 		var err error
@@ -2014,7 +2009,6 @@ func (parser *Parser) ParseFunctionCallArguments() (*ast.CallArgumentList, error
 
 			// skip name and colon
 			parser.advance()
-			tok = parser.peek()
 
 			val, err = parser.ParseFunctionCallExpr()
 			if err != nil {
@@ -2027,15 +2021,15 @@ func (parser *Parser) ParseFunctionCallArguments() (*ast.CallArgumentList, error
 			}
 		}
 
-		if name != nil {
-			fmt.Println("name", name.String())
-		}
-		if tok != nil {
-			fmt.Println("tok", tok.String())
-		}
-		if val != nil {
-			fmt.Println("val", val.String())
-		}
+		//if name != nil {
+		//fmt.Println("name", name.String())
+		//}
+		//if tok != nil {
+		//fmt.Println("tok", tok.String())
+		//}
+		//if val != nil {
+		//fmt.Println("val", val.String())
+		//}
 
 		arg := ast.NewCallArgumentWithToken(name, val)
 
