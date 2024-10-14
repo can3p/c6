@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/c9s/c6/ast"
+	"github.com/c9s/c6/parser"
 )
 
 const MaxWhileIterations = 10_000
@@ -264,27 +265,20 @@ func (r *Runtime) executeIncludeStmt(scope *Scope, stmt *ast.IncludeStmt) (*ast.
 
 	child := NewScope(scope)
 
-	if m.ArgumentList != nil {
-		for idx, v := range m.ArgumentList.Arguments {
-			name := v.Name.Str
+	args, err := parser.ApplyCallArguments(m.ArgumentList, stmt.ArgumentList)
 
-			var val ast.Value
-			var err error
+	if err != nil {
+		return nil, err
+	}
 
-			if idx < len(stmt.ArgumentList.Args) {
-				val, err = EvaluateExpr(stmt.ArgumentList.Args[idx], child)
-			} else if v.DefaultValue != nil {
-				val, err = EvaluateExpr(v.DefaultValue, child)
-			} else {
-				return nil, fmt.Errorf("Failed to resolve argument nr %d, including mixin %s", idx+1, stmt.NormalizedName())
-			}
+	for _, v := range args.Args {
+		val, err := EvaluateExpr(v, child)
 
-			if err != nil {
-				return nil, err
-			}
-
-			child.Insert(name, val)
+		if err != nil {
+			return nil, err
 		}
+
+		child.Insert(v.Name.NormalizedName(), val)
 	}
 
 	l, err := r.ExecuteList(child, &m.Block.Stmts)
