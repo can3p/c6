@@ -12,8 +12,18 @@ func ApplyCallArguments(protoList *ast.ArgumentList, callList *ast.CallArgumentL
 	kwMap := map[string]*ast.CallArgument{}
 	kwArgsIdx := len(callList.Args)
 
+	var spreadFound bool
+
+	if l := len(protoList.Arguments); l > 0 && protoList.Arguments[l-1].VariableLength {
+		spreadFound = true
+	}
+
 	for idx, arg := range callList.Args {
 		if arg.Name != nil {
+			if spreadFound {
+				return nil, fmt.Errorf("Named arguments cannot work with spread operator")
+			}
+
 			if kwArgsIdx == len(callList.Args) {
 				kwArgsIdx = idx
 			}
@@ -32,6 +42,19 @@ func ApplyCallArguments(protoList *ast.ArgumentList, callList *ast.CallArgumentL
 		var val ast.Expr
 
 		v := ast.NewVariableWithToken(proto.Name)
+
+		// spread var is always the last one, this is (should be) checked in parser
+		if proto.VariableLength {
+			list := ast.NewList(" ")
+			if idx < len(callList.Args) {
+				for _, callArg := range callList.Args[idx:] {
+					list.Append(callArg.Value)
+				}
+			}
+
+			out.Args = append(out.Args, ast.NewCallArgumentWithToken(v, list))
+			break
+		}
 
 		if idx < kwArgsIdx {
 			val = callList.Args[idx].Value
