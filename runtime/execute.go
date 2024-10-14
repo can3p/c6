@@ -272,7 +272,7 @@ func (r *Runtime) executeIncludeStmt(scope *Scope, stmt *ast.IncludeStmt) (*ast.
 	}
 
 	for _, v := range args.Args {
-		val, err := EvaluateExpr(v, child)
+		val, err := EvaluateExpr(v.Value, child)
 
 		if err != nil {
 			return nil, err

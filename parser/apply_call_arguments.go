@@ -9,6 +9,10 @@ import (
 func ApplyCallArguments(protoList *ast.ArgumentList, callList *ast.CallArgumentList) (*ast.CallArgumentList, error) {
 	out := &ast.CallArgumentList{}
 
+	if protoList == nil && callList == nil {
+		return out, nil
+	}
+
 	kwMap := map[string]*ast.CallArgument{}
 	kwArgsIdx := len(callList.Args)
 
