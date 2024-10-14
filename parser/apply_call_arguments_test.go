@@ -33,6 +33,12 @@ func TestApplyCallArguments(t *testing.T) {
 			proto:       "$a: 1, $b: 2, $c: 3",
 			expected:    "$a: 11, $b: 22, $c: 3",
 		},
+		{
+			description: "keyword args",
+			args:        "44, $c: 11, $b: 22",
+			proto:       "$a: 1, $b: 2, $c: 3",
+			expected:    "$a: 44, $b: 22, $c: 11",
+		},
 	}
 
 	for _, ex := range ex {
