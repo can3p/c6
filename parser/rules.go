@@ -1963,6 +1963,26 @@ func (parser *Parser) ParseFunctionPrototype() (*ast.ArgumentList, error) {
 	return args, nil
 }
 
+func (parser *Parser) ParseFunctionCallExpr() (ast.Expr, error) {
+	var pos = parser.Pos
+	var val ast.Expr
+
+	if listValue, err := parser.ParseSpaceSepList(); err != nil {
+		return nil, err
+	} else if listValue != nil {
+		val = listValue
+	} else {
+		parser.restore(pos)
+
+		val, err = parser.ParseExpr(false)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return val, nil
+}
+
 func (parser *Parser) ParseFunctionCallArguments() (*ast.CallArgumentList, error) {
 	debug("ParseFunctionCallArguments")
 
@@ -1980,21 +2000,36 @@ func (parser *Parser) ParseFunctionCallArguments() (*ast.CallArgumentList, error
 		}
 
 		var val ast.Expr
-		var pos = parser.Pos
+		var name *ast.Variable
+		var err error
 
-		if listValue, err := parser.ParseSpaceSepList(); err != nil {
-			return nil, err
-		} else if listValue != nil {
-			val = listValue
+		var tok2 = parser.peekBy(2)
+		if tok.Type == ast.T_VARIABLE && tok2.Type == ast.T_COLON {
+
+			name, err = parser.ParseVariable()
+
+			if err != nil {
+				return nil, err
+			}
+
+			// skip name and colon
+			parser.advance()
+			tok = parser.peek()
+
+			val, err = parser.ParseFunctionCallExpr()
+			if err != nil {
+				return nil, err
+			}
 		} else {
-			parser.restore(pos)
-
-			val, err = parser.ParseExpr(false)
+			val, err = parser.ParseFunctionCallExpr()
 			if err != nil {
 				return nil, err
 			}
 		}
 
+		if name != nil {
+			fmt.Println("name", name.String())
+		}
 		if tok != nil {
 			fmt.Println("tok", tok.String())
 		}
@@ -2002,10 +2037,14 @@ func (parser *Parser) ParseFunctionCallArguments() (*ast.CallArgumentList, error
 			fmt.Println("val", val.String())
 		}
 
-		arg := ast.NewCallArgumentWithToken(nil, val)
+		arg := ast.NewCallArgumentWithToken(name, val)
 
 		tok = parser.peek()
 		if tok.Type == ast.T_VARIABLE_LENGTH_ARGUMENTS {
+			if name != nil {
+				return nil, fmt.Errorf("named arguments cannot use spread")
+			}
+
 			arg.VariableLength = true
 			parser.next()
 			tok = parser.peek()

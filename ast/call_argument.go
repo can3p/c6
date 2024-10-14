@@ -2,7 +2,7 @@ package ast
 
 type CallArgument struct {
 	Value          Expr
-	Name           *Token
+	Name           *Variable
 	VariableLength bool
 }
 
@@ -17,7 +17,7 @@ func (arg CallArgument) String() string {
 	}
 }
 
-func NewCallArgumentWithToken(name *Token, v Expr) *CallArgument {
+func NewCallArgumentWithToken(name *Variable, v Expr) *CallArgument {
 	return &CallArgument{
 		Value:          v,
 		Name:           name,
