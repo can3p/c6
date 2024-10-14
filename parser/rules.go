@@ -1918,7 +1918,7 @@ func (parser *Parser) ParseFunctionCallArguments() (*ast.CallArgumentList, error
 	}
 
 	var tok = parser.peek()
-	for {
+	for tok.Type != ast.T_PAREN_CLOSE {
 		var val ast.Expr
 		var name *ast.Variable
 		var err error

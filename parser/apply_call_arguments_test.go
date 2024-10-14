@@ -21,6 +21,18 @@ func TestApplyCallArguments(t *testing.T) {
 			proto:       "$a, $b, $c",
 			expected:    "$a: 1, $b: 2, $c: 3",
 		},
+		{
+			description: "defaults case",
+			args:        "",
+			proto:       "$a: 1, $b: 2, $c: 3",
+			expected:    "$a: 1, $b: 2, $c: 3",
+		},
+		{
+			description: "defaults overrides",
+			args:        "11,22",
+			proto:       "$a: 1, $b: 2, $c: 3",
+			expected:    "$a: 11, $b: 22, $c: 3",
+		},
 	}
 
 	for _, ex := range ex {

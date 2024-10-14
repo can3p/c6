@@ -9,7 +9,13 @@ type CallArgument struct {
 func (arg CallArgument) String() string {
 	switch {
 	case arg.Name != nil:
-		return arg.Name.String() + ": " + arg.Value.String()
+		var v = "<no value>"
+
+		if arg.Value != nil {
+			v = arg.Value.String()
+		}
+
+		return arg.Name.String() + ": " + v
 	case arg.VariableLength:
 		return arg.Value.String() + "..."
 	default:

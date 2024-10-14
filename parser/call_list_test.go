@@ -16,6 +16,12 @@ func TestCallArguments(t *testing.T) {
 		expected    string
 	}{
 		{
+			description: "no args",
+			args:        "",
+			argNum:      0,
+			expected:    "",
+		},
+		{
 			description: "simple case",
 			args:        "1, 2, 3",
 			argNum:      3,
