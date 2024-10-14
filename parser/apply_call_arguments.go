@@ -9,7 +9,7 @@ import (
 func ApplyCallArguments(protoList *ast.ArgumentList, callList *ast.CallArgumentList) (*ast.CallArgumentList, error) {
 	out := &ast.CallArgumentList{}
 
-	if protoList == nil && callList == nil {
+	if (protoList == nil || len(protoList.Arguments) == 0) && (callList == nil || len(callList.Args) == 0) {
 		return out, nil
 	}
 
