@@ -61,3 +61,25 @@ p {
 }
 
 <===>
+https://sass-lang.com/playground/#eJw1jsEKgzAQRO/7FUPIoYUSTKEXc/FXTLI0KTURURHEf2+KcWFY3jCHp3U3xC0m5MnzdJOB4zvMD0hb4pRSd+yEcn39wDlpUbem1rY09gJXwJ1w0EEk1xb61YwbREzjMqvUDywgPjkk+MzCEHUxue/iuaroZzFY/wbmB/UzKzc=?s=L1C1-L11C27
+<===> basic/spread/input.scss
+@mixin order($height, $b, $c...) {
+    a {
+      height: $height;
+      b: $b;
+      c: $c;
+    }
+}
+
+$v: 150px "input.name" "john doe";
+
+@include order(12, $v...);
+
+<===> basic/spread/output.css
+a {
+  height: 12;
+  b: 150px;
+  c: "input.name" "john doe";
+}
+
+<===>
