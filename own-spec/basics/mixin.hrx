@@ -1,0 +1,63 @@
+<===> basic/noargs/input.scss
+@mixin abc {
+  a: b;
+}
+
+p {
+  @include abc;
+}
+
+<===> basic/noargs/output.css
+p {
+  a: b;
+}
+
+<===> basic/one_arg/input.scss
+@mixin abc2($a) {
+  a: $a;
+}
+
+p {
+  @include abc2(123);
+}
+
+<===> basic/one_arg/output.css
+p {
+  a: 123;
+}
+
+<===>
+https://sass-lang.com/playground/#eJwzNHTIzazIzFNITErWUEnUUVBJslIw0lSo5lJQSLRSUEm0BjKAQipJ1ly1XFwFYAmHzLzknNKUVLAmQyNjTaAcAKuxEmw=?s=L1C1-L8C2
+<===> basic/one_arg_and_default/input.scss
+@mixin abc($a, $b: 2) {
+  a: $a;
+  b: $b;
+}
+
+p {
+  @include abc(123);
+}
+
+<===> basic/one_arg_and_default/output.css
+p {
+  a: 123;
+  b: 2;
+}
+
+<===>
+https://sass-lang.com/playground/#eJwzNHTIzazIzFNITErWUEnUVKjmUlBItFJQSbTmquXiKgDzHTLzknNKU1KhiqwUDDWBsgDg0w/B?s=L1C1-L7C2
+<===> basic/named_arg/input.scss
+@mixin abc($a) {
+  a: $a;
+}
+
+p {
+  @include abc($a: 1);
+}
+
+<===> basic/named_arg/output.css
+p {
+  a: 1;
+}
+
+<===>

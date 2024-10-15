@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/c9s/c6/ast"
+	"github.com/c9s/c6/parser"
 )
 
 const MaxWhileIterations = 10_000
@@ -56,6 +57,11 @@ func (r *Runtime) ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, err
 		return r.executeRuleSet(scope, t)
 	case *ast.Property:
 		return r.executeProperty(scope, t)
+	case *ast.MixinStmt:
+		err := r.executeMixinStmt(scope, t)
+		return nil, err
+	case *ast.IncludeStmt:
+		return r.executeIncludeStmt(scope, t)
 	}
 
 	return nil, fmt.Errorf("Don't know how to execute the statement %v", stmt)
@@ -242,6 +248,41 @@ func (r *Runtime) executeLogStmt(scope *Scope, stmt *ast.LogStmt) error {
 	}
 
 	return nil
+}
+
+func (r *Runtime) executeMixinStmt(scope *Scope, stmt *ast.MixinStmt) error {
+	scope.InsertMixin(stmt.NormalizedName(), stmt)
+
+	return nil
+}
+
+func (r *Runtime) executeIncludeStmt(scope *Scope, stmt *ast.IncludeStmt) (*ast.StmtList, error) {
+	m, err := scope.LookupMixin(stmt.NormalizedName())
+
+	if err != nil {
+		return nil, err
+	}
+
+	child := NewScope(scope)
+
+	args, err := parser.ApplyCallArguments(m.ArgumentList, stmt.ArgumentList)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, v := range args.Args {
+		val, err := EvaluateExpr(v.Value, child)
+
+		if err != nil {
+			return nil, err
+		}
+
+		child.Insert(v.Name.NormalizedName(), val)
+	}
+
+	l, err := r.ExecuteList(child, &m.Block.Stmts)
+	return l, err
 }
 
 func (r *Runtime) executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {

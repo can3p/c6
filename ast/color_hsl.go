@@ -4,8 +4,10 @@ package ast
 http://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
 */
 
-import "fmt"
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 type HSLColor struct {
 	H     float64
@@ -30,7 +32,7 @@ func (c HSLColor) RGBColor() *RGBColor {
 }
 
 func (self HSLColor) String() string {
-	return fmt.Sprintf("hsl(%G, %G, %G)", self.H, self.S, self.L)
+	return fmt.Sprintf("hsl(%G, %G%%, %G%%)", self.H, self.S*100, self.L*100)
 }
 
 func NewHSLColor(h, s, v float64, token *Token) *HSLColor {

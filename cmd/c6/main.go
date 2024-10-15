@@ -9,7 +9,6 @@ import (
 
 	"github.com/c9s/c6/compiler"
 	"github.com/c9s/c6/parser"
-	"github.com/c9s/c6/runtime"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +20,7 @@ func main() {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fname := args[0]
-			var context = runtime.NewContext()
+			var context = parser.NewContext()
 			d := os.DirFS(path.Dir(fname))
 			var parser = parser.NewParser(context)
 			var stmts, err = parser.ParseFile(d, fname)
@@ -60,7 +59,7 @@ func main() {
 		Short: "Compile some scss from stdin",
 		// Long:  "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var context = runtime.NewContext()
+			var context = parser.NewContext()
 			var parser = parser.NewParser(context)
 			content, _ := io.ReadAll(os.Stdin)
 

@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 
 	"github.com/c9s/c6/ast"
-	"github.com/c9s/c6/runtime"
 )
 
 const (
@@ -39,8 +38,8 @@ func getFileTypeByExtension(extension string) uint {
 }
 
 type Parser struct {
-	GlobalContext *runtime.Context
-	ContextStack  []runtime.Context
+	GlobalContext *Context
+	ContextStack  []Context
 
 	fsys fs.FS
 
@@ -61,7 +60,7 @@ type Parser struct {
 	TopScope *ast.Scope // The top-most scope
 }
 
-func NewParser(context *runtime.Context) *Parser {
+func NewParser(context *Context) *Parser {
 	return &Parser{
 		GlobalContext: context,
 		Pos:           0,

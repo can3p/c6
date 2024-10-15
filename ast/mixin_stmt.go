@@ -1,5 +1,7 @@
 package ast
 
+import "strings"
+
 // import ""
 
 type MixinStmt struct {
@@ -7,6 +9,11 @@ type MixinStmt struct {
 	Ident        *Token
 	Block        *DeclBlock
 	ArgumentList *ArgumentList
+}
+
+// sass spec assumes that $var_name and $var-name mean the same
+func (self MixinStmt) NormalizedName() string {
+	return strings.ReplaceAll(self.Ident.Str, "-", "_")
 }
 
 func (stm MixinStmt) CanBeStmt()     {}

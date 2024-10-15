@@ -1,26 +1,22 @@
-package runtime
+package parser
 
-import "github.com/c9s/c6/symtable"
-import "github.com/c9s/c6/ast"
+import (
+	"github.com/c9s/c6/ast"
+)
 
-/**
+/*
+*
 The Context contains all runtime variables and ruleset stack
 */
 type Context struct {
 	RuleSetStack []*ast.RuleSet
 	GlobalBlock  *ast.Block
-	Mixins       *symtable.SymTable
-	Functions    *symtable.SymTable
-	Stack        *Stack
 	ImportedPath map[string]bool
 }
 
 func NewContext() *Context {
 	return &Context{
 		GlobalBlock: ast.NewBlock(),
-		Mixins:      &symtable.SymTable{},
-		Functions:   &symtable.SymTable{},
-		Stack:       &Stack{},
 	}
 }
 

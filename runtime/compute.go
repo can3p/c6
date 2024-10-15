@@ -448,6 +448,145 @@ func EvaluateUnaryExprInBooleanContext(expr *ast.UnaryExpr, scope *Scope) (ast.V
 	return val, nil
 }
 
+func EvaluateRGBColor(args *ast.CallArgumentList, scope *Scope) (ast.Value, error) {
+	var values []ast.Expr
+
+	if len(args.Args) == 1 {
+		v, err := EvaluateExpr(args.Args[0].Value, scope)
+		if err != nil {
+			return nil, err
+		}
+
+		l, ok := v.(*ast.List)
+		if !ok {
+			return nil, fmt.Errorf("the only argument is not a list")
+		}
+
+		if len(l.Exprs) != 3 {
+			return nil, fmt.Errorf("rgb color expects 3 arguments but got %s", l.String())
+		}
+
+		values = l.Exprs
+	} else {
+		if len(args.Args) != 3 {
+			return nil, fmt.Errorf("rgb color expects 3 arguments but got %s", args.String())
+		}
+
+		for _, a := range args.Args {
+			v, err := EvaluateExpr(a.Value, scope)
+			if err != nil {
+				return nil, err
+			}
+
+			values = append(values, v)
+		}
+	}
+
+	ints := [3]uint32{}
+
+	for idx, e := range values {
+		num, ok := e.(*ast.Number)
+		if !ok {
+			return nil, fmt.Errorf("Argument is not a number: %s - %T", e.String(), e)
+		}
+
+		rounded := num.Integer()
+		if rounded < 0 {
+			rounded = 0
+		}
+
+		if rounded > 255 {
+			rounded = 255
+		}
+
+		ints[idx] = uint32(rounded)
+	}
+
+	color := ast.NewRGBColor(ints[0], ints[1], ints[2], nil)
+	return color, nil
+}
+
+func EvaluateHSLColor(args *ast.CallArgumentList, scope *Scope) (ast.Value, error) {
+	var values []ast.Expr
+
+	if len(args.Args) == 1 {
+		v, err := EvaluateExpr(args.Args[0].Value, scope)
+		if err != nil {
+			return nil, err
+		}
+
+		l, ok := v.(*ast.List)
+		if !ok {
+			return nil, fmt.Errorf("the only argument is not a list")
+		}
+
+		if len(l.Exprs) != 3 {
+			return nil, fmt.Errorf("rgb color expects 3 arguments but got %s", l.String())
+		}
+
+		values = l.Exprs
+	} else {
+		if len(args.Args) != 3 {
+			return nil, fmt.Errorf("rgb color expects 3 arguments but got %s", args.String())
+		}
+
+		for _, a := range args.Args {
+			v, err := EvaluateExpr(a.Value, scope)
+			if err != nil {
+				return nil, err
+			}
+
+			values = append(values, v)
+		}
+	}
+
+	nums := [3]float64{}
+
+	for idx, e := range values {
+		num, ok := e.(*ast.Number)
+		if !ok {
+			return nil, fmt.Errorf("Argument is not a number: %s - %T", e.String(), e)
+		}
+
+		fl := num.Double()
+
+		if num.Unit != nil && num.Unit.Type == ast.T_UNIT_PERCENT {
+			fl = fl / 100.0
+		}
+
+		if fl < 0 {
+			fl = 0
+		}
+
+		if idx == 0 {
+			if fl > 360 {
+				fl = 360.0
+			}
+		} else if fl > 1.0 {
+			fl = 1.0
+		}
+
+		nums[idx] = fl
+	}
+
+	color := ast.NewHSLColor(nums[0], nums[1], nums[2], nil)
+	return color, nil
+}
+
+func EvaluateFunctionCall(fc *ast.FunctionCall, scope *Scope) (ast.Value, error) {
+	// this is lame, we should do better of course
+	if fc.Ident.Str == "rgb" {
+		return EvaluateRGBColor(fc.Arguments, scope)
+	}
+
+	if fc.Ident.Str == "hsl" {
+		return EvaluateHSLColor(fc.Arguments, scope)
+	}
+
+	// by default we assume that we've encountered a builtin function
+	return fc, nil
+}
+
 /*
 EvaluateExpr calls EvaluateBinaryExpr. except EvaluateExpr
 prevents calculate css slash as division.  otherwise it's the same as
@@ -472,12 +611,64 @@ func EvaluateExpr(expr ast.Expr, scope *Scope) (v ast.Value, err error) {
 	case *ast.UnaryExpr:
 		return EvaluateUnaryExpr(t, scope)
 
+	case *ast.ListLookup:
+		if val, err := scope.Lookup(t.Variable.NormalizedName()); err != nil {
+			return nil, err
+		} else {
+			l, ok := val.(*ast.List)
+
+			if !ok {
+				return nil, fmt.Errorf("%s is not a list", t.Variable.NormalizedName())
+			}
+
+			if t.Idx >= l.Len() {
+				return nil, fmt.Errorf("%s lookup is out of bounds, idx = %d, len = %d", t.Variable.NormalizedName(), t.Idx, l.Len())
+			}
+
+			return EvaluateExpr(l.Exprs[t.Idx], scope)
+		}
+
+	case *ast.ListSlice:
+		if val, err := scope.Lookup(t.Variable.NormalizedName()); err != nil {
+			return nil, err
+		} else {
+			l, ok := val.(*ast.List)
+
+			if !ok {
+				return nil, fmt.Errorf("%s is not a list", t.Variable.NormalizedName())
+			}
+
+			if t.FromIdx > l.Len() {
+				return nil, fmt.Errorf("%s lookup is out of bounds, idx = %d, len = %d", t.Variable.NormalizedName(), t.FromIdx, l.Len())
+			}
+
+			val := &ast.List{
+				Separator: " ",
+			}
+
+			if t.FromIdx < l.Len() {
+				for _, expr := range l.Exprs[t.FromIdx:] {
+					evaluated, err := EvaluateExpr(expr, scope)
+					if err != nil {
+						return nil, err
+					}
+
+					val.Append(evaluated)
+				}
+			}
+
+			return val, nil
+		}
+
 	case *ast.Variable:
 		if val, err := scope.Lookup(t.NormalizedName()); err != nil {
 			return nil, err
 		} else {
 			return val, nil
 		}
+
+	case *ast.FunctionCall:
+		return EvaluateFunctionCall(t, scope)
 
 	case *ast.List:
 		val := &ast.List{
@@ -499,17 +690,6 @@ func EvaluateExpr(expr ast.Expr, scope *Scope) (v ast.Value, err error) {
 
 	}
 
-}
-
-func EvaluateFunctionCall(fcall ast.FunctionCall, context *Context) (ast.Value, error) {
-	if fun, ok := context.Functions.Get(fcall.Ident.Str); ok {
-
-		_ = fun
-
-	} else {
-		return nil, fmt.Errorf("Function %s is undefined.", fcall.Ident.Str)
-	}
-	return nil, nil
 }
 
 /*

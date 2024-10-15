@@ -88,13 +88,45 @@ func (c *PrettyCompiler) printByte(b byte) {
 	c.Buffer.WriteByte(b)
 }
 
+func (c *PrettyCompiler) printString(s string) {
+	c.Buffer.WriteString(s)
+}
+
 func (c *PrettyCompiler) CompileComplexSelectorList(selectorList *ast.ComplexSelectorList) {
 	c.printLine(selectorList.String(), false)
 }
 
+func (c *PrettyCompiler) CompileValue(v ast.Expr) {
+	switch v := v.(type) {
+	case *ast.List:
+		for idx, expr := range v.Exprs {
+			if idx > 0 {
+				c.printString(v.Separator)
+			}
+
+			c.CompileValue(expr)
+		}
+	default:
+		c.printString(v.String())
+	}
+}
+
 func (c *PrettyCompiler) CompileDeclBlock(block *ast.DeclBlock) {
 	for _, stm := range block.Stmts.Stmts {
-		c.printLine(stm.String(), true)
+		switch stm := stm.(type) {
+		case *ast.Property:
+			c.printLine(stm.Name.String(), true)
+			c.printString(": ")
+			for idx, v := range stm.Values {
+				if idx > 0 {
+					c.printByte(' ')
+				}
+
+				c.CompileValue(v)
+			}
+		default:
+			c.printLine(stm.String(), true)
+		}
 		c.printByte(';')
 	}
 }

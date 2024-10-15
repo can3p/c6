@@ -97,3 +97,57 @@ func TestComputeRGBColorWithNumber(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, "rgb(13, 13, 13)", c.String())
 }
+
+func TestListLookup(t *testing.T) {
+	scope := NewScope(nil)
+	l := ast.NewList(" ")
+	l.Append(ast.NewNumber(1, nil, nil))
+	l.Append(ast.NewNumber(2, nil, nil))
+	scope.Insert("$a", l)
+
+	lookupWithinBounds := ast.NewListLookup(ast.NewVariableWithToken(&ast.Token{
+		Str: "$a",
+	}), 1)
+
+	val, err := EvaluateExpr(lookupWithinBounds, scope)
+	assert.NoError(t, err)
+	assert.Equal(t, "2", val.String())
+
+	lookupOutOfBounds := ast.NewListLookup(ast.NewVariableWithToken(&ast.Token{
+		Str: "$a",
+	}), 2)
+
+	_, err = EvaluateExpr(lookupOutOfBounds, scope)
+	assert.Error(t, err)
+}
+
+func TestListSlice(t *testing.T) {
+	scope := NewScope(nil)
+	l := ast.NewList(" ")
+	l.Append(ast.NewNumber(1, nil, nil))
+	l.Append(ast.NewNumber(2, nil, nil))
+	scope.Insert("$a", l)
+
+	lookupWithinBounds := ast.NewListSlice(ast.NewVariableWithToken(&ast.Token{
+		Str: "$a",
+	}), 1)
+
+	val, err := EvaluateExpr(lookupWithinBounds, scope)
+	assert.NoError(t, err)
+	assert.Equal(t, "[2]", val.String())
+
+	lookupBorder := ast.NewListSlice(ast.NewVariableWithToken(&ast.Token{
+		Str: "$a",
+	}), 2)
+
+	val, err = EvaluateExpr(lookupBorder, scope)
+	assert.NoError(t, err)
+	assert.Equal(t, "[]", val.String())
+
+	lookupOutOfBounds := ast.NewListSlice(ast.NewVariableWithToken(&ast.Token{
+		Str: "$a",
+	}), 3)
+
+	_, err = EvaluateExpr(lookupOutOfBounds, scope)
+	assert.Error(t, err)
+}

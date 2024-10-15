@@ -11,7 +11,6 @@ import (
 
 	"github.com/c9s/c6/compiler"
 	"github.com/c9s/c6/parser"
-	"github.com/c9s/c6/runtime"
 	"github.com/can3p/go-hrx/hrx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -61,7 +60,7 @@ func RunSpecs(t *testing.T, hrxPath string, testFiles []string, testOnly string,
 			testedCount++
 
 			if !assert.NotPanicsf(t, func() {
-				var context = runtime.NewContext()
+				var context = parser.NewContext()
 				var parser = parser.NewParser(context)
 
 				baseName := path.Dir(input)
