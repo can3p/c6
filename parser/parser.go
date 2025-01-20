@@ -37,7 +37,15 @@ func getFileTypeByExtension(extension string) uint {
 	return UnknownFileType
 }
 
+// one day we'll put some options there
+// Parser represents a global instance of parser that
+// contains shared options for all the files
+type GlobalParser struct{}
+
+// Parser represent the state of parsing of a given file
 type Parser struct {
+	GlobalParser *GlobalParser
+
 	fsys fs.FS
 
 	File *ast.File
@@ -55,14 +63,11 @@ type Parser struct {
 	Tokens []*ast.Token
 }
 
-func NewParser() *Parser {
-	return &Parser{
-		Pos:         0,
-		RollbackPos: 0,
-	}
+func NewParser() *GlobalParser {
+	return &GlobalParser{}
 }
 
-func (parser *Parser) ParseFile(fsys fs.FS, path string) (*ast.StmtList, error) {
+func (gp *GlobalParser) ParseFile(fsys fs.FS, path string) (*ast.StmtList, error) {
 	ext := filepath.Ext(path)
 	filetype := getFileTypeByExtension(ext)
 
@@ -75,8 +80,11 @@ func (parser *Parser) ParseFile(fsys fs.FS, path string) (*ast.StmtList, error) 
 		return nil, err
 	}
 
-	parser.Content = string(data)
-	parser.File = f
+	parser := &Parser{
+		GlobalParser: gp,
+		Content:      string(data),
+		File:         f,
+	}
 
 	var stmts *ast.StmtList
 
