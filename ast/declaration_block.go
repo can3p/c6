@@ -8,8 +8,6 @@ DeclBlock.
 	}
 */
 type DeclBlock struct {
-	Scope *Scope
-
 	// The symbol table for storing constant values
 	// Only constants can be stored here...
 	Stmts StmtList

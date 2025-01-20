@@ -55,8 +55,6 @@ type Parser struct {
 
 	// A token slice that contains all lexed tokens
 	Tokens []*ast.Token
-
-	TopScope *ast.Scope // The top-most scope
 }
 
 func NewParser(context *Context) *Parser {

@@ -6,7 +6,6 @@ import (
 )
 
 type File struct {
-	Scope    *Scope
 	FileName string
 	FileInfo os.FileInfo
 	fsys     fs.FS
