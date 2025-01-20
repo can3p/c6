@@ -11,8 +11,7 @@ import (
 )
 
 func AssertPrettyCompile(t *testing.T, code string, expected string) {
-	var context = parser.NewContext()
-	var parser = parser.NewParser(context)
+	var parser = parser.NewParser()
 	stmts, err := parser.ParseScss(code)
 	require.NoError(t, err)
 

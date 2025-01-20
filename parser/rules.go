@@ -303,7 +303,7 @@ func (parser *Parser) ParseComparisonExpr() (ast.Expr, error) {
 	return expr, nil
 }
 
-func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet, pos int) (ast.Selector, error) {
+func (parser *Parser) ParseSimpleSelector(pos int) (ast.Selector, error) {
 	debug("ParseSimpleSelector")
 
 	var tok = parser.next()
@@ -398,13 +398,13 @@ func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet, pos int) (
 	return nil, nil
 }
 
-func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) (*ast.CompoundSelector, error) {
+func (parser *Parser) ParseCompoundSelector() (*ast.CompoundSelector, error) {
 	debug("ParseCompoundSelector")
 
 	var sels = ast.NewCompoundSelector()
 	idx := 0
 	for {
-		sel, err := parser.ParseSimpleSelector(parentRuleSet, idx)
+		sel, err := parser.ParseSimpleSelector(idx)
 
 		if err != nil {
 			return nil, err
@@ -423,7 +423,7 @@ func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) (*ast.Co
 	return nil, nil
 }
 
-func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.ComplexSelector, error) {
+func (parser *Parser) ParseComplexSelector() (*ast.ComplexSelector, error) {
 	debug("ParseComplexSelector")
 
 	var complexSel = ast.NewComplexSelector()
@@ -465,7 +465,7 @@ func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.Com
 			}
 		}
 
-		if sel, err := parser.ParseCompoundSelector(parentRuleSet); err != nil {
+		if sel, err := parser.ParseCompoundSelector(); err != nil {
 			return nil, err
 		} else if sel != nil || comb != nil {
 			complexSel.AppendCompoundSelector(comb, sel)
@@ -479,11 +479,9 @@ func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.Com
 func (parser *Parser) ParseSelectorList() (*ast.ComplexSelectorList, error) {
 	debug("ParseSelectorList")
 
-	var parentRuleSet = parser.GlobalContext.TopRuleSet()
-
 	var complexSelectorList = &ast.ComplexSelectorList{}
 
-	complexSelector, err := parser.ParseComplexSelector(parentRuleSet)
+	complexSelector, err := parser.ParseComplexSelector()
 
 	if err != nil {
 		return nil, err
@@ -497,7 +495,7 @@ func (parser *Parser) ParseSelectorList() (*ast.ComplexSelectorList, error) {
 
 	// if there is more comma
 	for parser.accept(ast.T_COMMA) != nil {
-		complexSelector, err := parser.ParseComplexSelector(parentRuleSet)
+		complexSelector, err := parser.ParseComplexSelector()
 
 		if err != nil {
 			return nil, err
@@ -540,14 +538,12 @@ func (parser *Parser) ParseRuleSet() (ast.Stmt, error) {
 
 	ruleset.Selectors = selectors
 
-	parser.GlobalContext.PushRuleSet(ruleset)
 	bl, err := parser.ParseDeclBlock()
 	if err != nil {
 		return nil, err
 	}
 
 	ruleset.Block = bl
-	parser.GlobalContext.PopRuleSet()
 
 	return ruleset, nil
 }
@@ -1761,7 +1757,6 @@ func (parser *Parser) ParseFunctionDeclaration() (ast.Stmt, error) {
 	} else {
 		fun.Block = bl
 	}
-	//parser.GlobalContext.Functions.Set(identTok.Str, fun)
 	return fun, nil
 }
 
@@ -1800,7 +1795,6 @@ func (parser *Parser) ParseMixinStmt() (ast.Stmt, error) {
 		stm.Block = b
 	}
 
-	//parser.GlobalContext.Mixins.Set(stm.Ident.Str, stm)
 	return stm, nil
 }
 
@@ -2077,7 +2071,7 @@ func (parser *Parser) ParseAtRootStmt() (ast.Stmt, error) {
 	tok = parser.peek()
 
 	if tok.IsSelector() {
-		sel, err := parser.ParseComplexSelector(nil)
+		sel, err := parser.ParseComplexSelector()
 
 		if err != nil {
 			return nil, err

@@ -20,9 +20,8 @@ func main() {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fname := args[0]
-			var context = parser.NewContext()
 			d := os.DirFS(path.Dir(fname))
-			var parser = parser.NewParser(context)
+			var parser = parser.NewParser()
 			var stmts, err = parser.ParseFile(d, fname)
 
 			if err != nil {
@@ -59,8 +58,7 @@ func main() {
 		Short: "Compile some scss from stdin",
 		// Long:  "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var context = parser.NewContext()
-			var parser = parser.NewParser(context)
+			var parser = parser.NewParser()
 			content, _ := io.ReadAll(os.Stdin)
 
 			stmts, err := parser.ParseScss(string(content))

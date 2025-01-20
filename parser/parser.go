@@ -38,8 +38,6 @@ func getFileTypeByExtension(extension string) uint {
 }
 
 type Parser struct {
-	GlobalContext *Context
-
 	fsys fs.FS
 
 	File *ast.File
@@ -57,11 +55,10 @@ type Parser struct {
 	Tokens []*ast.Token
 }
 
-func NewParser(context *Context) *Parser {
+func NewParser() *Parser {
 	return &Parser{
-		GlobalContext: context,
-		Pos:           0,
-		RollbackPos:   0,
+		Pos:         0,
+		RollbackPos: 0,
 	}
 }
 

@@ -60,8 +60,7 @@ func RunSpecs(t *testing.T, hrxPath string, testFiles []string, testOnly string,
 			testedCount++
 
 			if !assert.NotPanicsf(t, func() {
-				var context = parser.NewContext()
-				var parser = parser.NewParser(context)
+				var parser = parser.NewParser()
 
 				baseName := path.Dir(input)
 				errFname := path.Join(baseName, "error")
