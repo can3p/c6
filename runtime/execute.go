@@ -312,7 +312,7 @@ func (r *Runtime) executeRuleSet(scope *Scope, stmt *ast.RuleSet) (*ast.StmtList
 	}
 
 	rs := ast.NewRuleSet()
-	decl := ast.NewDeclBlock(rs)
+	decl := ast.NewDeclBlock()
 	decl.AppendList(res)
 	rs.Block = decl
 	rs.Selectors = stmt.Selectors

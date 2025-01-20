@@ -39,7 +39,6 @@ func getFileTypeByExtension(extension string) uint {
 
 type Parser struct {
 	GlobalContext *Context
-	ContextStack  []Context
 
 	fsys fs.FS
 

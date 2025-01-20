@@ -1186,7 +1186,7 @@ func (parser *Parser) ParseSpaceSepList() (ast.Expr, error) {
 *
 We treat the property value section as a list value, which is separated by ',' or ' '
 */
-func (parser *Parser) ParsePropertyValue(parentRuleSet *ast.RuleSet, property *ast.Property) (*ast.List, error) {
+func (parser *Parser) ParsePropertyValue(property *ast.Property) (*ast.List, error) {
 	debug("ParsePropertyValue")
 	// var tok = parser.peek()
 	var list = ast.NewSpaceSepList()
@@ -1267,8 +1267,7 @@ func (parser *Parser) ParseDeclaration() ast.Stmt {
 }
 
 func (parser *Parser) ParseDeclBlock() (*ast.DeclBlock, error) {
-	var parentRuleSet = parser.GlobalContext.TopRuleSet()
-	var declBlock = ast.NewDeclBlock(parentRuleSet)
+	var declBlock = ast.NewDeclBlock()
 
 	if _, err := parser.expect(ast.T_BRACE_OPEN); err != nil {
 		return nil, err
@@ -1281,7 +1280,7 @@ func (parser *Parser) ParseDeclBlock() (*ast.DeclBlock, error) {
 		} else if propertyName != nil {
 			var property = ast.NewProperty(tok)
 
-			if valueList, err := parser.ParsePropertyValue(parentRuleSet, property); err != nil {
+			if valueList, err := parser.ParsePropertyValue(property); err != nil {
 				return nil, err
 			} else if valueList != nil {
 				for _, v := range valueList.Exprs {

@@ -45,7 +45,7 @@ func expandRuleset(rs *ast.RuleSet) (*ast.StmtList, error) {
 			if len(collector) > 0 {
 				nrs := ast.NewRuleSet()
 				nrs.Selectors = rs.Selectors
-				bl := ast.NewDeclBlock(nrs)
+				bl := ast.NewDeclBlock()
 				bl.AppendList(&ast.StmtList{
 					Stmts: collector,
 				})
@@ -89,7 +89,7 @@ func expandRuleset(rs *ast.RuleSet) (*ast.StmtList, error) {
 	if len(collector) > 0 {
 		nrs := ast.NewRuleSet()
 		nrs.Selectors = rs.Selectors
-		bl := ast.NewDeclBlock(nrs)
+		bl := ast.NewDeclBlock()
 		bl.AppendList(&ast.StmtList{
 			Stmts: collector,
 		})
