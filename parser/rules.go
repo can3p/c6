@@ -1683,7 +1683,7 @@ func (parser *Parser) ParseImportStmt() (ast.Stmt, error) {
 			stm = cssImport
 		}
 	} else {
-		scssImport := ast.NewImportStmt()
+		scssImport := ast.NewImportStmt(parser.File.FileName)
 
 		for {
 			strExpr, err := parser.ParseString()

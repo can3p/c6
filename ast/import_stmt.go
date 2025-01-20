@@ -10,11 +10,14 @@ For import like this:
 @import "component/list"; // => component/_list.scss
 */
 type ImportStmt struct {
-	Paths []*String
+	SourceFileName string
+	Paths          []*String
 }
 
-func NewImportStmt() *ImportStmt {
-	return &ImportStmt{}
+func NewImportStmt(sourceFileName string) *ImportStmt {
+	return &ImportStmt{
+		SourceFileName: sourceFileName,
+	}
 }
 
 func (self ImportStmt) CanBeStmt() {}
