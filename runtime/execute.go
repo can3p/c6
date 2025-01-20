@@ -9,6 +9,8 @@ import (
 
 const MaxWhileIterations = 10_000
 
+var ErrNotImplemented = fmt.Errorf("Not Implemented")
+
 type Printer func(msg any)
 
 type Runtime struct {
@@ -62,6 +64,10 @@ func (r *Runtime) ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, err
 		return nil, err
 	case *ast.IncludeStmt:
 		return r.executeIncludeStmt(scope, t)
+	case *ast.CssImportStmt:
+		return r.executeCssImportStmt(scope, t)
+	case *ast.ImportStmt:
+		return r.executeImportStmt(scope, t)
 	}
 
 	return nil, fmt.Errorf("Don't know how to execute the statement %v", stmt)
@@ -283,6 +289,72 @@ func (r *Runtime) executeIncludeStmt(scope *Scope, stmt *ast.IncludeStmt) (*ast.
 
 	l, err := r.ExecuteList(child, &m.Block.Stmts)
 	return l, err
+}
+
+func (r *Runtime) executeCssImportStmt(scope *Scope, stmt *ast.CssImportStmt) (*ast.StmtList, error) {
+	return nil, fmt.Errorf("%w %s", ErrNotImplemented, stmt.String())
+}
+
+func (r *Runtime) executeImportStmt(scope *Scope, stmt *ast.ImportStmt) (*ast.StmtList, error) {
+	// // check scss import url by file system
+	//
+	//	if parser.File != nil {
+	//		return nil, fmt.Errorf("Unknown scss file to detect import path.")
+	//	}
+	//
+	// var importPath = tok.Str
+	// fi, err := fs.Stat(parser.fsys, importPath)
+	//
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//
+	// // go find the _index.scss if it's a local directory
+	// if fi.Mode().IsDir() {
+	//
+	//	importPath = importPath + string(filepath.Separator) + "_index.scss"
+	//
+	//	} else {
+	//		var dirname = filepath.Dir(importPath)
+	//		var basename = filepath.Base(importPath)
+	//		if dirname == "." {
+	//			importPath = "_" + basename + ".scss"
+	//		} else {
+	//			importPath = dirname + string(filepath.Separator) + "_" + basename + ".scss"
+	//		}
+	//	}
+	//
+	//	if _, err := fs.Stat(parser.fsys, importPath); err != nil {
+	//		return nil, err
+	//	}
+	//
+	// stm.Url = ast.ScssImportUrl(importPath)
+	//
+	//	if _, ok := parser.GlobalContext.ImportedPath[importPath]; !ok {
+	//		// Set imported path to true
+	//		parser.GlobalContext.ImportedPath[importPath] = true
+	//
+	//		// parse the imported file using the same context
+	//		var subparser = NewParser(parser.GlobalContext)
+	//		var stmts, err = subparser.ParseScssFile(importPath)
+	//		if err != nil {
+	//			return nil, err
+	//		}
+	//
+	//		// For root @import and nested ruleset @import:
+	//		//
+	//		// 1. For nested rules, we need to merge the rulesets and assignment to the parent ruleset
+	//		//    we can expand the the statements in the parsing-time.
+	//		//
+	//		// 2. for root level statements, we need to merge the statements into the global block.
+	//		//    for symbal table, we also need to merge them
+	//		//
+	//		// note that the parse method might push the statements to global block, we should avoid that.
+	//		var currentBlock = parser.GlobalContext.CurrentBlock()
+	//		currentBlock.MergeStmts(stmts)
+	//	}
+
+	return nil, fmt.Errorf("%w %s", ErrNotImplemented, stmt.String())
 }
 
 func (r *Runtime) executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {
