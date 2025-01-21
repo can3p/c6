@@ -160,7 +160,7 @@ func TestParserImportRuleWithUrl(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(stmts.Stmts))
 
-	rule, ok := (stmts.Stmts)[0].(*ast.ImportStmt)
+	rule, ok := (stmts.Stmts)[0].(*ast.CssImportStmt)
 	assert.True(t, ok, "Convert to ImportStmt OK")
 	assert.NotNil(t, rule)
 }

@@ -34,11 +34,11 @@ func (stm MediaQueryStmt) String() (out string) {
 One MediaQuery may contain media type or media expression.
 */
 type MediaQuery struct {
-	MediaType Expr
+	MediaType *MediaType
 	MediaExpr Expr
 }
 
-func NewMediaQuery(mediaType Expr, expr Expr) *MediaQuery {
+func NewMediaQuery(mediaType *MediaType, expr Expr) *MediaQuery {
 	return &MediaQuery{mediaType, expr}
 }
 

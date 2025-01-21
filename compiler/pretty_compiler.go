@@ -141,8 +141,61 @@ func (c *PrettyCompiler) CompileRuleSet(ruleset *ast.RuleSet) {
 	c.printLine("}", len(ruleset.Block.Stmts.Stmts) > 0)
 }
 
+func (c *PrettyCompiler) CompileExpression(stmt ast.Expr) {
+	switch t := stmt.(type) {
+	case *ast.BinaryExpr:
+		c.CompileExpression(t.Left)
+		c.printByte(' ')
+		c.printString(t.Op.String())
+		c.printByte(' ')
+		c.CompileExpression(t.Right)
+	case *ast.UnaryExpr:
+		c.printString(t.Op.String())
+		c.printByte(' ')
+		c.CompileExpression(t.Expr)
+	case *ast.Token:
+		c.printString(t.Str)
+	case *ast.MediaFeature:
+		c.printByte('(')
+		c.CompileExpression(t.Feature)
+		if t.Value != nil {
+			c.printString(": ")
+			c.CompileExpression(t.Value)
+		}
+		c.printByte(')')
+	default:
+		fmt.Printf("UKNOWN EXPR TYPE: %T\n", t)
+		// TODO: replace String() with the method in this file
+		c.printString(t.String())
+	}
+}
+
+func (c *PrettyCompiler) CompileMediaType(stmt *ast.MediaType) {
+	c.CompileExpression(stmt.Expr)
+}
+
+func (c *PrettyCompiler) CompileMediaQuery(stmt *ast.MediaQuery) {
+	if stmt.MediaType != nil {
+		// TODO: replace String() with the method in this file
+		c.CompileMediaType(stmt.MediaType)
+	}
+	if stmt.MediaExpr != nil {
+		if stmt.MediaType != nil {
+			c.printString(" and ")
+		}
+
+		c.CompileExpression(stmt.MediaExpr)
+	}
+}
+
 func (c *PrettyCompiler) CompileCssImport(stmt *ast.CssImportStmt) {
-	c.printLine(fmt.Sprintf("@import %s", stmt.Url), false)
+	c.printString(fmt.Sprintf("@import url(%s)", stmt.Url))
+	if stmt.MediaQuery != nil {
+		c.printByte(' ')
+		c.CompileMediaQuery(stmt.MediaQuery)
+	}
+
+	c.printByte(';')
 }
 
 func (c *PrettyCompiler) CompileStmt(anyStm ast.Stmt) error {
@@ -151,6 +204,7 @@ func (c *PrettyCompiler) CompileStmt(anyStm ast.Stmt) error {
 		c.CompileRuleSet(stm)
 		return nil
 	case *ast.CssImportStmt:
+		c.CompileCssImport(stm)
 		return nil
 	case *ast.AssignStmt:
 		return nil

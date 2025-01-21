@@ -42,8 +42,8 @@ hides the style sheet from Netscape 4, IE 4 and below, Konqueror 2
 	@import "../styles.css";
 */
 type CssImportStmt struct {
-	Url            Url // if it's wrapped with url(...) or "string"
-	MediaQueryList []*MediaQuery
+	Url        Url // if it's wrapped with url(...) or "string"
+	MediaQuery *MediaQuery
 }
 
 func NewCssImportStmt() *CssImportStmt {

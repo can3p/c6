@@ -5,17 +5,10 @@ get-dev:
 	go get -t github.com/c9s/c6/...
 
 
-gogenerate:
-	go generate github.com/c9s/c6/...
+test:
+	IGNORE_BLACKLISTED=true go test github.com/c9s/c6/...
 
-test: gogenerate 
-	go test github.com/c9s/c6/...
-	# The tests should pass aftr `go generete` too,
-	# # This is to guard against changes that can break
-	# # with `go generate`.
-	go test github.com/c9s/c6/...
-
-vet: 
+vet:
 	go vet github.com/c9s/c6/...
 
 gofmt:
@@ -25,7 +18,7 @@ gofmt:
 cover:
 	go test -cover -coverprofile c6.cov -coverpkg github.com/c9s/c6/ast,github.com/c9s/c6/runtime,github.com/c9s/c6/parser,github.com/c9s/c6/compiler github.com/c9s/c6/compiler
 
-benchmark: 
+benchmark:
 	go test -run=NONE -bench=. github.com/c9s/c6/... >| benchmarks/new.txt
 	benchcmp benchmarks/old.txt benchmarks/new.txt
 

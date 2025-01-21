@@ -1626,6 +1626,12 @@ func (parser *Parser) ParseImportStmt() (ast.Stmt, error) {
 				return nil, err
 			}
 
+			if mediaQuery, err := parser.ParseMediaQuery(); err != nil {
+				return nil, err
+			} else if mediaQuery != nil {
+				cssImport.MediaQuery = mediaQuery
+			}
+
 			stm = cssImport
 		} else {
 			parser.advance()
@@ -1643,10 +1649,10 @@ func (parser *Parser) ParseImportStmt() (ast.Stmt, error) {
 				}
 			}
 
-			if mediaQueryList, err := parser.ParseMediaQueryList(); err != nil {
+			if mediaQuery, err := parser.ParseMediaQuery(); err != nil {
 				return nil, err
-			} else if mediaQueryList != nil {
-				cssImport.MediaQueryList = mediaQueryList.List
+			} else if mediaQuery != nil {
+				cssImport.MediaQuery = mediaQuery
 			}
 
 			stm = cssImport

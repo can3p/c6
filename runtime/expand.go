@@ -8,6 +8,7 @@ import (
 
 func ExpandTree(stmts *ast.StmtList) ([]*ast.StmtList, error) {
 	out := []*ast.StmtList{}
+	cssImports := &ast.StmtList{}
 
 	for _, stmt := range stmts.Stmts {
 		switch t := stmt.(type) {
@@ -20,13 +21,21 @@ func ExpandTree(stmts *ast.StmtList) ([]*ast.StmtList, error) {
 
 			out = append(out, ret)
 		case *ast.CssImportStmt:
-			s := &ast.StmtList{}
-			s.Append(stmt)
-			out = append(out, s)
+			cssImports.Append(t)
 		default:
 			return nil, fmt.Errorf("Tree can only contain rule sets or css imports, but has variable of type %T", stmt)
 		}
+	}
 
+	if len(cssImports.Stmts) > 0 {
+		if len(out) > 0 {
+			// css import should always go in the beginning
+			cssImports.AppendList(out[0])
+			out[0] = cssImports
+		} else {
+			// in case there are not rules except imports
+			out = append(out, cssImports)
+		}
 	}
 
 	return out, nil

@@ -1,0 +1,20 @@
+<===>
+https://sass-lang.com/playground/#eJwzNHTIzC3ILypRKC3K0UjLz9dLLi7WVMjPy6lUKE4uSk3Ns+bi4kpRqOZSUChITEnJzEu3UjCw5qrl4sKqUSM3M0+3PDOlJMPKxMCgoELTmkh1Col5KUDRxAqoqKmlJVg3AIYtM+Y=?s=L1C1-L9C62
+<===> basic/input.scss
+@import url(foo.css) only screen;
+
+
+d {
+  padding: 0;
+}
+
+@import url(foo.css) (min-width:400px);
+@import url(foo.css) (min-width:400px) and (max-width:599px);
+
+<===> basic/output.css
+@import url(foo.css) only screen;
+@import url(foo.css) (min-width: 400px);
+@import url(foo.css) (min-width: 400px) and (max-width: 599px);
+d {
+  padding: 0;
+}

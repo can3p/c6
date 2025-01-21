@@ -4352,7 +4352,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"selector/to/input.scss": "compiler_output_does_not_match",
 	},
 	"css/media/bubbling.hrx": {
-		"preserve_merge_after_bubble/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"preserve_merge_after_bubble/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (a:b)",
 		"unmergeable_and_merged/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement not'a' (T_IDENT) at line 4, offset 281",
 	},
 	"css/media/comment.hrx": {
@@ -4370,12 +4370,12 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"simple_selector_on_different_lines/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement a",
 	},
 	"css/media/logic/and.hrx": {
-		"comment_after/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"comment_after/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (a)and(b)",
 		"interpolation/input.scss": "parse_failure",
 		"mixed_case/input.scss": "parse_failure",
-		"multiple/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
-		"no_whitespace_before/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
-		"one/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"multiple/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (a)and(b)and(c)and(d)",
+		"no_whitespace_before/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (a)and(b)",
+		"one/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (a)and(b)",
 	},
 	"css/media/logic/and_not.hrx": {
 		"after_interpolation/input.scss": "parse_failure",
@@ -4420,7 +4420,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"raw/and/mixed_case/input.scss": "parse_failure",
 		"raw/different_than_top_level/input.scss": "parse_failure",
 		"raw/not/lowercase/input.scss": "parse_failure",
-		"raw/not/mixed_case/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"raw/not/mixed_case/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (NoT(a))",
 		"raw/or/lowercase/input.scss": "parse_failure",
 		"raw/or/mixed_case/input.scss": "parse_failure",
 	},
@@ -4635,11 +4635,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"error/wrong_order/supports_after_comma/input.scss": "parser_error_does_not_match",
 		"error/wrong_order/unknown_function_after_comma/input.scss": "parser_error_does_not_match",
 		"error/wrong_order/url_after_comma/input.scss": "parser_error_does_not_match",
-		"media/complex/input.scss": "parse_failure",
+		"media/complex/input.scss": "compiler_output_does_not_match",
 		"media/list/after_feature/input.scss": "parse_failure",
 		"media/list/after_ident/input.scss": "parse_failure",
 		"media/list/and_without_space/input.scss": "parse_failure",
-		"media/simple/input.scss": "parse_failure",
+		"media/simple/input.scss": "compiler_output_does_not_match",
 		"multiple/many/input.scss": "parse_failure",
 		"multiple/supports_then/media/input.scss": "parse_failure",
 		"multiple/supports_then/supports/input.scss": "parse_failure",
@@ -6195,9 +6195,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_1322.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass-closed-issues/issue_1323.hrx": {
-		"input.scss": "parse_failure",
-	},
 	"libsass-closed-issues/issue_1328.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
@@ -6613,7 +6610,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1794.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (max-width:500px)",
 	},
 	"libsass-closed-issues/issue_1796.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -6658,7 +6655,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement only'screen' (T_IDENT) at line 0, offset 12",
 	},
 	"libsass-closed-issues/issue_185/media_level_4.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (pointer:none)",
 	},
 	"libsass-closed-issues/issue_185/media_wrapper_selector.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all",
@@ -6871,7 +6868,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2154.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (min-width:1px)",
 	},
 	"libsass-closed-issues/issue_2155.hrx": {
 		"input.scss": "parser_error_does_not_match",
@@ -7119,9 +7116,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_2884.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass-closed-issues/issue_289.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"libsass-closed-issues/issue_2959.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -7243,7 +7237,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_56.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (min-width:980px)",
 	},
 	"libsass-closed-issues/issue_574.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -7444,7 +7438,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_panic",
 	},
 	"libsass-closed-issues/issue_829.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (foo:bar), (bar:baz)",
 	},
 	"libsass-closed-issues/issue_83.hrx": {
 		"input.scss": "parser_error_does_not_match",
@@ -10154,9 +10148,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss-tests/022_test_css_import_directive.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss-tests/023_test_css_import_directive.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss-tests/024_test_media_import.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -10167,9 +10158,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_unexpected_compile_error - stat fonts.googleapis.com/_css?family=Droid+Sans.scss: file does not exist",
 	},
 	"non_conformant/scss-tests/028_test_import_with_interpolation.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
-	"non_conformant/scss-tests/029_test_url_import.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/030_test_block_comment_in_script.hrx": {
@@ -10457,9 +10445,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"non_conformant/scss/css_crazy_comments.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"non_conformant/scss/css_import_directive.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"non_conformant/scss/css_property_comments.hrx": {
 		"input.scss": "parse_failure",
 	},
@@ -10557,7 +10542,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss/media/nesting/merged_and_retained.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement %!v(PANIC=String method: value method github.com/c9s/c6/ast.MediaType.String called using nil *MediaType pointer)",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement (retained:before)",
 	},
 	"non_conformant/scss/media/nesting/removed.hrx": {
 		"input.scss": "parse_failure",
@@ -10681,9 +10666,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"non_conformant/scss/strings.hrx": {
 		"input.scss": "compiler_panic",
-	},
-	"non_conformant/scss/url_import.hrx": {
-		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/variables.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Undefined variable.",
