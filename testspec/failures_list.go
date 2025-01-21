@@ -4222,7 +4222,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"css/custom_properties/name_interpolation.hrx": {
-		"import_nesting_use/input.scss": "parse_failure",
+		"import_nesting_use/input.scss": "compiler_unexpected_compile_error - stat import_nesting_use/_foo.scss: file does not exist",
 		"nested_properties/input.scss": "compiler_output_does_not_match",
 		"non_conformant/input.scss": "parse_failure",
 	},
@@ -4275,7 +4275,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"bubble/deeply-nested/input.scss": "unhandled_warning",
 		"bubble/empty/input.scss": "parse_failure",
 		"bubble/in-mixin/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement",
-		"bubble/loaded/import/input.scss": "parse_failure",
+		"bubble/loaded/import/input.scss": "unhandled_warning",
 		"bubble/loaded/meta-load-css/input.scss": "unhandled_warning",
 		"bubble/rules/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement",
 	},
@@ -4635,11 +4635,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"error/wrong_order/supports_after_comma/input.scss": "parser_error_does_not_match",
 		"error/wrong_order/unknown_function_after_comma/input.scss": "parser_error_does_not_match",
 		"error/wrong_order/url_after_comma/input.scss": "parser_error_does_not_match",
-		"media/complex/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"media/complex/input.scss": "parse_failure",
 		"media/list/after_feature/input.scss": "parse_failure",
 		"media/list/after_ident/input.scss": "parse_failure",
 		"media/list/and_without_space/input.scss": "parse_failure",
-		"media/simple/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"media/simple/input.scss": "parse_failure",
 		"multiple/many/input.scss": "parse_failure",
 		"multiple/supports_then/media/input.scss": "parse_failure",
 		"multiple/supports_then/supports/input.scss": "parse_failure",
@@ -4653,10 +4653,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"multiple/unknown_ident_then/supports/input.scss": "parse_failure",
 		"multiple/unknown_ident_then/unknown_function/input.scss": "parse_failure",
 		"multiple/unknown_ident_then/unknown_ident/input.scss": "parse_failure",
-		"supports/calc/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"supports/calc/input.scss": "compiler_output_does_not_match",
 		"supports/condition/input.scss": "parse_failure",
 		"supports/condition_and/input.scss": "parse_failure",
-		"supports/condition_function/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"supports/condition_function/input.scss": "compiler_output_does_not_match",
 		"supports/condition_negation/input.scss": "parse_failure",
 		"supports/declaration/custom_prop/punctuation/input.scss": "parse_failure",
 		"supports/declaration/custom_prop/value/input.scss": "parse_failure",
@@ -4672,19 +4672,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"unknown/identifier/static/input.scss": "parse_failure",
 	},
 	"css/plain/import/css_before_index.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_unexpected_compile_error - stat _other.scss: file does not exist",
 	},
 	"css/plain/import/in_css.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_unexpected_compile_error - stat _plain.scss: file does not exist",
 	},
 	"css/plain/import/partial_conflict.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"css/plain/import/sass_takes_precedence.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_unexpected_compile_error - stat _other.scss: file does not exist",
 	},
 	"css/plain/import/scss_takes_precedence.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_unexpected_compile_error - stat _other.scss: file does not exist",
 	},
 	"css/plain/media.hrx": {
 		"logic/and/mixed_case/input.scss": "compiler_output_does_not_match",
@@ -5054,9 +5054,9 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"comment/no_query/silent/input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement '@at-root' (T_AT_ROOT) at line 0, offset 0",
 		"keyframes/all/input.scss": "compiler_output_does_not_match",
 		"load_css/input.scss": "compiler_output_does_not_match",
-		"nested_import/with_builtin_use/input.scss": "parse_failure",
-		"nested_import/with_no_use/input.scss": "parse_failure",
-		"nested_import/with_user_use/input.scss": "parse_failure",
+		"nested_import/with_builtin_use/input.scss": "compiler_unexpected_compile_error - stat nested_import/with_builtin_use/_other.scss: file does not exist",
+		"nested_import/with_no_use/input.scss": "compiler_unexpected_compile_error - stat nested_import/with_no_use/_other.scss: file does not exist",
+		"nested_import/with_user_use/input.scss": "compiler_unexpected_compile_error - stat nested_import/with_user_use/_other.scss: file does not exist",
 		"property_only/input.scss": "parse_failure",
 	},
 	"directives/extend/after_target.hrx": {
@@ -5159,7 +5159,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"directives/forward/error/syntax.hrx": {
 		"after/at_rule/css/input.scss": "compiler_should_have_errored",
-		"after/at_rule/import/input.scss": "parser_error_does_not_match",
+		"after/at_rule/import/input.scss": "compiler_error_does_not_match",
 		"after/at_rule/sass/input.scss": "compiler_should_have_errored",
 		"after/at_rule/unknown/input.scss": "compiler_should_have_errored",
 		"after/indented/include/input.sass": "parser_error_does_not_match",
@@ -5254,9 +5254,9 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"with/input.scss": "compiler_output_does_not_match",
 	},
 	"directives/forward/member/import/import_to_forward/nested.hrx": {
-		"mixin/input.scss": "parse_failure",
-		"variable_assignment/input.scss": "parse_failure",
-		"variable_use/input.scss": "parse_failure",
+		"mixin/input.scss": "compiler_unexpected_compile_error - Undefined mixin - [b]",
+		"variable_assignment/input.scss": "compiler_output_does_not_match",
+		"variable_use/input.scss": "compiler_unexpected_compile_error - Undefined variable.",
 	},
 	"directives/forward/member/import/import_to_forward/override.hrx": {
 		"override/function/input.scss": "parse_failure",
@@ -5264,16 +5264,16 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"override/variable/input.scss": "parse_failure",
 	},
 	"directives/forward/member/import/import_to_forward/top_level.hrx": {
-		"mixin/input.scss": "parse_failure",
-		"post_facto/with_use/input.scss": "parse_failure",
-		"post_facto/without_use/input.scss": "parse_failure",
-		"variable_assignment/input.scss": "parse_failure",
-		"variable_use/input.scss": "parse_failure",
+		"mixin/input.scss": "compiler_unexpected_compile_error - Undefined mixin - [a]",
+		"post_facto/with_use/input.scss": "compiler_unexpected_compile_error - Undefined mixin - [a]",
+		"post_facto/without_use/input.scss": "compiler_unexpected_compile_error - Undefined variable.",
+		"variable_assignment/input.scss": "compiler_output_does_not_match",
+		"variable_use/input.scss": "compiler_unexpected_compile_error - Undefined variable.",
 	},
 	"directives/forward/member/import/import_to_forward/transitive.hrx": {
-		"transitive/function/input.scss": "parse_failure",
+		"transitive/function/input.scss": "compiler_output_does_not_match",
 		"transitive/mixin/input.scss": "parse_failure",
-		"transitive/variable/input.scss": "parse_failure",
+		"transitive/variable/input.scss": "compiler_unexpected_compile_error - Undefined variable.",
 	},
 	"directives/forward/member/import/import_to_forward/use_to.hrx": {
 		"mixin/input.scss": "compiler_output_does_not_match",
@@ -5281,9 +5281,9 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"variable_use/input.scss": "compiler_output_does_not_match",
 	},
 	"directives/forward/member/import/import_to_forward/with.hrx": {
-		"default/input.scss": "parse_failure",
-		"non_overridable/input.scss": "parse_failure",
-		"overridden/input.scss": "parse_failure",
+		"default/input.scss": "compiler_output_does_not_match",
+		"non_overridable/input.scss": "compiler_output_does_not_match",
+		"overridden/input.scss": "compiler_output_does_not_match",
 	},
 	"directives/forward/member/import/precedence.hrx": {
 		"nested/input.scss": "parse_failure",
@@ -5422,30 +5422,30 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"modifier/no_args/before/silent/input.scss": "parse_failure",
 	},
 	"directives/import/configuration.hrx": {
-		"import_twice/no_change/input.scss": "parse_failure",
-		"import_twice/still_changes_in_same_file/input.scss": "parse_failure",
-		"import_twice/with_change/input.scss": "parse_failure",
-		"indirect/through_forward/input.scss": "parse_failure",
-		"indirect/through_import/input.scss": "parse_failure",
-		"midstream_definition/no_config/input.scss": "parse_failure",
-		"midstream_definition/with_config/input.scss": "parse_failure",
-		"nested/input.scss": "parse_failure",
-		"prefixed_as/input.scss": "parse_failure",
-		"same_file/input.scss": "parse_failure",
-		"separate_file/input.scss": "parse_failure",
-		"unrelated_variable/input.scss": "parse_failure",
+		"import_twice/no_change/input.scss": "compiler_output_does_not_match",
+		"import_twice/still_changes_in_same_file/input.scss": "compiler_output_does_not_match",
+		"import_twice/with_change/input.scss": "compiler_output_does_not_match",
+		"indirect/through_forward/input.scss": "compiler_output_does_not_match",
+		"indirect/through_import/input.scss": "compiler_output_does_not_match",
+		"midstream_definition/no_config/input.scss": "compiler_output_does_not_match",
+		"midstream_definition/with_config/input.scss": "compiler_output_does_not_match",
+		"nested/input.scss": "compiler_panic",
+		"prefixed_as/input.scss": "compiler_output_does_not_match",
+		"same_file/input.scss": "compiler_output_does_not_match",
+		"separate_file/input.scss": "compiler_output_does_not_match",
+		"unrelated_variable/input.scss": "compiler_output_does_not_match",
 	},
 	"directives/import/css.hrx": {
-		"css_import_after_style_rule/input.scss": "parse_failure",
+		"css_import_after_style_rule/input.scss": "compiler_unexpected_compile_error - stat css_import_after_style_rule/_rule.scss: file does not exist",
 		"unquoted/input.sass": "parse_failure",
 	},
 	"directives/import/error/conflict.hrx": {
-		"all/input.scss": "parser_error_does_not_match",
-		"extension/input.scss": "parser_error_does_not_match",
-		"import_only/no_extension/input.scss": "parser_error_does_not_match",
+		"all/input.scss": "compiler_should_have_errored",
+		"extension/input.scss": "compiler_error_does_not_match",
+		"import_only/no_extension/input.scss": "compiler_error_does_not_match",
 		"import_only/with_extension/input.scss": "compiler_error_does_not_match",
-		"index/input.scss": "parser_error_does_not_match",
-		"partial/input.scss": "parser_error_does_not_match",
+		"index/input.scss": "compiler_should_have_errored",
+		"partial/input.scss": "compiler_should_have_errored",
 	},
 	"directives/import/error/member.hrx": {
 		"inaccessible/nested/function/input.scss": "parse_failure",
@@ -5453,41 +5453,40 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"inaccessible/nested/variable/input.scss": "parser_error_does_not_match",
 	},
 	"directives/import/error/not_found.hrx": {
-		"directory_dot_import/input.scss": "parser_error_does_not_match",
-		"no_extension/input.scss": "parser_error_does_not_match",
-		"parent_relative/input.scss": "parser_error_does_not_match",
+		"directory_dot_import/input.scss": "compiler_error_does_not_match",
+		"no_extension/input.scss": "compiler_error_does_not_match",
+		"parent_relative/input.scss": "compiler_error_does_not_match",
 	},
 	"directives/import/escaped.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"directives/import/implicit_dependencies.hrx": {
-		"forwarded_first/no_use/input.scss": "parse_failure",
-		"forwarded_first/use_in_both/input.scss": "parse_failure",
-		"forwarded_first/use_in_first/input.scss": "parse_failure",
-		"forwarded_first/use_in_second/input.scss": "parse_failure",
-		"no_forward/no_use/input.scss": "parse_failure",
-		"no_forward/use_in_both/input.scss": "parse_failure",
-		"no_forward/use_in_first/input.scss": "parse_failure",
-		"no_forward/use_in_second/input.scss": "parse_failure",
+		"forwarded_first/no_use/input.scss": "compiler_unexpected_compile_error - stat forwarded_first/no_use/_first.scss: file does not exist",
+		"forwarded_first/use_in_both/input.scss": "compiler_unexpected_compile_error - stat forwarded_first/use_in_both/_first.scss: file does not exist",
+		"forwarded_first/use_in_first/input.scss": "compiler_unexpected_compile_error - stat forwarded_first/use_in_first/_first.scss: file does not exist",
+		"forwarded_first/use_in_second/input.scss": "compiler_unexpected_compile_error - stat forwarded_first/use_in_second/_first.scss: file does not exist",
+		"no_forward/no_use/input.scss": "compiler_unexpected_compile_error - stat no_forward/no_use/_first.scss: file does not exist",
+		"no_forward/use_in_both/input.scss": "compiler_unexpected_compile_error - stat no_forward/use_in_both/_first.scss: file does not exist",
+		"no_forward/use_in_first/input.scss": "compiler_unexpected_compile_error - stat no_forward/use_in_first/_first.scss: file does not exist",
+		"no_forward/use_in_second/input.scss": "compiler_unexpected_compile_error - stat no_forward/use_in_second/_first.scss: file does not exist",
 	},
 	"directives/import/load.hrx": {
-		"explicit_extension/sass/input.scss": "parse_failure",
-		"explicit_extension/scss/input.scss": "compiler_panic",
-		"index/dir_dot_foo/input.scss": "parse_failure",
+		"explicit_extension/sass/input.scss": "compiler_unexpected_compile_error - stat explicit_extension/sass/_other.sass.scss: file does not exist",
+		"explicit_extension/scss/input.scss": "compiler_unexpected_compile_error - stat explicit_extension/scss/_other.scss.scss: file does not exist",
+		"index/dir_dot_foo/input.scss": "compiler_unexpected_compile_error - stat index/dir_dot_foo/dir.foo/_index.scss: file does not exist",
 		"index/dir_dot_scss/input.scss": "compiler_error_does_not_match",
-		"index/partial/input.scss": "parse_failure",
-		"index/sass/input.scss": "parse_failure",
-		"index/scss/input.scss": "parse_failure",
-		"precedence/import_only/before_index/input.scss": "parse_failure",
-		"precedence/import_only/explicit_extension/input.scss": "parse_failure",
-		"precedence/import_only/implicit_extension/input.scss": "parse_failure",
-		"precedence/import_only/index/input.scss": "parse_failure",
-		"precedence/import_only/index_after_normal/input.scss": "parse_failure",
-		"precedence/import_only/normal_before_partial/input.scss": "parse_failure",
-		"precedence/import_only/partial_before_normal/input.scss": "parse_failure",
-		"precedence/normal_before_index/input.scss": "parse_failure",
-		"precedence/sass_before_css/input.scss": "parse_failure",
-		"precedence/scss_before_css/input.scss": "parse_failure",
+		"index/sass/input.scss": "compiler_unexpected_compile_error - stat index/sass/dir/_index.scss: file does not exist",
+		"index/scss/input.scss": "compiler_unexpected_compile_error - stat index/scss/dir/_index.scss: file does not exist",
+		"precedence/import_only/before_index/input.scss": "compiler_unexpected_compile_error - stat precedence/import_only/before_index/other/_index.scss: file does not exist",
+		"precedence/import_only/explicit_extension/input.scss": "compiler_unexpected_compile_error - stat precedence/import_only/explicit_extension/_other.scss: file does not exist",
+		"precedence/import_only/implicit_extension/input.scss": "compiler_unexpected_compile_error - stat precedence/import_only/implicit_extension/_other.scss: file does not exist",
+		"precedence/import_only/index/input.scss": "compiler_unexpected_compile_error - stat precedence/import_only/index/other/_index.scss: file does not exist",
+		"precedence/import_only/index_after_normal/input.scss": "compiler_unexpected_compile_error - stat precedence/import_only/index_after_normal/other/_index.scss: file does not exist",
+		"precedence/import_only/normal_before_partial/input.scss": "compiler_output_does_not_match",
+		"precedence/import_only/partial_before_normal/input.scss": "compiler_unexpected_compile_error - stat precedence/import_only/partial_before_normal/_other.scss: file does not exist",
+		"precedence/normal_before_index/input.scss": "compiler_unexpected_compile_error - stat precedence/normal_before_index/dir/_index.scss: file does not exist",
+		"precedence/sass_before_css/input.scss": "compiler_unexpected_compile_error - stat precedence/sass_before_css/_other.scss: file does not exist",
+		"precedence/scss_before_css/input.scss": "compiler_unexpected_compile_error - stat precedence/scss_before_css/_other.scss: file does not exist",
 	},
 	"directives/import/nested.hrx": {
 		"at_rule/childless/input.scss": "parse_failure",
@@ -5495,9 +5494,9 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"at_rule/keyframes/input.scss": "parse_failure",
 		"at_rule/rule_child/input.scss": "parse_failure",
 		"scope/function/input.scss": "parse_failure",
-		"scope/mixin/input.scss": "parse_failure",
-		"scope/variable/input.scss": "parse_failure",
-		"with_comment/input.scss": "parse_failure",
+		"scope/mixin/input.scss": "compiler_unexpected_compile_error - stat scope/mixin/_other.scss: file does not exist",
+		"scope/variable/input.scss": "compiler_unexpected_compile_error - stat scope/variable/_other.scss: file does not exist",
+		"with_comment/input.scss": "compiler_output_does_not_match",
 	},
 	"directives/mixin.hrx": {
 		"comment/content/after_args/loud/input.scss": "parse_failure",
@@ -5536,9 +5535,9 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"directives/use/css/order/use_and_import.hrx": {
 		"comments_and_imports/input.scss": "compiler_output_does_not_match",
-		"import_into_use/css_import_above_rule/input.scss": "parse_failure",
-		"import_into_use/css_import_below_rule/input.scss": "parse_failure",
-		"import_into_use/sass_import_below_css_import/input.scss": "parse_failure",
+		"import_into_use/css_import_above_rule/input.scss": "compiler_output_does_not_match",
+		"import_into_use/css_import_below_rule/input.scss": "compiler_output_does_not_match",
+		"import_into_use/sass_import_below_css_import/input.scss": "compiler_output_does_not_match",
 		"use_into_import/css_import_above_rule/input.scss": "compiler_output_does_not_match",
 		"use_into_import/css_import_below_rule/input.scss": "compiler_output_does_not_match",
 		"use_into_import/sass_import_below_css_import/input.scss": "compiler_output_does_not_match",
@@ -5575,7 +5574,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"conflicting_namespace/implicit/input.scss": "compiler_should_have_errored",
 		"conflicting_namespace/mixed/input.scss": "compiler_should_have_errored",
 		"dir_dot_scss/input.scss": "compiler_should_have_errored",
-		"loop/import_to_use/input.scss": "parser_error_does_not_match",
+		"loop/import_to_use/input.scss": "compiler_error_does_not_match",
 		"loop/use_self/input.scss": "compiler_should_have_errored",
 		"loop/use_to_import/input.scss": "compiler_should_have_errored",
 		"loop/use_to_use/input.scss": "compiler_should_have_errored",
@@ -5604,9 +5603,9 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"transitive/function/input.scss": "compiler_output_does_not_match",
 		"transitive/mixin/input.scss": "compiler_should_have_errored",
 		"transitive/variable/input.scss": "compiler_should_have_errored",
-		"transitive_from_import/function/input.scss": "parse_failure",
-		"transitive_from_import/mixin/input.scss": "parser_error_does_not_match",
-		"transitive_from_import/variable/input.scss": "parser_error_does_not_match",
+		"transitive_from_import/function/input.scss": "compiler_unexpected_compile_error - stat transitive_from_import/function/_midstream.scss: file does not exist",
+		"transitive_from_import/mixin/input.scss": "compiler_error_does_not_match",
+		"transitive_from_import/variable/input.scss": "compiler_error_does_not_match",
 	},
 	"directives/use/error/member/missing.hrx": {
 		"global/mixin/input.scss": "compiler_should_have_errored",
@@ -5618,7 +5617,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	},
 	"directives/use/error/syntax/after.hrx": {
 		"at_rule/css/input.scss": "compiler_should_have_errored",
-		"at_rule/import/input.scss": "parser_error_does_not_match",
+		"at_rule/import/input.scss": "compiler_error_does_not_match",
 		"at_rule/sass/input.scss": "compiler_should_have_errored",
 		"at_rule/unknown/input.scss": "compiler_should_have_errored",
 		"indented/include/input.sass": "parser_error_does_not_match",
@@ -5912,7 +5911,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_1081.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "unhandled_warning",
 	},
 	"libsass-closed-issues/issue_1082.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement",
@@ -5954,7 +5953,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1103.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement screen and (max-width:2)",
 	},
 	"libsass-closed-issues/issue_1106.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -6197,7 +6196,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1323.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1328.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -6623,7 +6622,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_1801/import-cycle.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_1803/nested.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -6827,7 +6826,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all",
 	},
 	"libsass-closed-issues/issue_2106/test.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-closed-issues/issue_2112.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -6962,16 +6961,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_2295/basic.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_unexpected_compile_error - stat _include.scss.scss: file does not exist",
 	},
 	"libsass-closed-issues/issue_2295/original.hrx": {
-		"input.scss": "parse_failure",
-	},
-	"libsass-closed-issues/issue_2303.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_unexpected_compile_error - Undefined variable.",
 	},
 	"libsass-closed-issues/issue_2304.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass-closed-issues/issue_2307.hrx": {
 		"input.scss": "parser_error_does_not_match",
@@ -7112,7 +7108,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass-closed-issues/issue_279.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_unexpected_compile_error - stat _foo.scss.scss: file does not exist",
 	},
 	"libsass-closed-issues/issue_2808.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -7124,7 +7120,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"libsass-closed-issues/issue_289.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-closed-issues/issue_2959.hrx": {
 		"input.scss": "parse_failure",
@@ -7562,7 +7558,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-todo-issues/issue_1801/simple-import-loop.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass-todo-issues/issue_2016.hrx": {
 		"input.scss": "parser_error_does_not_match",
@@ -7583,7 +7579,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parser_error_does_not_match",
 	},
 	"libsass-todo-issues/issue_2096.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass-todo-issues/issue_221260.hrx": {
 		"input.scss": "compiler_should_have_errored",
@@ -7688,13 +7684,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/at-root-postfix-itpl.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_unexpected_compile_error - stat _include.scss.scss: file does not exist",
 	},
 	"libsass/base-level-parent/imported/at-root-postfix.hrx": {
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/at-root-prefix-itpl.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_unexpected_compile_error - stat _include.scss.scss: file does not exist",
 	},
 	"libsass/base-level-parent/imported/at-root-prefix.hrx": {
 		"input.scss": "compiler_error_does_not_match",
@@ -7706,13 +7702,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/basic-postfix-itpl.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_unexpected_compile_error - stat _include.scss.scss: file does not exist",
 	},
 	"libsass/base-level-parent/imported/basic-postfix.hrx": {
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/basic-prefix-itpl.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_unexpected_compile_error - stat _include.scss.scss: file does not exist",
 	},
 	"libsass/base-level-parent/imported/basic-prefix.hrx": {
 		"input.scss": "compiler_error_does_not_match",
@@ -7886,7 +7882,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass/http_import.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/import.hrx": {
 		"input.scss": "parse_failure",
@@ -8195,13 +8191,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/basic/42_css_imports.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/basic/44_bem_selectors.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/basic/49_interpolants_in_css_imports.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/basic/50_wrapped_pseudo_selectors.hrx": {
 		"input.scss": "parse_failure",
@@ -8291,19 +8287,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement Function.String() is unimplemented.",
 	},
 	"non_conformant/errors/import/file/control-else.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/import/file/control-if.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/import/file/loop/each.hrx": {
 		"input.scss": "parser_error_does_not_match",
 	},
 	"non_conformant/errors/import/file/loop/for.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/import/file/loop/while.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/import/file/mixin/control-else/inside.hrx": {
 		"input.scss": "parser_error_does_not_match",
@@ -8327,19 +8323,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/miss/control-else.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/import/miss/control-if.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/import/miss/loop/each.hrx": {
 		"input.scss": "parser_error_does_not_match",
 	},
 	"non_conformant/errors/import/miss/loop/for.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/import/miss/loop/while.hrx": {
-		"input.scss": "parser_error_does_not_match",
+		"input.scss": "compiler_error_does_not_match",
 	},
 	"non_conformant/errors/import/miss/mixin/control-else/inside.hrx": {
 		"input.scss": "parser_error_does_not_match",
@@ -8363,19 +8359,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/control-else.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/control-if.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/loop/each.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/loop/for.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/loop/while.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/mixin/control-else/outside.hrx": {
 		"input.scss": "parse_failure",
@@ -10019,7 +10015,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.sass": "parse_failure",
 	},
 	"non_conformant/sass/imported.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_unexpected_compile_error - stat _imported.sass.scss: file does not exist",
 	},
 	"non_conformant/sass/indentation.hrx": {
 		"different/spaces/input.sass": "parse_failure",
@@ -10147,19 +10143,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/019_test_css_import_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/020_test_css_import_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/021_test_css_import_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/022_test_css_import_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/023_test_css_import_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/024_test_media_import.hrx": {
 		"input.scss": "parse_failure",
@@ -10168,13 +10164,13 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/027_test_protocol_relative_import.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_unexpected_compile_error - stat fonts.googleapis.com/_css?family=Droid+Sans.scss: file does not exist",
 	},
 	"non_conformant/scss-tests/028_test_import_with_interpolation.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/029_test_url_import.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss-tests/030_test_block_comment_in_script.hrx": {
 		"input.scss": "compiler_panic",
@@ -10462,7 +10458,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/css_import_directive.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/css_property_comments.hrx": {
 		"input.scss": "parse_failure",
@@ -10687,7 +10683,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_panic",
 	},
 	"non_conformant/scss/url_import.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement ImportStmt.String()",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/scss/variables.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Undefined variable.",

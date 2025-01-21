@@ -17,38 +17,6 @@ import (
 var HttpUrlPattern = regexp.MustCompile("^https?://")
 var AbsoluteUrlPattern = regexp.MustCompile("^[a-zA-Z]+?://")
 
-func (parser *Parser) ReadFile(file string) error {
-	f, err := ast.NewFile(parser.fsys, file)
-	if err != nil {
-		return err
-	}
-	data, err := f.ReadFile()
-	if err != nil {
-		return err
-	}
-	parser.File = f
-	parser.Content = string(data)
-	return nil
-}
-
-func (parser *Parser) ParseScssFile(file string) (*ast.StmtList, error) {
-	err := parser.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-
-	// XXX: this seems to copy the whole string, we should avoid this.
-	l := lexer.NewLexerWithString(parser.Content)
-	tokens, err := l.Run()
-
-	if err != nil {
-		return nil, err
-	}
-
-	parser.Tokens = tokens
-	return parser.ParseStmts()
-}
-
 func (parser *Parser) ParseScss(code string) (*ast.StmtList, error) {
 	l := lexer.NewLexerWithString(code)
 	tokens, err := l.Run()
@@ -1683,7 +1651,12 @@ func (parser *Parser) ParseImportStmt() (ast.Stmt, error) {
 			stm = cssImport
 		}
 	} else {
-		scssImport := ast.NewImportStmt(parser.File.FileName)
+		var sourceFname string
+		if parser.File != nil {
+			sourceFname = parser.File.FileName
+		}
+
+		scssImport := ast.NewImportStmt(sourceFname)
 
 		for {
 			strExpr, err := parser.ParseString()

@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/c9s/c6/ast"
+	"github.com/c9s/c6/parser"
 	"github.com/c9s/c6/runtime"
 )
 
@@ -140,12 +141,16 @@ func (c *PrettyCompiler) CompileRuleSet(ruleset *ast.RuleSet) {
 	c.printLine("}", len(ruleset.Block.Stmts.Stmts) > 0)
 }
 
+func (c *PrettyCompiler) CompileCssImport(stmt *ast.CssImportStmt) {
+	c.printLine(fmt.Sprintf("@import %s", stmt.Url), false)
+}
+
 func (c *PrettyCompiler) CompileStmt(anyStm ast.Stmt) error {
 	switch stm := anyStm.(type) {
 	case *ast.RuleSet:
 		c.CompileRuleSet(stm)
 		return nil
-	case *ast.ImportStmt:
+	case *ast.CssImportStmt:
 		return nil
 	case *ast.AssignStmt:
 		return nil
@@ -187,9 +192,9 @@ func (c *PrettyCompiler) CompileRoot(list []*ast.StmtList) error {
 	return nil
 }
 
-func (c *PrettyCompiler) Compile(list *ast.StmtList) error {
+func (c *PrettyCompiler) Compile(gp *parser.GlobalParser, list *ast.StmtList) error {
 	scope := runtime.NewScope(nil)
-	r := runtime.NewRuntime(c.DebugPrinter, c.WarnPrinter)
+	r := runtime.NewRuntime(gp, c.DebugPrinter, c.WarnPrinter)
 	executed, err := r.ExecuteList(scope, list)
 
 	if err != nil {

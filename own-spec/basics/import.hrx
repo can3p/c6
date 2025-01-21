@@ -3,7 +3,7 @@
 
 <===> basic/foundation/_code.scss
 code {
-  padding: .25em;
+  padding: 0.25em;
   line-height: 0;
 }
 
@@ -11,24 +11,23 @@ code {
 ul, ol {
   text-align: left;
 
-  & & {
-    padding: {
-      bottom: 0;
-      left: 0;
+  a, p {
+    padding-bottom: 0;
+    padding-left: 0;
     }
   }
 }
 
 <===> basic/output.css
 code {
-  padding: .25em;
+  padding: 0.25em;
   line-height: 0;
 }
 
 ul, ol {
   text-align: left;
 }
-ul ul, ol ol {
+ul a, ul p, ol a, ol p {
   padding-bottom: 0;
   padding-left: 0;
 }

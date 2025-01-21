@@ -7,6 +7,8 @@ package parser
 import (
 	"fmt"
 	"io/fs"
+	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/c9s/c6/ast"
@@ -40,13 +42,13 @@ func getFileTypeByExtension(extension string) uint {
 // one day we'll put some options there
 // Parser represents a global instance of parser that
 // contains shared options for all the files
-type GlobalParser struct{}
+type GlobalParser struct {
+	fsys fs.FS
+}
 
 // Parser represent the state of parsing of a given file
 type Parser struct {
 	GlobalParser *GlobalParser
-
-	fsys fs.FS
 
 	File *ast.File
 
@@ -63,15 +65,39 @@ type Parser struct {
 	Tokens []*ast.Token
 }
 
-func NewParser() *GlobalParser {
-	return &GlobalParser{}
+func NewParser(fsys fs.FS) *GlobalParser {
+	return &GlobalParser{
+		fsys: fsys,
+	}
 }
 
-func (gp *GlobalParser) ParseFile(fsys fs.FS, path string) (*ast.StmtList, error) {
+func (gp *GlobalParser) ResolveFileFname(source string, name string) (string, error) {
+	base := path.Dir(source)
+	importPath := path.Join(base, name)
+
+	fi, err := fs.Stat(gp.fsys, importPath)
+
+	if err != nil && os.IsExist(err) {
+		return "", err
+	}
+
+	// go find the _index.scss if it's a local directory
+	if fi != nil && fi.Mode().IsDir() {
+		importPath = path.Join(importPath, "_index.scss")
+	} else {
+		var dirname = filepath.Dir(importPath)
+		var basename = filepath.Base(importPath)
+		importPath = path.Join(dirname, "_"+basename+".scss")
+	}
+
+	return importPath, nil
+}
+
+func (gp *GlobalParser) ParseFile(path string) (*ast.StmtList, error) {
 	ext := filepath.Ext(path)
 	filetype := getFileTypeByExtension(ext)
 
-	f, err := ast.NewFile(fsys, path)
+	f, err := ast.NewFile(gp.fsys, path)
 	if err != nil {
 		return nil, err
 	}
@@ -98,6 +124,15 @@ func (gp *GlobalParser) ParseFile(fsys fs.FS, path string) (*ast.StmtList, error
 		return nil, fmt.Errorf("Unsupported file format: %s", path)
 	}
 	return stmts, nil
+}
+
+func (gp *GlobalParser) ParseScss(content string) (*ast.StmtList, error) {
+	parser := &Parser{
+		GlobalParser: gp,
+		Content:      content,
+	}
+
+	return parser.ParseScss(parser.Content)
 }
 
 func (parser *Parser) backup() {

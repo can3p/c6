@@ -10,19 +10,23 @@ func ExpandTree(stmts *ast.StmtList) ([]*ast.StmtList, error) {
 	out := []*ast.StmtList{}
 
 	for _, stmt := range stmts.Stmts {
-		t, ok := stmt.(*ast.RuleSet)
+		switch t := stmt.(type) {
+		case *ast.RuleSet:
+			ret, err := expandRuleset(t)
 
-		if !ok {
-			return nil, fmt.Errorf("Tree can only contain rule sets, but has variable of type %T", stmt)
+			if err != nil {
+				return nil, err
+			}
+
+			out = append(out, ret)
+		case *ast.CssImportStmt:
+			s := &ast.StmtList{}
+			s.Append(stmt)
+			out = append(out, s)
+		default:
+			return nil, fmt.Errorf("Tree can only contain rule sets or css imports, but has variable of type %T", stmt)
 		}
 
-		ret, err := expandRuleset(t)
-
-		if err != nil {
-			return nil, err
-		}
-
-		out = append(out, ret)
 	}
 
 	return out, nil

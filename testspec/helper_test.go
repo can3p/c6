@@ -60,7 +60,7 @@ func RunSpecs(t *testing.T, hrxPath string, testFiles []string, testOnly string,
 			testedCount++
 
 			if !assert.NotPanicsf(t, func() {
-				var parser = parser.NewParser()
+				var parser = parser.NewParser(archive)
 
 				baseName := path.Dir(input)
 				errFname := path.Join(baseName, "error")
@@ -84,7 +84,7 @@ func RunSpecs(t *testing.T, hrxPath string, testFiles []string, testOnly string,
 					expectedWarning = string(expected)
 				}
 
-				var stmts, parseErr = parser.ParseFile(archive, input)
+				var stmts, parseErr = parser.ParseFile(input)
 				if parseErr != nil {
 					if expectedError != "" {
 						if !assert.Equalf(t, expectedError, parseErr.Error(), "[example %s] Input: %s", fname, errFname) {
@@ -111,7 +111,7 @@ func RunSpecs(t *testing.T, hrxPath string, testFiles []string, testOnly string,
 
 				var compiler = compiler.NewPrettyCompiler(&b, compiler.WithWarn(wr), compiler.WithDebug(wr))
 
-				compileErr := compiler.Compile(stmts)
+				compileErr := compiler.Compile(parser, stmts)
 
 				if _, err := fs.Stat(archive, warnFname); err == nil {
 					if !assert.Equal(t, expectedWarning, warn.String(), "[example %s] Input: %s - warning is expected", fname, input) {

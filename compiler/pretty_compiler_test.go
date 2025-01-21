@@ -11,7 +11,7 @@ import (
 )
 
 func AssertPrettyCompile(t *testing.T, code string, expected string) {
-	var parser = parser.NewParser()
+	var parser = parser.NewParser(nil)
 	stmts, err := parser.ParseScss(code)
 	require.NoError(t, err)
 
@@ -19,7 +19,7 @@ func AssertPrettyCompile(t *testing.T, code string, expected string) {
 
 	var compiler = NewPrettyCompiler(&buf)
 
-	err = compiler.Compile(stmts)
+	err = compiler.Compile(parser, stmts)
 	require.NoError(t, err)
 	assert.Equal(t, expected, strings.TrimSpace(buf.String()))
 }
