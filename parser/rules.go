@@ -1626,6 +1626,7 @@ func (parser *Parser) ParseImportStmt() (ast.Stmt, error) {
 				return nil, err
 			}
 
+			stm = cssImport
 		} else {
 			parser.advance()
 

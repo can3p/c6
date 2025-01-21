@@ -8359,19 +8359,19 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/control-else.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/errors/import/url/control-if.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/errors/import/url/loop/each.hrx": {
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/errors/import/url/loop/for.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/errors/import/url/loop/while.hrx": {
-		"input.scss": "parse_failure",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"non_conformant/errors/import/url/mixin/control-else/outside.hrx": {
 		"input.scss": "parse_failure",
