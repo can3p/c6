@@ -188,11 +188,25 @@ func (c *PrettyCompiler) CompileMediaQuery(stmt *ast.MediaQuery) {
 	}
 }
 
+func (c *PrettyCompiler) CompileMediaQueryList(stmt *ast.MediaQueryList) {
+	if len(stmt.List) == 0 {
+		return
+	}
+
+	for idx, q := range stmt.List {
+		if idx > 0 {
+			c.printString(", ")
+		}
+
+		c.CompileMediaQuery(q)
+	}
+}
+
 func (c *PrettyCompiler) CompileCssImport(stmt *ast.CssImportStmt) {
 	c.printString(fmt.Sprintf("@import url(%s)", stmt.Url))
-	if stmt.MediaQuery != nil {
+	if stmt.MediaQueryList != nil {
 		c.printByte(' ')
-		c.CompileMediaQuery(stmt.MediaQuery)
+		c.CompileMediaQueryList(stmt.MediaQueryList)
 	}
 
 	c.printByte(';')
