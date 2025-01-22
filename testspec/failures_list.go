@@ -4672,16 +4672,16 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"unknown/identifier/static/input.scss": "parse_failure",
 	},
 	"css/plain/import/css_before_index.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - stat _other.scss: file does not exist",
+		"input.scss": "compiler_unexpected_compile_error - Unsupported file format: other.css",
 	},
 	"css/plain/import/in_css.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - stat _plain.scss: file does not exist",
+		"input.scss": "compiler_unexpected_compile_error - Unsupported file format: plain.css",
 	},
 	"css/plain/import/partial_conflict.hrx": {
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"css/plain/import/sass_takes_precedence.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - stat _other.scss: file does not exist",
+		"input.scss": "compiler_unexpected_compile_error - Unsupported file format: other.sass",
 	},
 	"css/plain/media.hrx": {
 		"logic/and/mixed_case/input.scss": "compiler_output_does_not_match",
@@ -5439,7 +5439,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"directives/import/error/conflict.hrx": {
 		"all/input.scss": "compiler_should_have_errored",
 		"extension/input.scss": "compiler_should_have_errored",
-		"import_only/no_extension/input.scss": "compiler_error_does_not_match",
+		"import_only/no_extension/input.scss": "compiler_should_have_errored",
 		"import_only/with_extension/input.scss": "compiler_error_does_not_match",
 		"index/input.scss": "compiler_should_have_errored",
 		"partial/input.scss": "compiler_should_have_errored",
@@ -5458,6 +5458,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_output_does_not_match",
 	},
 	"directives/import/implicit_dependencies.hrx": {
+		"forwarded_first/no_use/input.scss": "compiler_unexpected_compile_error - Undefined variable.",
 		"forwarded_first/use_in_both/input.scss": "compiler_output_does_not_match",
 		"forwarded_first/use_in_first/input.scss": "compiler_output_does_not_match",
 		"forwarded_first/use_in_second/input.scss": "compiler_unexpected_compile_error - Undefined variable.",
@@ -5466,19 +5467,11 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"no_forward/use_in_second/input.scss": "compiler_output_does_not_match",
 	},
 	"directives/import/load.hrx": {
-		"explicit_extension/sass/input.scss": "compiler_unexpected_compile_error - stat explicit_extension/sass/_other.sass.scss: file does not exist",
-		"explicit_extension/scss/input.scss": "compiler_unexpected_compile_error - stat explicit_extension/scss/_other.scss.scss: file does not exist",
-		"index/dir_dot_foo/input.scss": "compiler_unexpected_compile_error - stat index/dir_dot_foo/dir.foo/_index.scss: file does not exist",
+		"explicit_extension/sass/input.scss": "compiler_unexpected_compile_error - Unsupported file format: explicit_extension/sass/other.sass",
 		"index/dir_dot_scss/input.scss": "compiler_error_does_not_match",
-		"index/sass/input.scss": "compiler_unexpected_compile_error - stat index/sass/dir/_index.scss: file does not exist",
-		"index/scss/input.scss": "compiler_unexpected_compile_error - stat index/scss/dir/_index.scss: file does not exist",
-		"precedence/import_only/before_index/input.scss": "compiler_unexpected_compile_error - stat precedence/import_only/before_index/other/_index.scss: file does not exist",
-		"precedence/import_only/explicit_extension/input.scss": "compiler_output_does_not_match",
-		"precedence/import_only/implicit_extension/input.scss": "compiler_output_does_not_match",
-		"precedence/import_only/index/input.scss": "compiler_unexpected_compile_error - stat precedence/import_only/index/other/_index.scss: file does not exist",
-		"precedence/import_only/normal_before_partial/input.scss": "compiler_output_does_not_match",
-		"precedence/import_only/partial_before_normal/input.scss": "compiler_output_does_not_match",
-		"precedence/sass_before_css/input.scss": "compiler_unexpected_compile_error - stat precedence/sass_before_css/_other.scss: file does not exist",
+		"index/sass/input.scss": "compiler_unexpected_compile_error - Unsupported file format: index/sass/dir/index.sass",
+		"precedence/import_only/implicit_extension/input.scss": "compiler_unexpected_compile_error - Unsupported file format: precedence/import_only/implicit_extension/other.import.sass",
+		"precedence/sass_before_css/input.scss": "compiler_unexpected_compile_error - Unsupported file format: precedence/sass_before_css/other.sass",
 	},
 	"directives/import/nested.hrx": {
 		"at_rule/childless/input.scss": "parse_failure",
@@ -6946,9 +6939,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"libsass-closed-issues/issue_2291.hrx": {
 		"input.scss": "parse_failure",
 	},
-	"libsass-closed-issues/issue_2295/basic.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - stat _include.scss.scss: file does not exist",
-	},
 	"libsass-closed-issues/issue_2295/original.hrx": {
 		"input.scss": "compiler_unexpected_compile_error - Undefined variable.",
 	},
@@ -7094,7 +7084,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass-closed-issues/issue_279.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - stat _foo.scss.scss: file does not exist",
+		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement @extend",
 	},
 	"libsass-closed-issues/issue_2808.hrx": {
 		"input.scss": "compiler_output_does_not_match",
@@ -7583,10 +7573,10 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_unexpected_compile_error - Don't know how to execute the statement all and (min-width:100px)",
 	},
 	"libsass-todo-issues/issue_2295/error/basic.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_panic",
 	},
 	"libsass-todo-issues/issue_2295/error/wrapped.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass-todo-issues/issue_238764.hrx": {
 		"input.scss": "compiler_panic",
@@ -7667,31 +7657,31 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/at-root-postfix-itpl.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - stat _include.scss.scss: file does not exist",
+		"input.scss": "compiler_unexpected_compile_error - Parse failed at token '#{&}post' (T_INTERPOLATION_SELECTOR) at line 1, offset 14",
 	},
 	"libsass/base-level-parent/imported/at-root-postfix.hrx": {
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/at-root-prefix-itpl.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - stat _include.scss.scss: file does not exist",
+		"input.scss": "compiler_unexpected_compile_error - Parse failed at token 'pre#{&}' (T_INTERPOLATION_SELECTOR) at line 1, offset 14",
 	},
 	"libsass/base-level-parent/imported/at-root-prefix.hrx": {
 		"input.scss": "compiler_error_does_not_match",
 	},
 	"libsass/base-level-parent/imported/basic-alone-itpl.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass/base-level-parent/imported/basic-alone.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass/base-level-parent/imported/basic-postfix-itpl.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - stat _include.scss.scss: file does not exist",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/base-level-parent/imported/basic-postfix.hrx": {
-		"input.scss": "compiler_error_does_not_match",
+		"input.scss": "compiler_should_have_errored",
 	},
 	"libsass/base-level-parent/imported/basic-prefix-itpl.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - stat _include.scss.scss: file does not exist",
+		"input.scss": "compiler_output_does_not_match",
 	},
 	"libsass/base-level-parent/imported/basic-prefix.hrx": {
 		"input.scss": "compiler_error_does_not_match",
@@ -9998,7 +9988,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.sass": "parse_failure",
 	},
 	"non_conformant/sass/imported.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - stat _imported.sass.scss: file does not exist",
+		"input.scss": "compiler_unexpected_compile_error - Unsupported file format: imported.sass",
 	},
 	"non_conformant/sass/indentation.hrx": {
 		"different/spaces/input.sass": "parse_failure",
@@ -10144,7 +10134,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/027_test_protocol_relative_import.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - stat fonts.googleapis.com/_css?family=Droid+Sans.scss: file does not exist",
+		"input.scss": "compiler_unexpected_compile_error - unable to find the module \"//fonts.googleapis.com/css?family=Droid+Sans\": could not resolve import path '//fonts.googleapis.com/css?family=Droid+Sans' relative to 'input.scss': no such file or directory",
 	},
 	"non_conformant/scss-tests/028_test_import_with_interpolation.hrx": {
 		"input.scss": "compiler_output_does_not_match",

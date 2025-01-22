@@ -7,12 +7,10 @@ package parser
 import (
 	"fmt"
 	"io/fs"
-	"os"
-	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/c9s/c6/ast"
+	"github.com/c9s/c6/util"
 )
 
 const (
@@ -73,40 +71,7 @@ func NewParser(fsys fs.FS) *GlobalParser {
 }
 
 func (gp *GlobalParser) ResolveFileFname(source string, name string) (string, error) {
-	base := path.Dir(source)
-	importPath := path.Join(base, name)
-
-	fi, err := fs.Stat(gp.fsys, importPath)
-
-	if err != nil && os.IsExist(err) {
-		return "", err
-	}
-
-	// @import "foo" may import foo.scss from the current folder
-	if !strings.Contains(name, "/") {
-		currentFolderFile := importPath + ".scss"
-
-		fi, err := fs.Stat(gp.fsys, currentFolderFile)
-
-		if err != nil && os.IsExist(err) {
-			return "", err
-		}
-
-		if fi != nil {
-			return currentFolderFile, nil
-		}
-	}
-
-	// go find the _index.scss if it's a local directory
-	if fi != nil && fi.Mode().IsDir() {
-		importPath = path.Join(importPath, "_index.scss")
-	} else {
-		var dirname = filepath.Dir(importPath)
-		var basename = filepath.Base(importPath)
-		importPath = path.Join(dirname, "_"+basename+".scss")
-	}
-
-	return importPath, nil
+	return util.ResolveFilename(source, name, gp.fsys)
 }
 
 func (gp *GlobalParser) ParseFile(path string) (*ast.StmtList, error) {
