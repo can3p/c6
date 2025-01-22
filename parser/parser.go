@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/c9s/c6/ast"
 )
@@ -79,6 +80,21 @@ func (gp *GlobalParser) ResolveFileFname(source string, name string) (string, er
 
 	if err != nil && os.IsExist(err) {
 		return "", err
+	}
+
+	// @import "foo" may import foo.scss from the current folder
+	if !strings.Contains(name, "/") {
+		currentFolderFile := importPath + ".scss"
+
+		fi, err := fs.Stat(gp.fsys, currentFolderFile)
+
+		if err != nil && os.IsExist(err) {
+			return "", err
+		}
+
+		if fi != nil {
+			return currentFolderFile, nil
+		}
 	}
 
 	// go find the _index.scss if it's a local directory
