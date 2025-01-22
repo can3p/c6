@@ -10134,7 +10134,7 @@ var BlacklistedSpecs = map[string]map[string]string{
 		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/027_test_protocol_relative_import.hrx": {
-		"input.scss": "compiler_unexpected_compile_error - unable to find the module \"//fonts.googleapis.com/css?family=Droid+Sans\": could not resolve import path '//fonts.googleapis.com/css?family=Droid+Sans' relative to 'input.scss': no such file or directory",
+		"input.scss": "parse_failure",
 	},
 	"non_conformant/scss-tests/028_test_import_with_interpolation.hrx": {
 		"input.scss": "compiler_output_does_not_match",

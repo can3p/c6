@@ -1589,7 +1589,7 @@ func (parser *Parser) ParseImportStmt() (ast.Stmt, error) {
 
 	// that's a css import
 	if tok.Type == ast.T_FUNCTION_NAME ||
-		tok.IsString() && (strings.HasSuffix(tok.Str, ".css") || AbsoluteUrlPattern.MatchString(tok.Str)) {
+		tok.IsString() && (strings.HasSuffix(tok.Str, ".css") || strings.HasPrefix(tok.Str, "//") || AbsoluteUrlPattern.MatchString(tok.Str)) {
 		cssImport := ast.NewCssImportStmt()
 
 		// if it's url(..)
