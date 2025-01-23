@@ -9,17 +9,23 @@ import (
 
 const MaxWhileIterations = 10_000
 
+var ErrNotImplemented = fmt.Errorf("Not Implemented")
+
 type Printer func(msg any)
 
 type Runtime struct {
-	DebugPrinter Printer
-	WarnPrinter  Printer
+	GlobalParser  *parser.GlobalParser
+	DebugPrinter  Printer
+	WarnPrinter   Printer
+	ExecutedPaths map[string]struct{}
 }
 
-func NewRuntime(debug, warn Printer) *Runtime {
+func NewRuntime(gp *parser.GlobalParser, debug, warn Printer) *Runtime {
 	return &Runtime{
-		DebugPrinter: debug,
-		WarnPrinter:  warn,
+		GlobalParser:  gp,
+		DebugPrinter:  debug,
+		WarnPrinter:   warn,
+		ExecutedPaths: map[string]struct{}{},
 	}
 }
 
@@ -62,6 +68,10 @@ func (r *Runtime) ExecuteSingle(scope *Scope, stmt ast.Stmt) (*ast.StmtList, err
 		return nil, err
 	case *ast.IncludeStmt:
 		return r.executeIncludeStmt(scope, t)
+	case *ast.CssImportStmt:
+		return r.executeCssImportStmt(scope, t)
+	case *ast.ImportStmt:
+		return r.executeImportStmt(scope, t)
 	}
 
 	return nil, fmt.Errorf("Don't know how to execute the statement %v", stmt)
@@ -285,6 +295,57 @@ func (r *Runtime) executeIncludeStmt(scope *Scope, stmt *ast.IncludeStmt) (*ast.
 	return l, err
 }
 
+func (r *Runtime) executeCssImportStmt(_ *Scope, stmt *ast.CssImportStmt) (*ast.StmtList, error) {
+	out := &ast.StmtList{}
+	out.Append(stmt)
+
+	return out, nil
+}
+
+func (r *Runtime) executeImportStmt(scope *Scope, stmt *ast.ImportStmt) (*ast.StmtList, error) {
+	// // check scss import url by file system
+	//
+	if stmt.SourceFileName == "" {
+		return nil, fmt.Errorf("Unknown scss file to detect import path.")
+	}
+
+	out := &ast.StmtList{}
+
+	for _, p := range stmt.Paths {
+		targetFname, err := r.GlobalParser.ResolveFileFname(stmt.SourceFileName, p.Value)
+
+		if err != nil {
+			return nil, fmt.Errorf("unable to find the module %s: %w", p, err)
+		}
+
+		// that's our way to fight with import cycles
+		// that should probably live in the parser
+		if _, ok := r.ExecutedPaths[targetFname]; ok {
+			return nil, fmt.Errorf("unable to load %s, the file is already being executed", p)
+		}
+
+		r.ExecutedPaths[targetFname] = struct{}{}
+
+		imported, err := r.GlobalParser.ParseFile(targetFname)
+
+		if err != nil {
+			return nil, err
+		}
+
+		executed, err := r.ExecuteList(scope, imported)
+
+		if err != nil {
+			return nil, err
+		}
+
+		delete(r.ExecutedPaths, targetFname)
+
+		out.Stmts = append(out.Stmts, executed.Stmts...)
+	}
+
+	return out, nil
+}
+
 func (r *Runtime) executeAssignStmt(scope *Scope, stmt *ast.AssignStmt) error {
 	varName := stmt.Variable.Name
 	val, err := EvaluateExpr(stmt.Expr, scope)
@@ -312,7 +373,7 @@ func (r *Runtime) executeRuleSet(scope *Scope, stmt *ast.RuleSet) (*ast.StmtList
 	}
 
 	rs := ast.NewRuleSet()
-	decl := ast.NewDeclBlock(rs)
+	decl := ast.NewDeclBlock()
 	decl.AppendList(res)
 	rs.Block = decl
 	rs.Selectors = stmt.Selectors

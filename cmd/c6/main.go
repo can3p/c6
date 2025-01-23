@@ -20,10 +20,9 @@ func main() {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fname := args[0]
-			var context = parser.NewContext()
 			d := os.DirFS(path.Dir(fname))
-			var parser = parser.NewParser(context)
-			var stmts, err = parser.ParseFile(d, fname)
+			var parser = parser.NewParser(d)
+			var stmts, err = parser.ParseFile(fname)
 
 			if err != nil {
 				return err
@@ -32,7 +31,7 @@ func main() {
 			var b bytes.Buffer
 			var compiler = compiler.NewPrettyCompiler(&b)
 
-			err = compiler.Compile(stmts)
+			err = compiler.Compile(parser, stmts)
 
 			if err != nil {
 				return err
@@ -59,8 +58,7 @@ func main() {
 		Short: "Compile some scss from stdin",
 		// Long:  "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var context = parser.NewContext()
-			var parser = parser.NewParser(context)
+			var parser = parser.NewParser(nil)
 			content, _ := io.ReadAll(os.Stdin)
 
 			stmts, err := parser.ParseScss(string(content))
@@ -71,7 +69,7 @@ func main() {
 			var b bytes.Buffer
 			var compiler = compiler.NewPrettyCompiler(&b)
 
-			err = compiler.Compile(stmts)
+			err = compiler.Compile(parser, stmts)
 
 			if err != nil {
 				return err

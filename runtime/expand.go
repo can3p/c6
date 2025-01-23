@@ -8,21 +8,34 @@ import (
 
 func ExpandTree(stmts *ast.StmtList) ([]*ast.StmtList, error) {
 	out := []*ast.StmtList{}
+	cssImports := &ast.StmtList{}
 
 	for _, stmt := range stmts.Stmts {
-		t, ok := stmt.(*ast.RuleSet)
+		switch t := stmt.(type) {
+		case *ast.RuleSet:
+			ret, err := expandRuleset(t)
 
-		if !ok {
-			return nil, fmt.Errorf("Tree can only contain rule sets, but has variable of type %T", stmt)
+			if err != nil {
+				return nil, err
+			}
+
+			out = append(out, ret)
+		case *ast.CssImportStmt:
+			cssImports.Append(t)
+		default:
+			return nil, fmt.Errorf("Tree can only contain rule sets or css imports, but has variable of type %T", stmt)
 		}
+	}
 
-		ret, err := expandRuleset(t)
-
-		if err != nil {
-			return nil, err
+	if len(cssImports.Stmts) > 0 {
+		if len(out) > 0 {
+			// css import should always go in the beginning
+			cssImports.AppendList(out[0])
+			out[0] = cssImports
+		} else {
+			// in case there are not rules except imports
+			out = append(out, cssImports)
 		}
-
-		out = append(out, ret)
 	}
 
 	return out, nil
@@ -45,7 +58,7 @@ func expandRuleset(rs *ast.RuleSet) (*ast.StmtList, error) {
 			if len(collector) > 0 {
 				nrs := ast.NewRuleSet()
 				nrs.Selectors = rs.Selectors
-				bl := ast.NewDeclBlock(nrs)
+				bl := ast.NewDeclBlock()
 				bl.AppendList(&ast.StmtList{
 					Stmts: collector,
 				})
@@ -89,7 +102,7 @@ func expandRuleset(rs *ast.RuleSet) (*ast.StmtList, error) {
 	if len(collector) > 0 {
 		nrs := ast.NewRuleSet()
 		nrs.Selectors = rs.Selectors
-		bl := ast.NewDeclBlock(nrs)
+		bl := ast.NewDeclBlock()
 		bl.AppendList(&ast.StmtList{
 			Stmts: collector,
 		})

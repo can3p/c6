@@ -1,0 +1,33 @@
+<===> basic/input.scss
+@import 'foundation/code', 'foundation/lists';
+
+<===> basic/foundation/_code.scss
+code {
+  padding: 0.25em;
+  line-height: 0;
+}
+
+<===> basic/foundation/_lists.scss
+ul, ol {
+  text-align: left;
+
+  a, p {
+    padding-bottom: 0;
+    padding-left: 0;
+    }
+  }
+}
+
+<===> basic/output.css
+code {
+  padding: 0.25em;
+  line-height: 0;
+}
+
+ul, ol {
+  text-align: left;
+}
+ul a, ul p, ol a, ol p {
+  padding-bottom: 0;
+  padding-left: 0;
+}

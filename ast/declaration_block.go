@@ -8,10 +8,6 @@ DeclBlock.
 	}
 */
 type DeclBlock struct {
-	ParentRuleSet *RuleSet
-
-	Scope *Scope
-
 	// The symbol table for storing constant values
 	// Only constants can be stored here...
 	Stmts StmtList
@@ -20,10 +16,9 @@ type DeclBlock struct {
 	SubRuleSets []*RuleSet
 }
 
-func NewDeclBlock(parentRuleSet *RuleSet) *DeclBlock {
+func NewDeclBlock() *DeclBlock {
 	return &DeclBlock{
-		ParentRuleSet: parentRuleSet,
-		Stmts:         StmtList{},
+		Stmts: StmtList{},
 	}
 }
 

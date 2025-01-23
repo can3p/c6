@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"github.com/c9s/c6/ast"
+	"github.com/c9s/c6/util"
 )
 
 const (
@@ -37,11 +38,16 @@ func getFileTypeByExtension(extension string) uint {
 	return UnknownFileType
 }
 
-type Parser struct {
-	GlobalContext *Context
-	ContextStack  []Context
-
+// one day we'll put some options there
+// Parser represents a global instance of parser that
+// contains shared options for all the files
+type GlobalParser struct {
 	fsys fs.FS
+}
+
+// Parser represent the state of parsing of a given file
+type Parser struct {
+	GlobalParser *GlobalParser
 
 	File *ast.File
 
@@ -56,23 +62,23 @@ type Parser struct {
 
 	// A token slice that contains all lexed tokens
 	Tokens []*ast.Token
-
-	TopScope *ast.Scope // The top-most scope
 }
 
-func NewParser(context *Context) *Parser {
-	return &Parser{
-		GlobalContext: context,
-		Pos:           0,
-		RollbackPos:   0,
+func NewParser(fsys fs.FS) *GlobalParser {
+	return &GlobalParser{
+		fsys: fsys,
 	}
 }
 
-func (parser *Parser) ParseFile(fsys fs.FS, path string) (*ast.StmtList, error) {
+func (gp *GlobalParser) ResolveFileFname(source string, name string) (string, error) {
+	return util.ResolveFilename(source, name, gp.fsys)
+}
+
+func (gp *GlobalParser) ParseFile(path string) (*ast.StmtList, error) {
 	ext := filepath.Ext(path)
 	filetype := getFileTypeByExtension(ext)
 
-	f, err := ast.NewFile(fsys, path)
+	f, err := ast.NewFile(gp.fsys, path)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +87,11 @@ func (parser *Parser) ParseFile(fsys fs.FS, path string) (*ast.StmtList, error) 
 		return nil, err
 	}
 
-	parser.Content = string(data)
-	parser.File = f
+	parser := &Parser{
+		GlobalParser: gp,
+		Content:      string(data),
+		File:         f,
+	}
 
 	var stmts *ast.StmtList
 
@@ -96,6 +105,15 @@ func (parser *Parser) ParseFile(fsys fs.FS, path string) (*ast.StmtList, error) 
 		return nil, fmt.Errorf("Unsupported file format: %s", path)
 	}
 	return stmts, nil
+}
+
+func (gp *GlobalParser) ParseScss(content string) (*ast.StmtList, error) {
+	parser := &Parser{
+		GlobalParser: gp,
+		Content:      content,
+	}
+
+	return parser.ParseScss(parser.Content)
 }
 
 func (parser *Parser) backup() {

@@ -6,8 +6,6 @@ package parser
 
 import (
 	"fmt"
-	"io/fs"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -18,38 +16,6 @@ import (
 
 var HttpUrlPattern = regexp.MustCompile("^https?://")
 var AbsoluteUrlPattern = regexp.MustCompile("^[a-zA-Z]+?://")
-
-func (parser *Parser) ReadFile(file string) error {
-	f, err := ast.NewFile(parser.fsys, file)
-	if err != nil {
-		return err
-	}
-	data, err := f.ReadFile()
-	if err != nil {
-		return err
-	}
-	parser.File = f
-	parser.Content = string(data)
-	return nil
-}
-
-func (parser *Parser) ParseScssFile(file string) (*ast.StmtList, error) {
-	err := parser.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-
-	// XXX: this seems to copy the whole string, we should avoid this.
-	l := lexer.NewLexerWithString(parser.Content)
-	tokens, err := l.Run()
-
-	if err != nil {
-		return nil, err
-	}
-
-	parser.Tokens = tokens
-	return parser.ParseStmts()
-}
 
 func (parser *Parser) ParseScss(code string) (*ast.StmtList, error) {
 	l := lexer.NewLexerWithString(code)
@@ -305,7 +271,7 @@ func (parser *Parser) ParseComparisonExpr() (ast.Expr, error) {
 	return expr, nil
 }
 
-func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet, pos int) (ast.Selector, error) {
+func (parser *Parser) ParseSimpleSelector(pos int) (ast.Selector, error) {
 	debug("ParseSimpleSelector")
 
 	var tok = parser.next()
@@ -400,13 +366,13 @@ func (parser *Parser) ParseSimpleSelector(parentRuleSet *ast.RuleSet, pos int) (
 	return nil, nil
 }
 
-func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) (*ast.CompoundSelector, error) {
+func (parser *Parser) ParseCompoundSelector() (*ast.CompoundSelector, error) {
 	debug("ParseCompoundSelector")
 
 	var sels = ast.NewCompoundSelector()
 	idx := 0
 	for {
-		sel, err := parser.ParseSimpleSelector(parentRuleSet, idx)
+		sel, err := parser.ParseSimpleSelector(idx)
 
 		if err != nil {
 			return nil, err
@@ -425,7 +391,7 @@ func (parser *Parser) ParseCompoundSelector(parentRuleSet *ast.RuleSet) (*ast.Co
 	return nil, nil
 }
 
-func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.ComplexSelector, error) {
+func (parser *Parser) ParseComplexSelector() (*ast.ComplexSelector, error) {
 	debug("ParseComplexSelector")
 
 	var complexSel = ast.NewComplexSelector()
@@ -467,7 +433,7 @@ func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.Com
 			}
 		}
 
-		if sel, err := parser.ParseCompoundSelector(parentRuleSet); err != nil {
+		if sel, err := parser.ParseCompoundSelector(); err != nil {
 			return nil, err
 		} else if sel != nil || comb != nil {
 			complexSel.AppendCompoundSelector(comb, sel)
@@ -481,11 +447,9 @@ func (parser *Parser) ParseComplexSelector(parentRuleSet *ast.RuleSet) (*ast.Com
 func (parser *Parser) ParseSelectorList() (*ast.ComplexSelectorList, error) {
 	debug("ParseSelectorList")
 
-	var parentRuleSet = parser.GlobalContext.TopRuleSet()
-
 	var complexSelectorList = &ast.ComplexSelectorList{}
 
-	complexSelector, err := parser.ParseComplexSelector(parentRuleSet)
+	complexSelector, err := parser.ParseComplexSelector()
 
 	if err != nil {
 		return nil, err
@@ -499,7 +463,7 @@ func (parser *Parser) ParseSelectorList() (*ast.ComplexSelectorList, error) {
 
 	// if there is more comma
 	for parser.accept(ast.T_COMMA) != nil {
-		complexSelector, err := parser.ParseComplexSelector(parentRuleSet)
+		complexSelector, err := parser.ParseComplexSelector()
 
 		if err != nil {
 			return nil, err
@@ -542,14 +506,12 @@ func (parser *Parser) ParseRuleSet() (ast.Stmt, error) {
 
 	ruleset.Selectors = selectors
 
-	parser.GlobalContext.PushRuleSet(ruleset)
 	bl, err := parser.ParseDeclBlock()
 	if err != nil {
 		return nil, err
 	}
 
 	ruleset.Block = bl
-	parser.GlobalContext.PopRuleSet()
 
 	return ruleset, nil
 }
@@ -1186,7 +1148,7 @@ func (parser *Parser) ParseSpaceSepList() (ast.Expr, error) {
 *
 We treat the property value section as a list value, which is separated by ',' or ' '
 */
-func (parser *Parser) ParsePropertyValue(parentRuleSet *ast.RuleSet, property *ast.Property) (*ast.List, error) {
+func (parser *Parser) ParsePropertyValue(property *ast.Property) (*ast.List, error) {
 	debug("ParsePropertyValue")
 	// var tok = parser.peek()
 	var list = ast.NewSpaceSepList()
@@ -1267,8 +1229,7 @@ func (parser *Parser) ParseDeclaration() ast.Stmt {
 }
 
 func (parser *Parser) ParseDeclBlock() (*ast.DeclBlock, error) {
-	var parentRuleSet = parser.GlobalContext.TopRuleSet()
-	var declBlock = ast.NewDeclBlock(parentRuleSet)
+	var declBlock = ast.NewDeclBlock()
 
 	if _, err := parser.expect(ast.T_BRACE_OPEN); err != nil {
 		return nil, err
@@ -1281,7 +1242,7 @@ func (parser *Parser) ParseDeclBlock() (*ast.DeclBlock, error) {
 		} else if propertyName != nil {
 			var property = ast.NewProperty(tok)
 
-			if valueList, err := parser.ParsePropertyValue(parentRuleSet, property); err != nil {
+			if valueList, err := parser.ParsePropertyValue(property); err != nil {
 				return nil, err
 			} else if valueList != nil {
 				for _, v := range valueList.Exprs {
@@ -1622,123 +1583,112 @@ func (parser *Parser) ParseImportStmt() (ast.Stmt, error) {
 	}
 
 	// Create the import statement node
-	var stm = ast.NewImportStmt()
+	var stm ast.Stmt
 
 	var tok = parser.peek()
 
-	// if it's url(..)
-	if tok.Type == ast.T_FUNCTION_NAME {
-		parser.advance()
-		if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
-			return nil, err
-		}
+	// that's a css import
+	if tok.Type == ast.T_FUNCTION_NAME ||
+		tok.IsString() && (strings.HasSuffix(tok.Str, ".css") || strings.HasPrefix(tok.Str, "//") || AbsoluteUrlPattern.MatchString(tok.Str)) {
+		cssImport := ast.NewCssImportStmt()
 
-		var urlTok = parser.acceptAnyOf3(ast.T_QQ_STRING, ast.T_Q_STRING, ast.T_UNQUOTE_STRING)
-		if urlTok == nil {
-			return nil, SyntaxError{
-				Reason:      "Expecting url string in the url() function expression",
-				ActualToken: parser.peek(),
-				File:        parser.File,
-			}
-		}
-
-		if HttpUrlPattern.MatchString(urlTok.Str) {
-			stm.Url = ast.AbsoluteUrl(urlTok.Str)
-		} else {
-			stm.Url = ast.RelativeUrl(urlTok.Str)
-		}
-
-		if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
-			return nil, err
-		}
-
-	} else if tok.IsString() {
-
-		parser.advance()
-
-		// Relative url for CSS
-		if strings.HasSuffix(tok.Str, ".css") {
-
-			stm.Url = ast.StringUrl(tok.Str)
-
-		} else if AbsoluteUrlPattern.MatchString(tok.Str) {
-
-			stm.Url = ast.AbsoluteUrl(tok.Str)
-
-		} else if strings.HasSuffix(tok.Str, ".scss") {
-
-			stm.Url = ast.ScssImportUrl(tok.Str)
-
-		} else {
-			// check scss import url by file system
-			if parser.File != nil {
-				return nil, fmt.Errorf("Unknown scss file to detect import path.")
+		// if it's url(..)
+		if tok.Type == ast.T_FUNCTION_NAME {
+			if tok.Str != "url" {
+				return nil, SyntaxError{
+					Reason:      "url is the only function supported by css import",
+					ActualToken: parser.peek(),
+					File:        parser.File,
+				}
 			}
 
-			var importPath = tok.Str
-			fi, err := fs.Stat(parser.fsys, importPath)
-			if err != nil {
+			parser.advance()
+			if _, err := parser.expect(ast.T_PAREN_OPEN); err != nil {
 				return nil, err
 			}
 
-			// go find the _index.scss if it's a local directory
-			if fi.Mode().IsDir() {
+			var urlTok = parser.acceptAnyOf3(ast.T_QQ_STRING, ast.T_Q_STRING, ast.T_UNQUOTE_STRING)
+			if urlTok == nil {
+				return nil, SyntaxError{
+					Reason:      "Expecting url string in the url() function expression",
+					ActualToken: parser.peek(),
+					File:        parser.File,
+				}
+			}
 
-				importPath = importPath + string(filepath.Separator) + "_index.scss"
-
+			if HttpUrlPattern.MatchString(urlTok.Str) {
+				cssImport.Url = ast.AbsoluteUrl(urlTok.Str)
 			} else {
-				var dirname = filepath.Dir(importPath)
-				var basename = filepath.Base(importPath)
-				if dirname == "." {
-					importPath = "_" + basename + ".scss"
-				} else {
-					importPath = dirname + string(filepath.Separator) + "_" + basename + ".scss"
-				}
+				cssImport.Url = ast.RelativeUrl(urlTok.Str)
 			}
 
-			if _, err := fs.Stat(parser.fsys, importPath); err != nil {
+			if _, err := parser.expect(ast.T_PAREN_CLOSE); err != nil {
 				return nil, err
 			}
-			stm.Url = ast.ScssImportUrl(importPath)
 
-			if _, ok := parser.GlobalContext.ImportedPath[importPath]; !ok {
-				// Set imported path to true
-				parser.GlobalContext.ImportedPath[importPath] = true
-
-				// parse the imported file using the same context
-				var subparser = NewParser(parser.GlobalContext)
-				var stmts, err = subparser.ParseScssFile(importPath)
-				if err != nil {
-					return nil, err
-				}
-
-				// Cache the compiled statement in the AST, so we can include the compiled AST nodes when watch mode is enabled
-				// if it's not changed.
-				ASTCache[importPath] = stmts
-
-				// For root @import and nested ruleset @import:
-				//
-				// 1. For nested rules, we need to merge the rulesets and assignment to the parent ruleset
-				//    we can expand the the statements in the parsing-time.
-				//
-				// 2. for root level statements, we need to merge the statements into the global block.
-				//    for symbal table, we also need to merge them
-				//
-				// note that the parse method might push the statements to global block, we should avoid that.
-				var currentBlock = parser.GlobalContext.CurrentBlock()
-				currentBlock.MergeStmts(stmts)
+			if list, err := parser.ParseMediaQueryList(); err != nil {
+				return nil, err
+			} else if list != nil {
+				cssImport.MediaQueryList = list
 			}
 
+			stm = cssImport
+		} else {
+			parser.advance()
+
+			// Relative url for CSS
+			if strings.HasSuffix(tok.Str, ".css") {
+				cssImport.Url = ast.StringUrl(tok.Str)
+			} else if AbsoluteUrlPattern.MatchString(tok.Str) {
+				cssImport.Url = ast.AbsoluteUrl(tok.Str)
+			} else {
+				return nil, SyntaxError{
+					Reason:      "Unknown syntax for css import",
+					ActualToken: parser.peek(),
+					File:        parser.File,
+				}
+			}
+
+			if list, err := parser.ParseMediaQueryList(); err != nil {
+				return nil, err
+			} else if list != nil {
+				cssImport.MediaQueryList = list
+			}
+
+			stm = cssImport
+		}
+	} else {
+		var sourceFname string
+		if parser.File != nil {
+			sourceFname = parser.File.FileName
 		}
 
-	} else {
-		return nil, fmt.Errorf("Unexpected token: %s", tok)
-	}
+		scssImport := ast.NewImportStmt(sourceFname)
 
-	if mediaQueryList, err := parser.ParseMediaQueryList(); err != nil {
-		return nil, err
-	} else if mediaQueryList != nil {
-		stm.MediaQueryList = mediaQueryList.List
+		for {
+			strExpr, err := parser.ParseString()
+			if err != nil {
+				return nil, fmt.Errorf("string expected: %w", err)
+			}
+
+			str, ok := strExpr.(*ast.String)
+
+			if !ok {
+				return nil, fmt.Errorf("string expected, but got: %s", tok)
+			}
+
+			scssImport.Paths = append(scssImport.Paths, str)
+
+			if tok = parser.accept(ast.T_COMMA); tok == nil {
+				break
+			}
+		}
+
+		// @TODO: ideally we would like to provide two options
+		// there: just get the ast, or parse all the referred
+		// paths. Let's parse only at runtime at the moment
+		// and fix it later
+		stm = scssImport
 	}
 
 	// must be ast.T_SEMICOLON at the end
@@ -1787,7 +1737,6 @@ func (parser *Parser) ParseFunctionDeclaration() (ast.Stmt, error) {
 	} else {
 		fun.Block = bl
 	}
-	//parser.GlobalContext.Functions.Set(identTok.Str, fun)
 	return fun, nil
 }
 
@@ -1826,7 +1775,6 @@ func (parser *Parser) ParseMixinStmt() (ast.Stmt, error) {
 		stm.Block = b
 	}
 
-	//parser.GlobalContext.Mixins.Set(stm.Ident.Str, stm)
 	return stm, nil
 }
 
@@ -2103,7 +2051,7 @@ func (parser *Parser) ParseAtRootStmt() (ast.Stmt, error) {
 	tok = parser.peek()
 
 	if tok.IsSelector() {
-		sel, err := parser.ParseComplexSelector(nil)
+		sel, err := parser.ParseComplexSelector()
 
 		if err != nil {
 			return nil, err
