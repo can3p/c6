@@ -110,3 +110,17 @@ c a b {
 }
 
 <===>
+https://sass-lang.com/playground/#eJwzNCzN0VHIz1Go5lJQUANCEK2gkJtYlJ6ZZ6VgYA3k1nLVcgEAxmkJfA==?s=L1C1-L5C2
+<===> basic/double_amp/input.scss
+ul, ol {
+  & & {
+    margin: 0;
+  }
+}
+
+<===> basic/double_amp/output.css
+ul ul, ul ol, ol ul, ol ol {
+  margin: 0;
+}
+
+<===>
