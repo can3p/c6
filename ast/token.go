@@ -38,6 +38,7 @@ var KeywordList = []KeywordToken{
 	{"@else", T_ELSE},
 	{"@if", T_IF},
 	{"@import", T_IMPORT},
+	{"@use", T_USE},
 	{"@media", T_MEDIA},
 	{"@page", T_PAGE},
 	{"@return", T_RETURN},
@@ -329,6 +330,7 @@ const (
 	T_VARIABLE_LENGTH_ARGUMENTS // for '...'
 
 	T_IMPORT
+	T_USE
 	T_AT_RULE
 
 	T_CHARSET
