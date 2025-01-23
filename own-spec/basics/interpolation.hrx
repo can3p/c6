@@ -1,0 +1,15 @@
+<===>
+https://sass-lang.com/playground/#eJwzNFRJslJITEq25uIqzdFVrlZJqlWo5lIAgtzEovTMPIiQlQKYsuaq5QIAUrgNnw==?s=L1C1-L5C2
+<===> basic/selector_prop_value/input.scss
+$b: abc;
+
+ul-#{$b} {
+  margin-#{$b}: #{$b};
+}
+
+<===> basic/multiple_levels_acc/output.css
+ul-abc {
+  margin-abc: abc;
+}
+
+<===>
