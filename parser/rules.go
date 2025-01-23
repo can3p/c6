@@ -73,6 +73,8 @@ func (parser *Parser) ParseStmt() (ast.Stmt, error) {
 	}
 
 	switch token.Type {
+	case ast.T_USE:
+		return parser.ParseUseStmt()
 	case ast.T_IMPORT:
 		return parser.ParseImportStmt()
 	case ast.T_CHARSET:
@@ -1097,6 +1099,63 @@ func (parser *Parser) ParseFlags(stm *ast.AssignStmt) {
 		}
 		tok = parser.peek()
 	}
+}
+
+func (parser *Parser) ParseUseStmt() (ast.Stmt, error) {
+	// skip the ast.T_USE token
+	if _, err := parser.expect(ast.T_USE); err != nil {
+		return nil, err
+	}
+
+	useStmt := ast.NewUseStmt()
+
+	// Parse the path (required)
+	path, err := parser.ParseString()
+	if err != nil {
+		return nil, err
+	}
+	if path == nil {
+		return nil, fmt.Errorf("@use statement requires a path")
+	}
+
+	str, ok := path.(*ast.String)
+
+	if !ok {
+		return nil, fmt.Errorf("string expected, but got: %T", path)
+	}
+	useStmt.Path = str
+
+	// Parse optional 'as' namespace
+	if tok := parser.peek(); tok != nil && tok.Type == ast.T_IDENT && tok.Str == "as" {
+		parser.next() // consume 'as'
+		ns, err := parser.ParseIdent()
+		if err != nil {
+			return nil, err
+		}
+		if ns == nil {
+			return nil, fmt.Errorf("@use statement with 'as' requires a namespace identifier")
+		}
+		useStmt.Namespace = ns
+	}
+
+	// Parse optional 'with' configuration
+	if tok := parser.peek(); tok != nil && tok.Type == ast.T_IDENT && tok.Str == "with" {
+		parser.next() // consume 'with'
+		config, err := parser.ParseMap()
+		if err != nil {
+			return nil, err
+		}
+		if config == nil {
+			return nil, fmt.Errorf("@use statement with 'with' requires a configuration map")
+		}
+		useStmt.Config = config.(*ast.Map)
+	}
+
+	if tok := parser.peek(); tok != nil && tok.Type == ast.T_SEMICOLON {
+		parser.next()
+	}
+
+	return useStmt, nil
 }
 
 func (parser *Parser) ParseSpaceSepList() (ast.Expr, error) {

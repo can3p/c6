@@ -5794,9 +5794,6 @@ var BlacklistedSpecs = map[string]map[string]string{
 	"directives/use/with/null.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},
-	"directives/use/with/single.hrx": {
-		"input.scss": "compiler_output_does_not_match",
-	},
 	"directives/use/with/some_unconfigured.hrx": {
 		"input.scss": "compiler_output_does_not_match",
 	},

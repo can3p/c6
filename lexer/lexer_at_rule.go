@@ -16,6 +16,8 @@ func lexAtRule(l *Lexer) (stateFn, error) {
 	var tok = l.matchKeywordList(ast.KeywordList, false)
 	if tok != nil {
 		switch tok.Type {
+		case ast.T_USE:
+			fallthrough
 		case ast.T_IMPORT:
 			l.ignoreSpaces()
 			for {
